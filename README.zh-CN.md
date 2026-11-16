@@ -589,10 +589,10 @@ A4 横向布局，标题“研究区土地利用现状”，导出 300 dpi PDF �
 ## 🗂️ 仓库结构
 
 ```
-├── main(默认分支)🏠          开发主线:AgentKit 2.0.1(MCP 2.0.1 + 守卫 + 蒸馏)
+├── main 🏠                   开发主线:AgentKit 2.0.1(MCP 2.0.1 + 守卫 + 蒸馏;非默认分支)
 ├── customer-v2.0.1 🧪        2.0.1 包快照(测试版;Release 已移除)
-├── customer-v2.0.0 🗄️        2.0.0 客户版历史快照(已恢复,配合 v2.0.0 Release)
-├── customer-v1.1.4 ✅        稳定版客户版(add-in 1.1.4,推荐)
+├── customer-v2.0.0 🗄️        2.0.0 客户版历史快照(仅分支留档)
+├── customer-v1.1.4 ✅        默认分支(主干)·稳定版客户版(add-in 1.1.4,推荐)
 ├── installer/ 🛺             ArcGISProMCP.Install——NuGet 安装器工具(下载→校验→启动安装)
 ├── addin/ArcGISProMCP/ 🧩     C# 插件(125 个工具、GuardClient、模板命令)
 ├── src/arcgis_pro_mcp/ 🐍     上游 Python stdio/CLI 服务(保留便于 rebase)
