@@ -19,7 +19,7 @@ Say it in plain language — *"color the counties by area, pastel red to green"*
 
 | | Part | What it does | Status |
 |---|---|---|---|
-| 🧩 | **MCP** | ArcGIS Pro add-in: **125 native tools** (in-process, ~9 ms ⚡), every geoprocessing tool, optional arcpy via RunCode / Python bridge. Listens on `127.0.0.1:6520/mcp`. | **v2.0.0** on [`customer-v2.0.0`](../../tree/customer-v2.0.0) 🎁 |
+| 🧩 | **MCP** | ArcGIS Pro add-in: **125 native tools** (in-process, ~9 ms ⚡), every geoprocessing tool, optional arcpy via RunCode / Python bridge. Listens on `127.0.0.1:6520/mcp`. | **Released v2.0.0** on `main` 🎉 |
 | 🛡️ | **Guard** | On-demand dialog guard for the "third-party code library" trust dialog. Summoned only when needed, gone right after. 🥷 | **Ready** — see [guard.md](docs/guard.md) |
 | 🧪 | **Distill** | On-demand template distillation: sample figure → reusable layout spec. One shot, no daemon, fully repeatable. 🧬 | **Ready** — see [distill.md](docs/distill.md) |
 
