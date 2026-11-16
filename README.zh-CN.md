@@ -1,4 +1,4 @@
-[![English](https://img.shields.io/badge/Language-English-1f6feb?style=flat-square)](README.md) [![简体中文](https://img.shields.io/badge/Language-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-d1242f?style=flat-square)](README.zh-CN.md) [![Version](https://img.shields.io/badge/Version-2.0.1%20(V2.01)-2ea44f?style=flat-square)](../../releases/tag/v2.0.1) [![License: AGPL v3+](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue?style=flat-square)](LICENSE) [![ArcGIS Pro](https://img.shields.io/badge/ArcGIS%20Pro-3.7%2B-00a1e0?style=flat-square)](https://www.esri.com/en-us/arcgis/products/arcgis-pro/overview) [![Platform](https://img.shields.io/badge/Platform-Windows%2011-lightgrey?style=flat-square)]() [![Release](https://img.shields.io/github/v/release/XNYGggg/arcgis-pro-mcp-optimized?style=flat-square&label=release)](../../releases)
+[![English](https://img.shields.io/badge/Language-English-1f6feb?style=flat-square)](README.md) [![简体中文](https://img.shields.io/badge/Language-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-d1242f?style=flat-square)](README.zh-CN.md) [![Version](https://img.shields.io/badge/Version-1.1.4%20(stable)-2ea44f?style=flat-square)](../../releases/tag/v1.1.4) [![License: AGPL v3+](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue?style=flat-square)](LICENSE) [![ArcGIS Pro](https://img.shields.io/badge/ArcGIS%20Pro-3.7%2B-00a1e0?style=flat-square)](https://www.esri.com/en-us/arcgis/products/arcgis-pro/overview) [![Platform](https://img.shields.io/badge/Platform-Windows%2011-lightgrey?style=flat-square)]() [![Release](https://img.shields.io/github/v/release/XNYGggg/arcgis-pro-mcp-optimized?style=flat-square&label=release)](../../releases)
 
 # 🗺️ ArcGIS Pro MCP · 优化版（AgentKit）⚡
 
@@ -6,11 +6,10 @@
 
 告别"导出 → 上传 → 下载"的往返折腾 🏃‍♂️💨。助手直接跟你眼前的 Pro 会话对话:你的数据、你的地图、你的布局。🔒 所有通信只走 `127.0.0.1`,数据不出本机。
 
-> **📌 当前版本：V2.01（v2.0.1）· 推荐使用（2026-11-16 正式发布）**
+> **📌 版本状态（2026-11-16 更新）**
 >
-> V2.01 已在 ArcGIS Pro 3.7 实机验证：125 个工具、按需守卫（RunCode 自动召唤）、`template_*` 全链路。下载：[**Release v2.0.1**](../../releases/tag/v2.0.1) → `ArcGIS-Pro-MCP-v2.0.1-r2.zip`。
->
-> 1.x 稳定线（[v1.1.4](../../releases/tag/v1.1.4)）转为 **legacy**：仍可下载与使用，但新项目请使用 V2.01。
+> - ✅ **v1.1.4 · 稳定版 · 推荐使用**（113 工具）：[**Release v1.1.4**](../../releases/tag/v1.1.4) → `ArcGIS-Pro-MCP-v1.1.4.zip`；NuGet 安装固定 `dotnet tool install --global ArcGISProMCP.Install --version 1.1.4`。
+> - 🧪 **v2.0.0 / v2.0.1 · 测试版 · 不推荐**：2.0 优化尚未完成，GitHub Release 资产与对应 tag 已移除（NuGet 2.0.x 安装将无法下载）；2.0 代码仅保留在 `customer-v2.0.1` / `main` 分支中，待优化完成后再发布。
 
 > ### 🙏 上游项目与原作者
 > 本项目站在巨人的肩膀上:**[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**,
@@ -29,7 +28,7 @@ V2.01 是 2.0 线的**实机验证补丁版**：本机安装 2.0.0 并在 ArcGIS
 | 2 | `template_preview` 失败：`run-distill.ps1` 使用 `ValueFromRemainingArguments`，`--out` 被误绑定为 `-OutVariable` | 启动器改为 `$args` 简单脚本 | `template_preview` 正常返回 PNG |
 | 3 | 升级丢失模板库：安装器整目录替换 runtime，会把用户 `library/` 移进 `.bak` | 替换前先合并用户 `library/` | 重装后模板列表仍为 1，preview 正常 |
 
-> 2.0 线的主体能力（125 工具、按需守卫、模板蒸馏、RunCode 自动守卫）见下文。完整记录见 [CHANGELOG.md](CHANGELOG.md) 与 Release v2.0.1 说明。
+> 2.0 线的主体能力（125 工具、按需守卫、模板蒸馏、RunCode 自动守卫）见下文（**开发记录；测试版本，不推荐部署**）。完整记录见 [CHANGELOG.md](CHANGELOG.md)（Release v2.0.1 已移除）。
 
 ---
 
@@ -39,7 +38,7 @@ V2.01 是 2.0 线的**实机验证补丁版**：本机安装 2.0.0 并在 ArcGIS
 
 | | 模块 | 作用 | 状态 |
 |---|---|---|---|
-| 🧩 | **MCP** | ArcGIS Pro 插件:**125 个原生工具**(进程内执行,约 9 ms ⚡)、全部地理处理工具、可选 RunCode / Python 桥 arcpy 通道。监听 `127.0.0.1:6520/mcp`。 | **V2.01（v2.0.1）· 当前推荐 · 实机验证通过** ✅ |
+| 🧩 | **MCP** | ArcGIS Pro 插件:**125 个原生工具**(进程内执行,约 9 ms ⚡)、全部地理处理工具、可选 RunCode / Python 桥 arcpy 通道。监听 `127.0.0.1:6520/mcp`。 | **🧪 测试版 · 不推荐（Release 已移除）** |
 | 🛡️ | **Guard** | 按需弹窗守卫:只在可能触发"第三方代码库"信任框的操作前被召唤,操作结束立刻收队。🥷 | **已完成**——见 [guard.md](docs/guard.md) |
 | 🧪 | **Distill** | 按需模板蒸馏:样本成图 → 可复用版式 spec。一次作业、无守护进程、完全可复现。🧬 | **已完成**——见 [distill.md](docs/distill.md) |
 
@@ -60,24 +59,16 @@ flowchart LR
 
 ---
 
-## 🚀 快速开始 —— 客户版 V2.01
+## 🚀 快速开始 —— 稳定版 v1.1.4（推荐）
 
-V2.01（v2.0.1）为本仓库**当前推荐版本**，已在 ArcGIS Pro 3.7 实机验证（125 工具、自动守卫、RunCode、`template_*` 全链路）：
-
-- ✅ **推荐 · 当前版本**：[**Release v2.0.1**](../../releases/tag/v2.0.1) → **`ArcGIS-Pro-MCP-v2.0.1-r2.zip`**——add-in 2.0.1（125 工具）、按需守卫、内置蒸馏运行时；r2 为**文档修订包**（README / RELEASE-NOTES 更新，**二进制与初版资产完全一致**）
-  - 校验：同名 `.sha256` 附件 + 包内 `SHA256SUMS.txt`（231 个文件全覆盖）
-  - 初版资产 `ArcGIS-Pro-MCP-v2.0.1.zip` 保留可查；`ArcGIS-Pro-MCP-2.0.1.zip` 是 NuGet 安装器兼容别名（与 r2 字节相同）
-- 🗄️ **历史版本**：[v2.0.0](../../releases/tag/v2.0.0)（预览，保留）· [v1.1.4](../../releases/tag/v1.1.4)（1.x legacy，保留）
-- 👀 浏览源码：[**`customer-v2.0.1`**](../../tree/customer-v2.0.1)（当前客户版包快照）· [**`customer-v2.0.0`**](../../tree/customer-v2.0.0)（2.0.0 历史快照，已恢复）· [**`main`**](../../tree/main)（开发主线）· [**`customer-v1.1.4`**](../../tree/customer-v1.1.4)（legacy）
-- 🗂️ 分支 / 标签 / Release 全图：[BRANCHES.md](BRANCHES.md)
-- 🛺 想一条命令装好？看下面的 NuGet 安装器 ⬇️
+✅ **v1.1.4（113 工具）是本仓库当前稳定推荐版本**：[**Release v1.1.4**](../../releases/tag/v1.1.4) → **`ArcGIS-Pro-MCP-v1.1.4.zip`**（SHA256 `29e01ae4…82d7`，171 个文件校验通过）。
 
 1. 📂 解压到任意目录 → 双击 `install/00-install.cmd`（不需要管理员；要求 ArcGIS Pro **3.7+**）
 2. 🖥️ 打开 ArcGIS Pro → 首次加载未签名 add-in 时选"是/信任" → 确认顶部 **MCP 选项卡** 显示 **running**（端口 `127.0.0.1:6520`）
 3. 🔌 接入你的 AI 客户端（见下方"配置方法"）
 4. ✅ 运行 `install/01-check.cmd`，全部 `[OK]` 就大功告成 (๑•̀ㅂ•́)و✧
 
-无需 Python 🐍、无需 pip 📦、无需联网 🌐：add-in 跑在 ArcGIS Pro 3.7+ 自带的 .NET 运行时上，stdio 桥与守卫用的是 Windows 自带的 PowerShell。包内 `SHA256SUMS.txt` 覆盖每一个文件 🔐。
+> 🧪 **2.0 线（v2.0.0 / v2.0.1）为测试版，不推荐使用**：优化尚未完成，GitHub Release 资产与 tag 已移除（NuGet 2.0.x 将无法下载）。2.0 代码仅保留在分支（`customer-v2.0.1`、`main`）中，待优化完成后再发布；下文相关能力介绍仅作开发记录，请勿据此部署。
 
 ### 🛺 通过 NuGet 一键安装（GitHub Packages）
 
@@ -87,11 +78,12 @@ dotnet 工具 [`ArcGISProMCP.Install`](../../pkgs/nuget/ArcGISProMCP.Install) �
 # 首次：注册 GitHub Packages 的 NuGet 源
 dotnet nuget add source "https://nuget.pkg.github.com/XNYGggg/index.json" --name github --username XNYGggg --password <你的PAT> --store-password-in-clear-text
 
-dotnet tool install --global ArcGISProMCP.Install --version 2.0.1
+# 稳定版（推荐）：固定安装 1.1.4
+dotnet tool install --global ArcGISProMCP.Install --version 1.1.4
 arcgis-pro-mcp-install              # 加 --dry-run 则只下载与校验，不启动安装
 ```
 
-> 安装器 2.0.1 通过兼容别名 `ArcGIS-Pro-MCP-2.0.1.zip` 下载；安装器源码中的 URL 回退修复将随下一个 NuGet 版本发布。
+> NuGet 上的 2.0.0 / 2.0.1 为测试版本，对应 Release 资产已移除，**请勿安装**。
 
 ---
 
@@ -598,9 +590,9 @@ A4 横向布局，标题“研究区土地利用现状”，导出 300 dpi PDF �
 
 ```
 ├── main(默认分支)🏠          开发主线:AgentKit 2.0.1(MCP 2.0.1 + 守卫 + 蒸馏)
-├── customer-v2.0.1 🎁        当前客户版离线包快照(与 Release v2.0.1 资产一致)
+├── customer-v2.0.1 🧪        2.0.1 包快照(测试版;Release 已移除)
 ├── customer-v2.0.0 🗄️        2.0.0 客户版历史快照(已恢复,配合 v2.0.0 Release)
-├── customer-v1.1.4 🗄️        legacy 客户版(add-in 1.1.4),保留
+├── customer-v1.1.4 ✅        稳定版客户版(add-in 1.1.4,推荐)
 ├── installer/ 🛺             ArcGISProMCP.Install——NuGet 安装器工具(下载→校验→启动安装)
 ├── addin/ArcGISProMCP/ 🧩     C# 插件(125 个工具、GuardClient、模板命令)
 ├── src/arcgis_pro_mcp/ 🐍     上游 Python stdio/CLI 服务(保留便于 rebase)
