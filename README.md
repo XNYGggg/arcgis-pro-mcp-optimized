@@ -125,6 +125,165 @@ url = "http://127.0.0.1:6520/mcp"
 
 ---
 
+## 🎨 出图制图怎么用（提示词指南）
+
+这一节把"怎么跟 AI 说"讲透：不需要记工具名，按下面四要素交代，助手会自动拆成 MCP 工具调用。
+
+### 说清四件事，一次做对
+
+| 要素 | 要交代什么 | 示例 |
+|---|---|---|
+| 数据 | 图层名、数据路径、当前选择集 | "当前地图里的 `区县边界` 图层" |
+| 操作 | 分级字段/方法、缓冲距离、统计口径 | "按 `AREA` 分 5 级，自然断点" |
+| 风格 | 配色、字号、图例/比例尺/指北针位置、底图 | "浅红到深绿，图例放右下角" |
+| 输出 | 图片/PDF/新要素类，分辨率与保存路径 | "A3 横向 PDF，300 dpi，存到 `D:\out\`" |
+
+**好提示词 vs 坏提示词**
+- ❌ "帮我美化一下地图" —— 没有目标，助手只能猜。
+- ✅ "把 `土地利用` 按 `DLMC` 做唯一值符号化，图例放右下角，然后导出一张 A3 横向 PDF 到 `D:\out\landuse.pdf`，300 dpi。"
+- ❌ "出个图" —— 没说范围、版式、输出。
+- ✅ "以 `研究区` 图层为范围，比例尺 1:10000，出一张 A4 纵向 PNG，标题‘研究区土地利用现状’，带图例、比例尺、指北针，先发预览图给我确认。"
+
+### 各工具组提示词速查
+
+| 模块（工具组） | 你可以这样说 | 助手会用 |
+|---|---|---|
+| 会话与工程 | "先 `diagnose` 看看连接和当前工程；然后把工程另存到 `D:\proj\成果.aprx`" | diagnose / save_project |
+| 图层 | "把 `roads` 移进 `底图` 组，透明度 40%，只显示 1:50000 以近；`POI` 图层关掉" | move_layer / set_layer_transparency / set_layer_scale_range / set_layer_visibility |
+| 数据与属性 | "读一下 `parcels` 的前 20 行，按面积降序；统计 `DLMC` 各类面积" | get_features / summarize_features |
+| 选择 | "选出 `POP` 大于 50 万的县，导出成 `D:\out\counties_big.shp`；再按位置选出落在 `研究区` 内的地块" | select_features / select_by_location / export_features |
+| 字段与数据集 | "给 `parcels` 加 DOUBLE 字段 `AREA_HA`，用 `!Shape_Area!/10000` 计算；新建 EPSG:4547 的面要素类 `成果_2026`" | add_field / calculate_field / create_feature_class |
+| 地理处理 | "道路做 500 米缓冲并融合；用 `研究区` 掩膜裁剪土地利用栅格" | run_geoprocessing_tool / run_batch |
+| 符号化 | "按面积分 5 级、自然断点、浅红到深绿；或按 `TYPE` 唯一值配色" | set_layer_renderer |
+| 地图视图 | "缩放到 `研究区`，比例尺 1:10000，截一张 1600×900 的 PNG 给我" | set_map_view / zoom_to_layer / export_map_view |
+| 布局与出图 | "建 A3 横向布局，标题…，图例只保留 3 个图层，加比例尺和指北针，导出 300 dpi PDF" | create_layout / add_layout_* / export_layout |
+| 栅格 | "读 DEM 的波段、像元大小和统计值；用 NDVI 公式算植被指数" | get_raster_info / raster_calculator / zonal_statistics |
+| 目录与数据发现 | "在工程和文件夹连接里搜名字含 `2025` 的 shapefile" | search_data / describe_dataset / list_folder |
+| 实用工具 | "一次完成：隐藏底图→缩放到区县→导出 PNG；用 arcpy 给所有图层名加前缀" | run_batch / execute_arcpy_code |
+
+### 标准出图提示词模板（复制即用）
+
+```text
+用当前工程的 <地图名> 出图：
+- 范围：<研究区图层/范围>，比例尺 1:<...>
+- 数据：<图层1>、<图层2>（需要时说明字段和筛选条件）
+- 符号：<按字段分级/唯一值/单色>，配色 <色带或十六进制>
+- 版式：<A3 横向 / A4 纵向>，标题 "<标题>"，图例 <位置>，比例尺 <位置>，指北针 <位置>
+- 输出：<PDF / PNG>，<300> dpi，保存到 <绝对路径>
+- 流程：先自检版式，把预览图发给我确认，确认后再导出正式文件。
+```
+
+### 批量出图提示词
+
+```text
+对 `maps` 里的每个地图，套用同一套 A3 横向布局模板导出 PDF：
+标题用地图名，图例保留可见图层，比例尺和指北针放右下角，
+输出到 `D:\out\maps\`，300 dpi。先导出第一张给我看，确认后再批量。
+```
+
+### 常见翻车怎么用一句话补救
+
+- "图例压住主图了" → 助手调整 `legend` 坐标或版式。
+- "页面比例不对/留白太多" → 调整 map frame 与页面比例。
+- "配色太跳/不符合论文风格" → 给出色带、十六进制或参考图。
+- "先别导出，给我预览" → 助手先 `export_map_view` 或布局预览。
+
+**效果**：把"数据、操作、风格、输出"一次讲全，助手通常一轮就能做出接近终稿的图；后续修改只需指出差异（"图例右移 1 cm"），不用重述全部。
+
+---
+
+## 🛡️ 弹窗守护怎么用（1.x 版）
+
+**它解决什么**：ArcGIS Pro 第一次运行第三方 `.pyt` / Python 工具（如 RunCode.pyt）会弹"第三方代码库"信任框；无人值守时任务会卡住。1.1.4 没有 MCP 守卫工具，而是包内自带一个**独立守护脚本**：启动后轮询 Pro 窗口，只点这一类"是(Y)"，按设定时长自动退出。
+
+**启动方式**
+
+```text
+install\03-dialog-guard.cmd                    # 默认 600 秒
+install\03-dialog-guard.cmd -DurationSeconds 120
+install\03-dialog-guard.cmd -AlertOnly         # 只置顶提醒，不自动点击
+install\03-dialog-guard.cmd -NotifyTest        # 只测提醒窗（30 秒）
+```
+
+也可以直接双击 `03-dialog-guard.cmd`，或让支持终端操作的 AI 助手在后台启动它。
+
+**提示词示例**
+
+| 你说 | 助手会做什么 |
+|---|---|
+| "我要在 Pro 里手动跑 RunCode.pyt。先帮我启动弹窗守护 600 秒；出现第三方代码信任框自动点‘是’，点不到就置顶响铃提醒我" | 在后台运行 `install\03-dialog-guard.cmd -DurationSeconds 600` |
+| "这次只提醒、不自动点" | 启动 `-AlertOnly` |
+| "测试一下提醒窗能不能弹出来" | 启动 `-NotifyTest`（30 秒） |
+| "守护的日志在哪？" | `%LOCALAPPDATA%\ArcGIS Pro MCP\guard\watch_pro_dialog.log` |
+
+**边界与效果**
+- 只处理带"第三方 / 代码库 / third-party / code library"上下文的信任框；覆盖、删除等其他确认框一律不碰。
+- 点不到按钮时，置顶提醒窗至少 30 秒并每 10 秒响铃。
+- 每个 Pro 进程首次信任后不再弹；重启 Pro 后恢复需要。
+- 2.x 把同一能力升级成了 `guard_summon` / `guard_status`，并在 RunCode 调用前自动 arm/settle；1.1.4 需要手动启动脚本。
+
+---
+
+## 🐍 RunCode 与 Python 桥怎么用（提示词指南）
+
+1.1.4 的 arcpy 通道有两级：**RunCode 工具箱**适合一次性/批量脚本；**Python 桥**适合需要跨调用保持变量的交互式会话。
+
+### RunCode 工具箱
+
+路径：`%LOCALAPPDATA%\ArcGIS Pro MCP\runcode\RunCode.pyt`。让助手调用 `run_python_toolbox_tool` 时传入该路径即可；也可以自己在 Pro 里"插入 → 工具箱 → 添加工具箱"。
+
+**提示词示例**
+- "用 RunCode.pyt 批量把当前工程所有图层的标注打开，标注字段用 `NAME`，字号 10。"
+- "写一个幂等 arcpy 脚本，用 RunCode 给每个图层名加前缀 `LYR_`，已经加过就跳过。"
+- "这段脚本要在 RunCode.pyt 里跑，先帮我检查参数和路径，再执行。"
+
+**首次运行**会弹"第三方代码库"信任框：先启动上面的弹窗守护，或手动点一次"是"。同一 Pro 进程只需信任一次。
+
+### Python 桥（需要 `CURRENT` 或持久变量时）
+
+1. 在 Pro 菜单 **分析 → Python** 打开 Python 窗口；
+2. 粘贴执行（路径按默认安装位置）：
+
+```python
+import sys; sys.path.insert(0, r"C:\Users\<你的用户名>\AppData\Local\ArcGIS Pro MCP\plugin")
+import mcp_bridge; print(mcp_bridge.start_server(port=6511))
+```
+
+3. 需要 `CURRENT`（当前工程）时再加一行（必须在主线程执行）：
+
+```python
+print(mcp_bridge.start_pump())
+```
+
+**提示词示例**
+- "接下来的 arcpy 需要 `CURRENT`。请提醒我在 Pro 的 Python 窗口粘贴桥的启动代码，然后我用 `execute_arcpy_code` 执行。"
+- "帮我把桥启动代码按我的用户名填好，复制给我；我自己粘贴到 Pro。"
+- "先 `get_pump_status` 看看 pump 是否就绪；没就绪就提醒我粘贴。"
+- "用持久会话分三步：先读图层，再建字段，最后计算——变量要跨调用保留。"
+
+**效果**：RunCode 解决"批量脚本一次跑完"；Python 桥解决"多步交互、需要当前工程"；两者都不需要另装 Python。
+
+---
+
+## 🧪 关于蒸馏模块（2.x 功能）
+
+1.1.4 **不包含**模板蒸馏：没有 `template_*` 工具，也没有 `guard_summon` / `guard_status`。如果你想把样图版式变成可复用模板、让多张图版式统一，请升级到 **V2.01（v2.0.1）**：
+
+- 2.x 提供 10 个 `template_*` 工具：import / measure / patch / validate / preview / review / approve / apply / list / get；
+- 模板库在 `%LOCALAPPDATA%\ArcGIS Pro MCP\library`，升级安装会保留已有模板；
+- 典型用法："把 `D:\samples\fig3.png` 蒸馏成模板，名称研究区总览图；按 import → measure → patch → validate → preview 流程，预览给我确认后再 review + approve。"
+
+1.1.4 与 2.x 的能力对照：
+
+| 能力 | 1.1.4（本分支） | 2.0.1（推荐） |
+|---|---|---|
+| 原生 MCP 工具 | 113 个（12 组） | 125 个（14 组） |
+| RunCode / Python 桥 | ✅ | ✅ |
+| 弹窗守护 | 独立脚本 `03-dialog-guard.cmd` | `guard_summon` / `guard_status` + RunCode 自动 arm/settle |
+| 模板蒸馏 | ❌ | ✅ 10 个 `template_*` 工具 + schema v1.1 |
+
+---
+
 ## 🧰 全部 113 个 MCP 工具（12 组）
 
 助手能做的全部事情，按名字列在这里。点开看看 👇
