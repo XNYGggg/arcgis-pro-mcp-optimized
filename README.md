@@ -1,4 +1,4 @@
-[![English](https://img.shields.io/badge/Language-English-1f6feb?style=flat-square)](README.md) [![简体中文](https://img.shields.io/badge/Language-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-d1242f?style=flat-square)](README.zh-CN.md) [![License: AGPL v3+](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue?style=flat-square)](LICENSE) [![ArcGIS Pro](https://img.shields.io/badge/ArcGIS%20Pro-3.7%2B-00a1e0?style=flat-square)](https://www.esri.com/en-us/arcgis/products/arcgis-pro/overview) [![Platform](https://img.shields.io/badge/Platform-Windows%2010%2F11-lightgrey?style=flat-square)]() [![Release](https://img.shields.io/github/v/release/XNYGggg/arcgis-pro-mcp-optimized?style=flat-square&label=release)](../../releases)
+[![English](https://img.shields.io/badge/Language-English-1f6feb?style=flat-square)](README.md) [![简体中文](https://img.shields.io/badge/Language-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-d1242f?style=flat-square)](README.zh-CN.md) [![Version](https://img.shields.io/badge/Version-2.0.1%20(V2.01)-2ea44f?style=flat-square)](../../releases/tag/v2.0.1) [![License: AGPL v3+](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue?style=flat-square)](LICENSE) [![ArcGIS Pro](https://img.shields.io/badge/ArcGIS%20Pro-3.7%2B-00a1e0?style=flat-square)](https://www.esri.com/en-us/arcgis/products/arcgis-pro/overview) [![Platform](https://img.shields.io/badge/Platform-Windows%2011-lightgrey?style=flat-square)]() [![Release](https://img.shields.io/github/v/release/XNYGggg/arcgis-pro-mcp-optimized?style=flat-square&label=release)](../../releases)
 
 # 🗺️ ArcGIS Pro MCP · AgentKit ⚡
 
@@ -6,12 +6,30 @@
 
 No file juggling, no "export → upload → download" ritual. Your assistant talks to the ArcGIS Pro session right in front of you: your data, your maps, your layouts. 🔒 Everything stays on `127.0.0.1`.
 
-> **📌 Version notice (2026-11-16):** **the 1.0 edition ([v1.1.4](../../releases/tag/v1.1.4)) is very stable and recommended for daily use.** **v2.0.0 is currently in the testing stage** and not yet recommended for production — download the stable package from [Release v1.1.4](../../releases/tag/v1.1.4).
+> **📌 Current version: V2.01 (v2.0.1) · recommended (officially published 2026-11-16)**
+>
+> Live-tested on ArcGIS Pro 3.7: 125 tools, on-demand guard (auto-summoned for RunCode), full `template_*` chain. Download: [**Release v2.0.1**](../../releases/tag/v2.0.1) → `ArcGIS-Pro-MCP-v2.0.1-r2.zip`.
+>
+> The 1.x line ([v1.1.4](../../releases/tag/v1.1.4)) is now **legacy**: still downloadable, but new projects should use V2.01.
 
 > ### 🙏 Upstream project & original author
 > This project stands on the shoulders of **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**,
 > originally created by **Pisut Nakmuenwai**, licensed **AGPL-3.0-or-later**. Huge thanks! 🌟
-> We carry local patches up to **v2.0.0** and add the guard/distill modules; upstream attribution lives in [NOTICE](NOTICE) and the source snapshot.
+> We carry local patches up to **V2.01 (v2.0.1)** and add the guard/distill modules; upstream attribution lives in [NOTICE](NOTICE) and the source snapshot.
+
+---
+
+## 🆙 V2.01 upgrades over V2.0 (v2.0.1)
+
+V2.01 is the **live-test patch release** of the 2.0 line: after installing 2.0.0 and driving a real ArcGIS Pro 3.7 session, three user-visible defects were fixed. Everything else is unchanged from 2.0 — **fixes only, no architecture change**.
+
+| # | Problem (v2.0.0) | V2.01 fix | Verified on Pro 3.7 |
+|---|---|---|---|
+| 1 | Guard false alarm: the trust dialog's text appears in the UIA tree before its buttons, so the first scan found no button and raised the 30 s alert | Wait 2.5 s for the button tree before alerting (logged as `dialog_button_wait`) | Fresh untrusted `.pyt`: detect → auto-click 是(Y) → no alert |
+| 2 | `template_preview` failed: `run-distill.ps1` used `ValueFromRemainingArguments`, so `--out` was bound to `-OutVariable` | Launcher rewritten as a plain `$args` script | `template_preview` returns a PNG again |
+| 3 | Upgrade lost the template library: the installer replaced the whole runtime directory, moving the user's `library/` into `.bak` | Merge the user's `library/` into the new runtime before swapping | Reinstall kept the template list (1 entry), preview works |
+
+> The 2.0 feature set itself (125 tools, on-demand guard, template distillation, RunCode auto-guard) is described below. Full history: [CHANGELOG.md](CHANGELOG.md) and the v2.0.1 release notes.
 
 ---
 
@@ -21,7 +39,7 @@ Say it in plain language — *"color the counties by area, pastel red to green"*
 
 | | Part | What it does | Status |
 |---|---|---|---|
-| 🧩 | **MCP** | ArcGIS Pro add-in: **125 native tools** (in-process, ~9 ms ⚡), every geoprocessing tool, optional arcpy via RunCode / Python bridge. Listens on `127.0.0.1:6520/mcp`. | **v2.0.1 preview · live-tested** 🧪 · stable: v1.1.4 |
+| 🧩 | **MCP** | ArcGIS Pro add-in: **125 native tools** (in-process, ~9 ms ⚡), every geoprocessing tool, optional arcpy via RunCode / Python bridge. Listens on `127.0.0.1:6520/mcp`. | **V2.01 (v2.0.1) · current recommended · live-tested** ✅ |
 | 🛡️ | **Guard** | On-demand dialog guard for the "third-party code library" trust dialog. Summoned only when needed, gone right after. 🥷 | **Ready** — see [guard.md](docs/guard.md) |
 | 🧪 | **Distill** | On-demand template distillation: sample figure → reusable layout spec. One shot, no daemon, fully repeatable. 🧬 | **Ready** — see [distill.md](docs/distill.md) |
 
@@ -42,18 +60,20 @@ flowchart LR
 
 ---
 
-## 🚀 Quick start — customer edition
+## 🚀 Quick start — customer edition V2.01
 
-v2.0.1 has passed live tests on ArcGIS Pro 3.7 (125 tools, auto guard, RunCode, template_*) but remains a **preview/prerelease**; v1.1.4 is the stable default:
+V2.01 (v2.0.1) is the repo's **current recommended version**, live-tested on ArcGIS Pro 3.7 (125 tools, auto guard, RunCode, full `template_*` chain).
 
-- ✅ **Stable · recommended:** [**Release v1.1.4**](../../releases/tag/v1.1.4) → `ArcGIS-Pro-MCP-v1.1.4.zip` — add-in 1.1.4, stdio bridge, RunCode, dialog guard, Python bridge, installers, docs, full AGPL source snapshot (every file verifies against the bundled `SHA256SUMS.txt`)
-- 🧪 **Preview · live-tested:** [**Release v2.0.1**](../../releases/tag/v2.0.1) → `ArcGIS-Pro-MCP-v2.0.1.zip` — add-in 2.0.1, on-demand guard engine, bundled Distill runtime and the installer template-library fix
-- 🗄️ **Previous preview:** [**v2.0.0**](../../releases/tag/v2.0.0) (prerelease, preserved)
-- 👀 Browse source: [**`customer-v1.1.4`**](../../tree/customer-v1.1.4) (stable) · [**`customer-v2.0.0`**](../../tree/customer-v2.0.0) (preview)
+- ✅ **Recommended · current:** [**Release v2.0.1**](../../releases/tag/v2.0.1) → **`ArcGIS-Pro-MCP-v2.0.1-r2.zip`** — add-in 2.0.1 (125 tools), on-demand guard, bundled Distill runtime. The `-r2` package is a **documentation revision** (README / RELEASE-NOTES updated, **binaries byte-identical to the original asset**).
+  - Verify: the matching `.sha256` asset plus the bundled `SHA256SUMS.txt` (all 231 files covered).
+  - The original `ArcGIS-Pro-MCP-v2.0.1.zip` stays available for reference; `ArcGIS-Pro-MCP-2.0.1.zip` is an installer-compatibility alias (byte-identical to `-r2`).
+- 🗄️ **Previous versions:** [v2.0.0](../../releases/tag/v2.0.0) (preview, preserved) · [v1.1.4](../../releases/tag/v1.1.4) (1.x legacy, preserved)
+- 👀 Browse source: [**`customer-v2.0.1`**](../../tree/customer-v2.0.1) (current package snapshot) · [**`main`**](../../tree/main) (development line) · [**`customer-v1.1.4`**](../../tree/customer-v1.1.4) (legacy)
+- 🗂️ Branch / tag / release map: [BRANCHES.md](BRANCHES.md)
 - 🛺 Prefer one command? Use the [NuGet installer](#-install-via-nuget-github-packages) below ⬇️
 
 1. 📂 Unzip anywhere → double-click `install/00-install.cmd` (no admin needed; ArcGIS Pro **3.7+** required).
-2. 🖥️ Open ArcGIS Pro → trust the unsigned add-in when asked (say **Yes** 😄) → confirm the **MCP** tab shows **running** (port `127.0.0.1:6520`).
+2. 🖥️ Open ArcGIS Pro → trust the unsigned add-in when asked (say **Yes**😄) → confirm the **MCP** tab shows **running** (port `127.0.0.1:6520`).
 3. 🔌 Connect your AI client (see the configuration section below).
 4. ✅ Run `install/01-check.cmd` — all `[OK]` and you're golden (๑•̀ㅂ•́)و✧
 
@@ -61,15 +81,37 @@ No Python 🐍, no pip 📦, no internet 🌐 required: the add-in runs on the .
 
 ### 🛺 Install via NuGet (GitHub Packages)
 
-Prefer one command? The [`ArcGISProMCP.Install`](../../pkgs/nuget/ArcGISProMCP.Install) dotnet tool downloads the release zip, verifies every file against `SHA256SUMS.txt`, then launches `install/00-install.cmd` for you. Needs the .NET SDK and a [PAT](https://github.com/settings/tokens) with `read:packages`:
+The [`ArcGISProMCP.Install`](../../pkgs/nuget/ArcGISProMCP.Install) dotnet tool downloads the release zip, verifies every file against `SHA256SUMS.txt`, then launches `install/00-install.cmd` for you. Needs the .NET SDK and a [PAT](https://github.com/settings/tokens) with `read:packages`:
 
 ```powershell
 # one-time: register the GitHub Packages NuGet source
 dotnet nuget add source "https://nuget.pkg.github.com/XNYGggg/index.json" --name github --username XNYGggg --password <YOUR_PAT> --store-password-in-clear-text
 
-dotnet tool install --global ArcGISProMCP.Install --version 1.1.4   # stable; 2.0.1 is a preview
+dotnet tool install --global ArcGISProMCP.Install --version 2.0.1
 arcgis-pro-mcp-install              # add --dry-run to download + verify only
 ```
+
+> Installer 2.0.1 downloads via the compatibility alias `ArcGIS-Pro-MCP-2.0.1.zip`; the URL-fallback fix in the installer source ships with the next NuGet version.
+
+---
+
+## 🖥️ System requirements
+
+| Item | Requirement |
+|---|---|
+| 🪟 OS | **Windows 11** (officially supported by ArcGIS Pro 3.7, 64-bit Home/Pro/Enterprise). Windows 10 22H2 may run but is not on the official 3.7 support list — **not verified**. |
+| 🗺️ ArcGIS Pro | **3.7 verified**; newer versions untested. |
+| 🔑 Privileges | Standard user; installation needs **no admin rights**. |
+| 📦 Other dependencies | None (PowerShell and .NET come with Windows / Pro). |
+
+---
+
+## ⚠️ Known boundaries
+
+- 🔏 The add-in is **unsigned**: trust it once inside Pro. Some organizations' security policies may block unsigned add-ins entirely — an administrator has to allow it.
+- 🧪 **The clean-Windows-VM walkthrough is not finished yet** — try it on a test machine first.
+- 🪟 Windows only; ArcGIS Pro 3.7 verified, newer versions untested.
+- 🚨 Negative tests for overwrite/delete confirmations are rule-level only; the real dialog matrix has not been exhausted.
 
 ---
 
@@ -378,10 +420,9 @@ Everything the assistant can do, by name. Click to expand 👇
 ## 🗂️ Repository layout
 
 ```
-├── main (this branch) 🏠      AgentKit 2.0.1 preview: MCP add-in 2.0.1 + guard + distill
-├── customer-v2.0.0 🎁         v2.0.0/v2.0.1 preview release branch (merged into main)
-├── customer-v1.1.4 🎁         previous customer edition (add-in 1.1.4), preserved
-├── history-main-pre-2.0 🗄️    main before the 2.0 merge, preserved as history
+├── main (default) 🏠          development line: AgentKit 2.0.1 (MCP 2.0.1 + guard + distill)
+├── customer-v2.0.1 🎁         current customer-package snapshot (matches the v2.0.1 release assets)
+├── customer-v1.1.4 🗄️         legacy customer edition (add-in 1.1.4), preserved
 ├── installer/ 🛺              ArcGISProMCP.Install — NuGet tool: download → verify → run setup
 ├── addin/ArcGISProMCP/ 🧩     C# add-in (125 tools, GuardClient, template commands)
 ├── src/arcgis_pro_mcp/ 🐍     upstream Python stdio/CLI server (kept for rebase)
@@ -391,6 +432,8 @@ Everything the assistant can do, by name. Click to expand 👇
 ├── docs/ 📖                   design, architecture, guard and distill notes
 └── tests/ 🧪                  pytest (guard handshake/rules, full distill pipeline)
 ```
+
+The full branch / tag / release map (including archived branch SHAs and restore commands) lives in [BRANCHES.md](BRANCHES.md).
 
 Development install:
 
@@ -404,16 +447,17 @@ arcgis-distill doctor
 
 1. ✅ **M1 — Guard 2.0**: summon protocol, event-first UIA detection, add-in auto-arm, rules schema, CLI, tests.
 2. ✅ **M2 — Distill 2.0**: import / measure / patch / validate / preview / review / approve / apply, schema v1.1, template MCP tools.
-3. ✅ **M3 — Release**: 2.0.0/2.0.1 versioning, tags, release assets and NuGet package shipped; code signing and the clean-VM walkthrough remain.
+3. ✅ **M3 — Release V2.01**: 2.0.1 version normalization, v2.0.1 tag promoted, release assets and NuGet package shipped, customer package snapshot branch `customer-v2.0.1`, README/branch overhaul.
+4. ⏳ **M4 — Polish**: add-in code signing, clean-Windows-VM walkthrough, exhaustive dialog negative tests, installer URL fix shipping with the next NuGet version.
 
-Details, acceptance criteria and trade-offs: [docs/design-2026-11-16.md](docs/design-2026-11-16.md). 2.0 已到场 (๑•̀ㅂ•́)و✧
+Details, acceptance criteria and trade-offs: [docs/design-2026-11-16.md](docs/design-2026-11-16.md). V2.01 已到场 (๑•̀ㅂ•́)و✧
 
 ---
 
 ## 📜 License, credits & disclaimer
 
 - ⚖️ **License**: [AGPL-3.0-or-later](LICENSE). The MCP module derives from an AGPL-3.0-or-later project, so the combined repo is AGPL too.
-- 🙏 **Upstream project & original author**: [Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP) by **Pisut Nakmuenwai** — thank you! 💐 Local modifications are declared in [NOTICE](NOTICE), [RELEASE-NOTES.md](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/blob/customer-v2.0.0/RELEASE-NOTES.md), and `source/SOURCE-NOTICE.md` in the customer package.
+- 🙏 **Upstream project & original author**: [Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP) by **Pisut Nakmuenwai** — thank you! 💐 Local modifications are declared in [NOTICE](NOTICE), [RELEASE-NOTES.md](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/blob/customer-v2.0.1/RELEASE-NOTES.md), and `source/SOURCE-NOTICE.md` in the customer package.
 - 🏷️ **Trademark**: not affiliated with Esri. "ArcGIS" is a trademark of Esri. Third-party tool, no strings attached.
 - 🔒 **Privacy / network**: all services bind to `127.0.0.1` only; zero telemetry, zero cloud calls.
 - 👤 **Maintainer**: Law ([@XNYGggg](https://github.com/XNYGggg)).

@@ -46,32 +46,54 @@ string extractDir = Path.Combine(workRoot, "extracted");
 if (zipOverride is null)
 {
     string version = tag.TrimStart('v', 'V');
-    string url = $"https://github.com/{Repo}/releases/download/{tag}/ArcGIS-Pro-MCP-{version}.zip";
-    Console.WriteLine($"[1/4] 下载: {url}");
+    // v2.0.1+ ships `ArcGIS-Pro-MCP-v{version}.zip`; v1.1.4/v2.0.0 published the
+    // no-`v` form, so try both names and only fall back when the first is 404.
+    string[] urls =
+    {
+        $"https://github.com/{Repo}/releases/download/{tag}/ArcGIS-Pro-MCP-v{version}.zip",
+        $"https://github.com/{Repo}/releases/download/{tag}/ArcGIS-Pro-MCP-{version}.zip",
+    };
     Directory.CreateDirectory(workRoot);
     try
     {
         using var http = new HttpClient { Timeout = TimeSpan.FromMinutes(10) };
         http.DefaultRequestHeaders.UserAgent.ParseAdd("ArcGISProMCP.Install/2.0.1");
-        using var resp = http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).GetAwaiter().GetResult();
-        if (!resp.IsSuccessStatusCode)
+        HttpResponseMessage? resp = null;
+        foreach (string url in urls)
         {
-            Console.Error.WriteLine($"下载失败: HTTP {(int)resp.StatusCode}。请确认发布标签 {tag} 与附件名一致。");
+            Console.WriteLine($"[1/4] 下载: {url}");
+            var candidate = http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).GetAwaiter().GetResult();
+            if (candidate.IsSuccessStatusCode) { resp = candidate; break; }
+            int status = (int)candidate.StatusCode;
+            candidate.Dispose();
+            if (status != 404)
+            {
+                Console.Error.WriteLine($"下载失败: HTTP {status}。请确认发布标签 {tag} 与附件名一致。");
+                return 3;
+            }
+            Console.WriteLine("      HTTP 404，尝试备用文件名…");
+        }
+        if (resp is null)
+        {
+            Console.Error.WriteLine($"下载失败: 带 v 与不带 v 的附件名均 404。请确认发布标签 {tag} 与附件名一致。");
             return 3;
         }
-        long total = resp.Content.Headers.ContentLength ?? -1;
-        using var src = resp.Content.ReadAsStream();
-        using var dst = File.Create(zipPath);
-        byte[] buffer = new byte[81920];
-        long done = 0;
-        int n;
-        while ((n = src.Read(buffer, 0, buffer.Length)) > 0)
+        using (resp)
         {
-            dst.Write(buffer, 0, n);
-            done += n;
-            if (total > 0) Console.Write($"\r      {done * 100.0 / total,6:F1}%   {done / 1048576.0,7:F1} / {total / 1048576.0:F1} MB");
+            long total = resp.Content.Headers.ContentLength ?? -1;
+            using var src = resp.Content.ReadAsStream();
+            using var dst = File.Create(zipPath);
+            byte[] buffer = new byte[81920];
+            long done = 0;
+            int n;
+            while ((n = src.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                dst.Write(buffer, 0, n);
+                done += n;
+                if (total > 0) Console.Write($"\r      {done * 100.0 / total,6:F1}%   {done / 1048576.0,7:F1} / {total / 1048576.0:F1} MB");
+            }
+            Console.WriteLine();
         }
-        Console.WriteLine();
     }
     catch (Exception ex)
     {

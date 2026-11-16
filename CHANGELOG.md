@@ -2,6 +2,28 @@
 
 ## 2.0.1 — 2026-11-16
 
+### V2.01 official release & repository overhaul (2026-11-16, later)
+
+The 2.0.1 build was promoted to the official **V2.01** release and the repository was tidied:
+
+- README (bilingual) rewritten around V2.01: new "V2.01 upgrades over V2.0" section,
+  quick start pointing at the v2.0.1 package and NuGet 2.0.1, a branch/tag/release map
+  (`BRANCHES.md`), and a dedicated known-boundaries section (unsigned add-in,
+  clean-VM walkthrough pending, Windows 11 / Pro 3.7 scope).
+- Branch consolidation: `main` is the default branch again; new `customer-v2.0.1`
+  holds the current customer-package snapshot; `customer-v2.0.0` and
+  `history-main-pre-2.0` were archived (SHAs and restore commands in `BRANCHES.md`).
+  Tag `v2.0.1` stays immutable at `61043d7`.
+- Release `v2.0.1` promoted from prerelease to the latest release. A
+  documentation-revision package (`ArcGIS-Pro-MCP-v2.0.1-r2.zip`: README /
+  RELEASE-NOTES / VERSION.json only, binaries byte-identical) is the canonical
+  download; the original asset remains for reference.
+- Installer: the download URL now tries `ArcGIS-Pro-MCP-v{version}.zip` first and
+  falls back to the legacy no-`v` name on 404. The already-published NuGet 2.0.1
+  tool is repaired in place by a byte-identical alias asset
+  `ArcGIS-Pro-MCP-2.0.1.zip` on the release (same for v1.1.4 and v2.0.0).
+- Customer package `VERSION.json` now records `branch: customer-v2.0.1`.
+
 Live-test fixes found by installing 2.0.0 and driving a real ArcGIS Pro session.
 
 - **Guard engine**: a trust dialog's text appears in the UIA tree before its
@@ -69,8 +91,8 @@ The unified AgentKit release: MCP + on-demand guard + on-demand distillation.
 
 ### Packaging & tests
 
-- Customer package branch `customer-v2.0.0` (add-in 2.0.0 + new guard engine +
-  bundled Distill runtime + installers + AGPL source snapshot).
+- Customer package branch `customer-v2.0.0` (later consolidated into `customer-v2.0.1`) — add-in 2.0.0 + new guard engine +
+  bundled Distill runtime + installers + AGPL source snapshot.
 - Python tests: 12 passed (guard handshake/rules + full distill pipeline and
   negative cases). Upstream C#/HTTP/installer suites updated to 125 tools, all passed.
 
