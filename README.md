@@ -2,6 +2,8 @@
 
 用一句自然语言，让 AI 助手直接操作你正开着的 ArcGIS Pro 工程：加图层、改符号、查属性、跑地理处理、出图导出。数据不出本机，所有通信都走 `127.0.0.1`。
 
+> **上游项目与原作者**：本客户版基于 **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**（原作者 **Pisut Nakmuenwai**，AGPL-3.0-or-later），在其基础上累计本地补丁至 **v1.1.4**。完整署名与修改声明见包根 `NOTICE` 与 `source/SOURCE-NOTICE.md`。
+
 本客户版把运行所需的**全部组件**打包在一起，离线可用，**不需要安装 Python、不需要 pip、不需要联网**，除 ArcGIS Pro 本身外没有任何额外依赖。
 
 ---
@@ -108,7 +110,8 @@
 ## 版本与许可
 
 - 版本：**1.1.4**（构建日期见 `VERSION.json`；工具数 113）
-- 许可证：**AGPL-3.0-or-later**（衍生自 [Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)，其同样为 AGPL-3.0-or-later；本包附带完整源码与上游 NOTICE）
+- 上游项目与原作者：**[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**，作者 **Pisut Nakmuenwai**（AGPL-3.0-or-later）。本包在其基础上累计补丁至 1.1.4（修改点见 `docs\CHANGELOG.md` 与 `RELEASE-NOTES.md`）。
+- 许可证：**AGPL-3.0-or-later**（本包附带完整源码快照与上游 NOTICE）
 - 商标：“ArcGIS”为 Esri 商标；本项目为第三方工具，与 Esri 无隶属关系。
 
 常见问题见 `docs\排障手册.md`；进阶用法见 `docs\使用指南.md`。
