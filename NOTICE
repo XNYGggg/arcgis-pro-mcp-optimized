@@ -45,12 +45,20 @@ Releases up to and including v1.0 were published under the MIT licence. That
 grant cannot be withdrawn: anyone who obtained those versions keeps MIT rights
 to them. The dual AGPL/commercial licence applies from v1.1 onward.
 
-MODIFICATIONS IN THIS CUSTOMER PACKAGE (2026-11-16)
----------------------------------------------------
-This distribution ("ArcGIS Pro MCP 优化版 客户版 1.1.4") conveys, together with
-the add-in binary, a corresponding source snapshot under source/ and the
-following additions by the package maintainers:
-  - PowerShell stdio bridge, RunCode toolbox runtime, dialog-guard scripts,
-    optional in-Pro Python bridge bundle, installers, self-check and docs;
-  - local patches to the add-in/source up to version 1.1.4 (see CHANGELOG).
-See source/SOURCE-NOTICE.md and RELEASE-NOTES.md for details.
+MODIFICATIONS IN THIS PACKAGE (2.0.0, 2026-11-16)
+-------------------------------------------------
+This distribution ("ArcGIS Pro MCP 优化版 / AgentKit 2.0.0") conveys, together
+with the add-in binary, a corresponding source snapshot and the following
+additions by the package maintainers:
+  - PowerShell stdio bridge, RunCode toolbox runtime, installers, self-check
+    and documentation;
+  - on-demand dialog guard: new `guard.ps1` engine, rules schema, Python CLI,
+    add-in `GuardClient` auto-summon, `guard_summon` / `guard_status` tools;
+  - on-demand template distillation: `arcgis-distill` pipeline, schema v1.1,
+    template library and `template_*` MCP tools;
+  - local patches carried from upstream 1.1.1 to 1.1.4 (activate_map deadlock
+    fix, three-lane JobScheduler, get_queue_status) and 2.0.0 version
+    normalization.
+See CHANGELOG.md, docs/guard.md, docs/distill.md and the source snapshot's
+SOURCE-NOTICE/upstream-CHANGELOG for details.
+

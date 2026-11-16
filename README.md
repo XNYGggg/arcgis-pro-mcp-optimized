@@ -9,7 +9,7 @@ No file juggling, no "export → upload → download" ritual. Your assistant tal
 > ### 🙏 Upstream project & original author
 > This project stands on the shoulders of **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**,
 > originally created by **Pisut Nakmuenwai**, licensed **AGPL-3.0-or-later**. Huge thanks! 🌟
-> We carry local patches up to **v1.1.4** and add the guard/distill modules; upstream attribution lives in [NOTICE](NOTICE) and the source snapshot.
+> We carry local patches up to **v2.0.0** and add the guard/distill modules; upstream attribution lives in [NOTICE](NOTICE) and the source snapshot.
 
 ---
 
@@ -19,9 +19,9 @@ Say it in plain language — *"color the counties by area, pastel red to green"*
 
 | | Part | What it does | Status |
 |---|---|---|---|
-| 🧩 | **MCP** | ArcGIS Pro add-in: **113 native tools** (in-process, ~9 ms ⚡), every geoprocessing tool, optional arcpy via RunCode / Python bridge. Listens on `127.0.0.1:6520/mcp`. | **Customer-ready v1.1.4** on [`customer-v1.1.4`](../../tree/customer-v1.1.4) 🎁 |
-| 🛡️ | **Guard** | On-demand dialog guard for the "third-party code library" trust dialog. Summoned only when needed, gone right after. 🥷 | Skeleton — see [design](docs/design-2026-11-16.md) §3 |
-| 🧪 | **Distill** | On-demand template distillation: sample figure → reusable layout spec. One shot, no daemon, fully repeatable. 🧬 | Skeleton — see [design](docs/design-2026-11-16.md) §4 |
+| 🧩 | **MCP** | ArcGIS Pro add-in: **125 native tools** (in-process, ~9 ms ⚡), every geoprocessing tool, optional arcpy via RunCode / Python bridge. Listens on `127.0.0.1:6520/mcp`. | **v2.0.0** on [`customer-v2.0.0`](../../tree/customer-v2.0.0) 🎁 |
+| 🛡️ | **Guard** | On-demand dialog guard for the "third-party code library" trust dialog. Summoned only when needed, gone right after. 🥷 | **Ready** — see [guard.md](docs/guard.md) |
+| 🧪 | **Distill** | On-demand template distillation: sample figure → reusable layout spec. One shot, no daemon, fully repeatable. 🧬 | **Ready** — see [distill.md](docs/distill.md) |
 
 ### 🧠 Why "on demand"? (Because nobody loves zombie processes 🧟)
 
@@ -40,12 +40,12 @@ flowchart LR
 
 ---
 
-## 🚀 Quick start — customer edition (v1.1.4)
+## 🚀 Quick start — customer edition (v2.0.0)
 
-Everything is packed, batteries included 🔋 — add-in, stdio bridge, RunCode, dialog guard, Python bridge, installers, docs, and the full AGPL source snapshot:
+Everything is packed, batteries included 🔋 — add-in 2.0.0, stdio bridge, RunCode, the new on-demand guard engine, the bundled Distill runtime, Python bridge, installers, docs, and the full AGPL source snapshot:
 
-- 📦 Download (recommended): [**Release v1.1.4**](../../releases/tag/v1.1.4) → `ArcGIS-Pro-MCP-v1.1.4.zip` ([direct link](../../releases/download/v1.1.4/ArcGIS-Pro-MCP-v1.1.4.zip), SHA256 `29e01ae4…82d7`, every file verifies against the bundled `SHA256SUMS.txt`)
-- 👀 Browse source: [**`customer-v1.1.4`**](../../tree/customer-v1.1.4)
+- 📦 Download: [**branch archive**](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/archive/refs/heads/customer-v2.0.0.zip) (a Release is created after the branch is reviewed)
+- 👀 Browse source: [**`customer-v2.0.0`**](../../tree/customer-v2.0.0)
 - 🛺 Prefer one command? Use the [NuGet installer](#-install-via-nuget-github-packages) below ⬇️
 
 1. 📂 Unzip anywhere → double-click `install/00-install.cmd` (no admin needed; ArcGIS Pro **3.7+** required).
@@ -165,12 +165,12 @@ Use Streamable HTTP to `http://127.0.0.1:6520/mcp`; or the generic JSON above. (
 
 ---
 
-## 🧰 All 113 MCP tools (12 groups)
+## 🧰 All 125 MCP tools (14 groups)
 
 Everything the assistant can do, by name. Click to expand 👇
 
 <details>
-<summary><b>📜 Full tool catalog — Session 15 · Layers 19 · Data 11 · Selection 6 · Schema 11 · Geoprocessing 7 · Symbology 6 · View 7 · Layouts 16 · Raster 5 · Catalog 6 · Utility 4</b></summary>
+<summary><b>📜 Full tool catalog — Session 15 · Layers 19 · Data 11 · Selection 6 · Schema 11 · Geoprocessing 7 · Symbology 6 · View 7 · Layouts 16 · Raster 5 · Catalog 6 · Utility 4 · Guard 2 · Template 10</b></summary>
 
 ### Session (15)
 
@@ -345,6 +345,28 @@ Everything the assistant can do, by name. Click to expand 👇
 | `stop_pump` | Remove the main-thread dispatcher. Live-project commands stop working until the user installs it again. |
 | `run_batch` | Run several commands in one round trip -- much faster for multi-step workflows. |
 
+### Guard (2)
+
+| Tool | What it does |
+|---|---|
+| `guard_summon` | Summon the on-demand dialog guard for a manual step. Clicks only the third-party code library trust dialog; a topmost alert stays ≥30 s when it cannot. Exits after `timeout_s`. |
+| `guard_status` | Guard engine path/version, session root, and the 20 most recent summon sessions. |
+
+### Template (10)
+
+| Tool | What it does |
+|---|---|
+| `template_list` | List distilled layout templates, optionally filtered by status or tag. |
+| `template_get` | Read one template spec (layout, palette, typography, regions, pitfalls, review). |
+| `template_import` | Import a sample figure as a draft (sha256-deduplicated). |
+| `template_measure` | Measure figure bbox, aspect, frame lines, palette and DPI. |
+| `template_patch` | Submit semantic fields as a validated merge; protected fields rejected. |
+| `template_validate` | Schema + geometric consistency checks. |
+| `template_review` | Record a human review decision. |
+| `template_approve` | Approve a reviewed, validated template (becomes ready). |
+| `template_preview` | Wireframe preview returned as an image. |
+| `template_apply` | Write a ready template into a mapping context file. |
+
 </details>
 
 ---
@@ -352,14 +374,17 @@ Everything the assistant can do, by name. Click to expand 👇
 ## 🗂️ Repository layout
 
 ```
-├── main (this branch) 🏠      project skeleton: guard + distill modules, design docs
-├── customer-v1.1.4 🎁         ready-to-use package (add-in 1.1.4 + everything above)
+├── main (this branch) 🏠      project skeleton + AgentKit modules and design docs
+├── customer-v1.1.4 🎁         previous customer edition (add-in 1.1.4), kept as history
+├── customer-v2.0.0 🎁         current customer edition (add-in 2.0.0 + guard engine + Distill runtime)
 ├── installer/ 🛺              ArcGISProMCP.Install — NuGet tool: download → verify → run setup
-├── src/arcgis_agentkit/ 🧰    guard / distill Python packages (CLI skeletons)
+├── addin/ArcGISProMCP/ 🧩     C# add-in (125 tools, GuardClient, template commands)
+├── src/arcgis_pro_mcp/ 🐍     upstream Python stdio/CLI server (kept for rebase)
+├── src/arcgis_agentkit/ 🧰    guard / distill Python packages (CLI + engine)
 ├── skills/ 🎓                 assistant-facing skills (template-distill, arcgis-pro-mapping)
-├── library/ 📚                template library schema (v1) and examples
-├── docs/ 📖                   design & architecture notes
-└── tests/ 🧪                  pytest smoke tests
+├── library/ 📚                template library schema (v1.1) and examples
+├── docs/ 📖                   design, architecture, guard and distill notes
+└── tests/ 🧪                  pytest (guard handshake/rules, full distill pipeline)
 ```
 
 Development install:
@@ -370,20 +395,20 @@ arcgis-guard doctor
 arcgis-distill doctor
 ```
 
-## 🛣️ Roadmap — next stop, greatness 🚌💨
+## 🛣️ Roadmap
 
-1. 🛡️ **M1 — Guard v1**: summon protocol, event-first UIA detection, add-in auto-arm around `run_python_toolbox_tool`, Pester tests.
-2. 🧪 **M2 — Distill v1**: import / measure / validate / preview / library, `template-distill` skill, template MCP tools.
-3. 🎉 **M3 — Open-source release**: versioning, bilingual docs, CI, release assets, clean-machine walkthrough.
+1. ✅ **M1 — Guard 2.0**: summon protocol, event-first UIA detection, add-in auto-arm, rules schema, CLI, tests.
+2. ✅ **M2 — Distill 2.0**: import / measure / patch / validate / preview / review / approve / apply, schema v1.1, template MCP tools.
+3. 🚧 **M3 — Release**: 2.0.0 version normalization done; clean-VM walkthrough, add-in signing and the public release remain.
 
-Details, acceptance criteria and trade-offs: [docs/design-2026-11-16.md](docs/design-2026-11-16.md). 别催,在做了 (｀・ω・´)ゞ
+Details, acceptance criteria and trade-offs: [docs/design-2026-11-16.md](docs/design-2026-11-16.md). 2.0 已到场 (๑•̀ㅂ•́)و✧
 
 ---
 
 ## 📜 License, credits & disclaimer
 
 - ⚖️ **License**: [AGPL-3.0-or-later](LICENSE). The MCP module derives from an AGPL-3.0-or-later project, so the combined repo is AGPL too.
-- 🙏 **Upstream project & original author**: [Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP) by **Pisut Nakmuenwai** — thank you! 💐 Local modifications are declared in [NOTICE](NOTICE), [RELEASE-NOTES.md](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/blob/customer-v1.1.4/RELEASE-NOTES.md), and `source/SOURCE-NOTICE.md` in the customer package.
+- 🙏 **Upstream project & original author**: [Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP) by **Pisut Nakmuenwai** — thank you! 💐 Local modifications are declared in [NOTICE](NOTICE), [RELEASE-NOTES.md](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/blob/customer-v2.0.0/RELEASE-NOTES.md), and `source/SOURCE-NOTICE.md` in the customer package.
 - 🏷️ **Trademark**: not affiliated with Esri. "ArcGIS" is a trademark of Esri. Third-party tool, no strings attached.
 - 🔒 **Privacy / network**: all services bind to `127.0.0.1` only; zero telemetry, zero cloud calls.
 - 👤 **Maintainer**: Law ([@XNYGggg](https://github.com/XNYGggg)).
