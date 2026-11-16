@@ -14,6 +14,12 @@ Live-test fixes found by installing 2.0.0 and driving a real ArcGIS Pro session.
   which made PowerShell bind CLI flags such as `--out` to the common parameter
   `-OutVariable`, breaking `template_preview`. The launcher is now a simple
   script using `$args`; `template_preview` returns an image again.
+- **Upgrade safety**: the runtime installer replaces the whole
+  `%LOCALAPPDATA%\ArcGIS Pro MCP` directory. It now merges the user's
+  `library/` into the new runtime before the swap, so distilled templates
+  survive an upgrade (verified by reinstalling 2.0.1: template list stayed 1).
+- Installer scripts are now kept in `packaging/customer/install/` so the
+  release source snapshot contains the code that ships in the zip.
 - Version bump to 2.0.1 across add-in, Python packages, installer and NuGet
   workflow. v2.0.0 remains available as a historical Release.
 
