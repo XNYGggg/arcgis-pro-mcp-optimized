@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "name",
+    "status",
+    "source_image",
+    "canvas"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "ready"
+      ]
+    },
+    "source_image": {
+      "type": "string"
+    },
+    "image_sha256": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "canvas": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "string"
+        },
+        "width_in": {
+          "type": "number"
+        },
+        "height_in": {
+          "type": "number"
+        },
+        "dpi": {
+          "type": "integer"
+        },
+        "background": {
+          "type": "string"
+        }
+      }
+    },
+    "map_frame": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "width": {
+          "type": "number"
+        },
+        "height": {
+          "type": "number"
+        }
+      }
+    },
+    "title": {
+      "type": "object"
+    },
+    "legend": {
+      "type": "object"
+    },
+    "scale_bar": {
+      "type": "object"
+    },
+    "north_arrow": {
+      "type": "object"
+    },
+    "palette": {
+      "type": "object"
+    },
+    "typography": {
+      "type": "object"
+    },
+    "labeling": {
+      "type": "object"
+    },
+    "export": {
+      "type": "object"
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}
