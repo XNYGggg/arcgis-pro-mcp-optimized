@@ -1,4 +1,4 @@
-[![English](https://img.shields.io/badge/Language-English-1f6feb?style=flat-square)](README.md) [![简体中文](https://img.shields.io/badge/Language-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-d1242f?style=flat-square)](README.zh-CN.md) [![License: AGPL v3+](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue?style=flat-square)](LICENSE) [![ArcGIS Pro](https://img.shields.io/badge/ArcGIS%20Pro-3.7%2B-00a1e0?style=flat-square)](https://www.esri.com/en-us/arcgis/products/arcgis-pro/overview) [![Platform](https://img.shields.io/badge/Platform-Windows%2010%2F11-lightgrey?style=flat-square)]()
+[![English](https://img.shields.io/badge/Language-English-1f6feb?style=flat-square)](README.md) [![简体中文](https://img.shields.io/badge/Language-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-d1242f?style=flat-square)](README.zh-CN.md) [![License: AGPL v3+](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue?style=flat-square)](LICENSE) [![ArcGIS Pro](https://img.shields.io/badge/ArcGIS%20Pro-3.7%2B-00a1e0?style=flat-square)](https://www.esri.com/en-us/arcgis/products/arcgis-pro/overview) [![Platform](https://img.shields.io/badge/Platform-Windows%2010%2F11-lightgrey?style=flat-square)]() [![Release](https://img.shields.io/github/v/release/XNYGggg/arcgis-pro-mcp-optimized?style=flat-square&label=release)](../../releases)
 
 # 🗺️ ArcGIS Pro MCP · 优化版（AgentKit）⚡
 
@@ -44,8 +44,9 @@ flowchart LR
 
 电池已装好,开箱即用 🔋——add-in、stdio 桥、RunCode、弹窗守护、Python 桥、安装器、文档与 AGPL 源码快照,一个包全带走:
 
-- 👀 浏览:[**`customer-v1.1.4`**](../../tree/customer-v1.1.4)
-- 📦 下载:[**ZIP 打包**](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/archive/refs/heads/customer-v1.1.4.zip)
+- 📦 下载(推荐):[**v1.1.4 Release**](../../releases/tag/v1.1.4) → `ArcGIS-Pro-MCP-v1.1.4.zip`([直链](../../releases/download/v1.1.4/ArcGIS-Pro-MCP-v1.1.4.zip),SHA256 `29e01ae4…82d7`,包内每个文件都可用自带 `SHA256SUMS.txt` 校验)
+- 👀 浏览源码:[**`customer-v1.1.4`**](../../tree/customer-v1.1.4)
+- 🛺 想一条命令装好?看下面的 NuGet 安装器 ⬇️
 
 1. 📂 解压到任意目录 → 双击 `install/00-install.cmd`(不需要管理员;要求 ArcGIS Pro **3.7+**)
 2. 🖥️ 打开 ArcGIS Pro → 首次加载未签名 add-in 时选"是/信任"(放心点 😄)→ 确认顶部 **MCP 选项卡** 显示 **running**(端口 `127.0.0.1:6520`)
@@ -53,6 +54,18 @@ flowchart LR
 4. ✅ 运行 `install/01-check.cmd`,全部 `[OK]` 就大功告成 (๑•̀ㅂ•́)و✧
 
 无需 Python 🐍、无需 pip 📦、无需联网 🌐:add-in 跑在 ArcGIS Pro 3.7+ 自带的 .NET 运行时上,stdio 桥与守卫用的是 Windows 自带的 PowerShell。包内 `SHA256SUMS.txt` 覆盖每一个文件 🔐。
+
+### 🛺 通过 NuGet 一键安装(GitHub Packages)
+
+不想手动解压?dotnet 工具 [`ArcGISProMCP.Install`](../../pkgs/nuget/ArcGISProMCP.Install) 会自动从 Releases 下载离线包、逐文件校验 `SHA256SUMS.txt` 后启动 `install/00-install.cmd`。需要 .NET SDK,以及带 `read:packages` 权限的 [PAT](https://github.com/settings/tokens):
+
+```powershell
+# 首次:注册 GitHub Packages 的 NuGet 源
+dotnet nuget add source "https://nuget.pkg.github.com/XNYGggg/index.json" --name github --username XNYGggg --password <你的PAT> --store-password-in-clear-text
+
+dotnet tool install --global ArcGISProMCP.Install
+arcgis-pro-mcp-install              # 加 --dry-run 则只下载与校验,不启动安装
+```
 
 ---
 
@@ -341,6 +354,7 @@ url = "http://127.0.0.1:6520/mcp"
 ```
 ├── main(本分支)🏠           项目骨架:guard + distill 模块与设计文档
 ├── customer-v1.1.4 🎁        开箱即用客户版(add-in 1.1.4 + 全部运行组件)
+├── installer/ 🛺             ArcGISProMCP.Install——NuGet 安装器工具(下载→校验→启动安装)
 ├── src/arcgis_agentkit/ 🧰   guard / distill Python 包(CLI 骨架)
 ├── skills/ 🎓                给助手的技能说明(template-distill、arcgis-pro-mapping)
 ├── library/ 📚               模板库 schema(v1)与示例

@@ -1,4 +1,4 @@
-[![English](https://img.shields.io/badge/Language-English-1f6feb?style=flat-square)](README.md) [![简体中文](https://img.shields.io/badge/Language-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-d1242f?style=flat-square)](README.zh-CN.md) [![License: AGPL v3+](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue?style=flat-square)](LICENSE) [![ArcGIS Pro](https://img.shields.io/badge/ArcGIS%20Pro-3.7%2B-00a1e0?style=flat-square)](https://www.esri.com/en-us/arcgis/products/arcgis-pro/overview) [![Platform](https://img.shields.io/badge/Platform-Windows%2010%2F11-lightgrey?style=flat-square)]()
+[![English](https://img.shields.io/badge/Language-English-1f6feb?style=flat-square)](README.md) [![简体中文](https://img.shields.io/badge/Language-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-d1242f?style=flat-square)](README.zh-CN.md) [![License: AGPL v3+](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue?style=flat-square)](LICENSE) [![ArcGIS Pro](https://img.shields.io/badge/ArcGIS%20Pro-3.7%2B-00a1e0?style=flat-square)](https://www.esri.com/en-us/arcgis/products/arcgis-pro/overview) [![Platform](https://img.shields.io/badge/Platform-Windows%2010%2F11-lightgrey?style=flat-square)]() [![Release](https://img.shields.io/github/v/release/XNYGggg/arcgis-pro-mcp-optimized?style=flat-square&label=release)](../../releases)
 
 # 🗺️ ArcGIS Pro MCP · AgentKit ⚡
 
@@ -44,8 +44,9 @@ flowchart LR
 
 Everything is packed, batteries included 🔋 — add-in, stdio bridge, RunCode, dialog guard, Python bridge, installers, docs, and the full AGPL source snapshot:
 
-- 👀 Browse: [**`customer-v1.1.4`**](../../tree/customer-v1.1.4)
-- 📦 Download: [**ZIP archive**](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/archive/refs/heads/customer-v1.1.4.zip)
+- 📦 Download (recommended): [**Release v1.1.4**](../../releases/tag/v1.1.4) → `ArcGIS-Pro-MCP-v1.1.4.zip` ([direct link](../../releases/download/v1.1.4/ArcGIS-Pro-MCP-v1.1.4.zip), SHA256 `29e01ae4…82d7`, every file verifies against the bundled `SHA256SUMS.txt`)
+- 👀 Browse source: [**`customer-v1.1.4`**](../../tree/customer-v1.1.4)
+- 🛺 Prefer one command? Use the [NuGet installer](#-install-via-nuget-github-packages) below ⬇️
 
 1. 📂 Unzip anywhere → double-click `install/00-install.cmd` (no admin needed; ArcGIS Pro **3.7+** required).
 2. 🖥️ Open ArcGIS Pro → trust the unsigned add-in when asked (say **Yes** 😄) → confirm the **MCP** tab shows **running** (port `127.0.0.1:6520`).
@@ -53,6 +54,18 @@ Everything is packed, batteries included 🔋 — add-in, stdio bridge, RunCode,
 4. ✅ Run `install/01-check.cmd` — all `[OK]` and you're golden (๑•̀ㅂ•́)و✧
 
 No Python 🐍, no pip 📦, no internet 🌐 required: the add-in runs on the .NET runtime shipped with ArcGIS Pro 3.7+, and the bridge/guard use Windows' own PowerShell. `SHA256SUMS.txt` covers every single file. 🔐
+
+### 🛺 Install via NuGet (GitHub Packages)
+
+Prefer one command? The [`ArcGISProMCP.Install`](../../pkgs/nuget/ArcGISProMCP.Install) dotnet tool downloads the release zip, verifies every file against `SHA256SUMS.txt`, then launches `install/00-install.cmd` for you. Needs the .NET SDK and a [PAT](https://github.com/settings/tokens) with `read:packages`:
+
+```powershell
+# one-time: register the GitHub Packages NuGet source
+dotnet nuget add source "https://nuget.pkg.github.com/XNYGggg/index.json" --name github --username XNYGggg --password <YOUR_PAT> --store-password-in-clear-text
+
+dotnet tool install --global ArcGISProMCP.Install
+arcgis-pro-mcp-install              # add --dry-run to download + verify only
+```
 
 ---
 
@@ -341,6 +354,7 @@ Everything the assistant can do, by name. Click to expand 👇
 ```
 ├── main (this branch) 🏠      project skeleton: guard + distill modules, design docs
 ├── customer-v1.1.4 🎁         ready-to-use package (add-in 1.1.4 + everything above)
+├── installer/ 🛺              ArcGISProMCP.Install — NuGet tool: download → verify → run setup
 ├── src/arcgis_agentkit/ 🧰    guard / distill Python packages (CLI skeletons)
 ├── skills/ 🎓                 assistant-facing skills (template-distill, arcgis-pro-mapping)
 ├── library/ 📚                template library schema (v1) and examples
