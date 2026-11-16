@@ -4,7 +4,7 @@
   "built": "2026-11-16",
   "tools": 125,
   "requirements": {
-    "os": "Windows 11 x64 (ArcGIS Pro 3.7 officially supports Windows 11; Windows 10 22H2 not verified)",
+    "os": "Windows 11 x64 (AMD64); ARM64 not supported",
     "arcgis_pro": ">=3.7 (3.7 verified; newer versions untested)",
     "external_deps": "none (PowerShell/.NET provided by Windows; distill uses the Python shipped with ArcGIS Pro, including Pillow)"
   },

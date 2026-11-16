@@ -32,7 +32,7 @@ V2.01 是 2.0 线的**实机验证补丁版**，修复 3 个用户可见问题�
 
 | 项目 | 要求 |
 |---|---|
-| 🪟 操作系统 | **Windows 11**（64 位 Home / Pro / Enterprise，ArcGIS Pro 3.7 官方支持）。Windows 10 22H2 可运行但不在 3.7 官方支持清单内，**未验证** |
+| 🪟 操作系统 | **Windows 11 x64**（64 位 Home / Pro / Enterprise，ArcGIS Pro 3.7 官方支持）。**架构：仅 x64（AMD64），不支持 ARM64** |
 | 🗺️ ArcGIS Pro | **3.7 已验证**；更新版本待验证（本 add-in 基于 3.7 / .NET 10 构建） |
 | 🔑 权限 | 普通用户即可，安装**不需要管理员** |
 | 📦 其他依赖 | 无（PowerShell 与 .NET 由 Windows / Pro 自带） |
