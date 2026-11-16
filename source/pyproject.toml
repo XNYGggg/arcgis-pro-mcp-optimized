@@ -1,0 +1,35 @@
+[project]
+name = "arcgis-pro-agentkit"
+version = "2.0.1"
+description = "Unified ArcGIS Pro toolkit: MCP add-in, on-demand dialog guard, on-demand template distillation"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "AGPL-3.0-or-later"}
+authors = [{ name = "ArcGIS Pro AgentKit contributors" }]
+dependencies = [
+    "Pillow>=9",
+    "mcp>=1.6.0,<2",
+    "pydantic>=2.0",
+]
+
+[project.scripts]
+arcgis-pro-mcp = "arcgis_pro_mcp.cli:main"
+arcgis-guard = "arcgis_agentkit.guard.cli:main"
+arcgis-distill = "arcgis_agentkit.distill.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+arcgis_agentkit = [
+    "guard/engine/*.ps1",
+    "guard/engine/*.json",
+    "distill/defaults/*.json",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

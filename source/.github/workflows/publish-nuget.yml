@@ -1,0 +1,44 @@
+# 发布 ArcGISProMCP.Install（dotnet tool）到 GitHub Packages 的 NuGet 仓库。
+# 触发：发布 Release 时自动执行，或在 Actions 页面手动 Run workflow。
+# 依据 GitHub Packages 文档，GITHUB_TOKEN 配合 permissions: packages: write
+# 即可向本仓库关联的 NuGet 源推送，无需额外 PAT。
+name: Publish NuGet installer
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main (installer lives on main, not on release tags)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Resolve version from release tag
+        run: |
+          TAG="${{ github.event.release.tag_name || 'v2.0.1' }}"
+          echo "PKG_VERSION=${TAG#v}" >> "$GITHUB_ENV"
+
+      - name: Pack
+        run: dotnet pack installer/ArcGISProMCP.Install/ArcGISProMCP.Install.csproj -c Release -o dist -p:Version="$PKG_VERSION"
+
+      - name: Add GitHub Packages NuGet source
+        run: >
+          dotnet nuget add source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+          --name github --username "${{ github.repository_owner }}"
+          --password "${{ secrets.GITHUB_TOKEN }}" --store-password-in-clear-text
+
+      - name: Push package
+        run: dotnet nuget push "dist/*.nupkg" --source github --skip-duplicate

@@ -1,0 +1,32 @@
+{
+  "name": "ArcGIS Pro MCP 优化版（AgentKit 客户版）",
+  "version": "2.0.1",
+  "built": "2026-11-16",
+  "tools": 125,
+  "requirements": {
+    "os": "Windows 11 x64 (ArcGIS Pro 3.7 officially supports Windows 11; Windows 10 22H2 not verified)",
+    "arcgis_pro": ">=3.7 (3.7 verified; newer versions untested)",
+    "external_deps": "none (PowerShell/.NET provided by Windows; distill uses the Python shipped with ArcGIS Pro, including Pillow)"
+  },
+  "addin": {
+    "file": "install/ArcGISProMCP.esriAddinX",
+    "file_version": "2.0.1.0",
+    "desktop_version": "3.7",
+    "sha256": "3eda4fec0d674dc49db4dbdb52a960a217ecbc5be35ca60d046461a421c21a39"
+  },
+  "guard": {
+    "engine": "install/runtime/guard/guard.ps1",
+    "rules": "install/runtime/guard/guard.schema.json",
+    "engine_version": "2.0.1"
+  },
+  "distill": {
+    "launcher": "install/runtime/distill/run-distill.ps1",
+    "default_library": "%LOCALAPPDATA%\\ArcGIS Pro MCP\\library",
+    "schema": "1.1"
+  },
+  "license": "AGPL-3.0-or-later",
+  "upstream": "https://github.com/Knight60/ArcGIS-Pro-MCP",
+  "source": "source/",
+  "branch": "customer-v2.0.1",
+  "revision": "r2 (2026-11-16: README/RELEASE-NOTES/VERSION.json updated; binaries unchanged)"
+}

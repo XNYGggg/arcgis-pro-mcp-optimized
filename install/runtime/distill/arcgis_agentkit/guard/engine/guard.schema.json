@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "match": {
+    "strong": ["第三方", "代码库", "第三方代码", "third-party", "third party", "code library", "code-library"],
+    "weak": ["Python"],
+    "affirm_buttons": ["是", "允许", "Yes", "Allow"],
+    "tallow": ["允许", "执行", "信任", "trust", "allow", "run"],
+    "deny": ["覆盖", "删除", "移除", "卸载", "清空", "格式化", "overwrite", "delete", "remove", "uninstall", "erase", "replace"]
+  },
+  "alert": {
+    "min_seconds": 30,
+    "sound": true,
+    "position": "top-right"
+  },
+  "limits": {
+    "arm_ready_ms": 2000,
+    "settle_grace_s": 3,
+    "op_timeout_s": 180,
+    "manual_timeout_s": 600,
+    "poll_active_ms": 400,
+    "poll_grace_ms": 1500
+  }
+}

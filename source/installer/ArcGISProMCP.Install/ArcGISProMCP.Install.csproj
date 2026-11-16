@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>arcgis-pro-mcp-install</ToolCommandName>
+    <PackageId>ArcGISProMCP.Install</PackageId>
+    <Version>2.0.1</Version>
+    <Authors>XNYGggg</Authors>
+    <Description>One-command installer for the ArcGIS Pro MCP offline bundle. Downloads the release asset from GitHub Releases, verifies every file against the bundled SHA256SUMS.txt, then runs install/00-install.cmd.</Description>
+    <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/XNYGggg/arcgis-pro-mcp-optimized</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/XNYGggg/arcgis-pro-mcp-optimized</RepositoryUrl>
+    <PackageTags>arcgis-pro;mcp;installer;dotnet-tool</PackageTags>
+  </PropertyGroup>
+</Project>
