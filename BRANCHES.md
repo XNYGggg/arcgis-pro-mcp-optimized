@@ -47,7 +47,7 @@
 
 ## 变更记录
 
-- **2026-11-16（深夜，平台说明与 v1.1.4 资产重发）**：全部分支与发布包的系统要求统一为 **Windows 11 x64（仅 x64 / AMD64，不支持 ARM64）**，删除全部 Windows 10 字样（README 双语、RELEASE-NOTES、VERSION.json、包内文档）；v1.1.4 Release 资产按用户要求重发——仅文档更新、add-in 与运行时二进制零改动，包内 SHA256SUMS 重算 171/171 通过，新 SHA256 `d475f47c3300929d07764efe5ed9e358285fbdb193932bdb40394e43e819c914`（1,712,641 B）；此为「Release 资产只增不改」约定的用户批准例外。
+- **2026-11-16（深夜，平台说明与 v1.1.4 资产重发）**：全部分支与发布包的系统要求统一为 **Windows 11 x64（仅 x64 / AMD64，不支持 ARM64）**，删除全部旧系统支持表述（README 双语、RELEASE-NOTES、VERSION.json、包内文档；仅保留 Windows 11，不含 10 及更早版本）；v1.1.4 Release 资产按用户要求重发——仅文档更新、add-in 与运行时二进制零改动，包内 SHA256SUMS 重算 171/171 通过，新 SHA256 `d475f47c3300929d07764efe5ed9e358285fbdb193932bdb40394e43e819c914`（1,712,641 B）；此为「Release 资产只增不改」约定的用户批准例外。
 - **2026-11-16（深夜，默认分支回到 main）**：按用户要求，仓库默认分支由 `customer-v1.1.4` 切回 `main`（此时 main 已是 v1.1.4 内容）；`customer-v1.1.4` 继续作为同内容的稳定版包快照。GitHub 设置：`gh api -X PATCH repos/XNYGggg/arcgis-pro-mcp-optimized -f default_branch=main`。
 - **2026-11-16（深夜，main 内容切换）**：按用户要求，`main` 分支内容由 2.0.1 开发线切换为 **v1.1.4 稳定版**（tree 与 `customer-v1.1.4` 一致，额外保留本 BRANCHES.md 供文档引用；2.0.1 历史提交仍在 main 的祖先链中，未丢失）；2.x 代码保留在 `customer-v2.0.1` / `customer-v2.0.0` 分支。
 - **2026-11-16（晚，1.1.4 README 双语与徽标）**：`customer-v1.1.4` 的 README 双语化（`README.md` 英文默认 + `README.zh-CN.md` 中文），顶部带 Language 切换并补全 Version / License / ArcGIS Pro / Platform / Release 徽标。
