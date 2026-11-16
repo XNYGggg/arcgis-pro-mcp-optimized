@@ -1,0 +1,21 @@
+{
+  "name": "ArcGIS Pro MCP 优化版（客户版）",
+  "version": "1.1.4",
+  "built": "2026-11-16",
+  "tools": 113,
+  "requirements": {
+    "os": "Windows 10/11 x64",
+    "arcgis_pro": ">=3.7",
+    "external_deps": "none (PowerShell/.NET provided by Windows and ArcGIS Pro)"
+  },
+  "addin": {
+    "file": "install/ArcGISProMCP.esriAddinX",
+    "file_version": "1.1.4.0",
+    "desktop_version": "3.7",
+    "sha256": "7e6ca097c7af065a1bc951930d47489dd1b8bb77cf6156cf98a742b53d286ad4"
+  },
+  "license": "AGPL-3.0-or-later",
+  "upstream": "https://github.com/Knight60/ArcGIS-Pro-MCP",
+  "source": "source/",
+  "branch": "customer-v1.1.4"
+}

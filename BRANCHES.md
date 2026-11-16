@@ -1,13 +1,13 @@
 # 分支、标签与 Release 对照表（BRANCHES.md）
 
-> 最后更新：2026-11-16（晚）· 本表是仓库分支治理的权威记录；新增/删除分支、移动标签、修订 Release 资产时请同步更新。
+> 最后更新：2026-11-16（深夜）· 本表是仓库分支治理的权威记录；新增/删除分支、移动标签、修订 Release 资产时请同步更新。
 
 ## 当前分支
 
 | 分支 | 角色 | 说明 |
 |---|---|---|
-| **`main`**（开发主线） | 开发主线（2.0 测试线） | AgentKit 2.0.1 代码（add-in 2.0.1 + 守卫 2.0 + 蒸馏 2.0）。**2.0 为测试版本，优化未完成，不推荐使用**；对应的 Release 资产已移除。非默认分支 |
-| `customer-v2.0.1` | 2.0.1 包快照（测试版） | 与已删除的 Release v2.0.1 资产同源；仅分支留档，不提供下载入口 |
+| **`main`** | 稳定版 v1.1.4 主线 | 内容与 `customer-v1.1.4` 一致（v1.1.4 完整离线包，add-in 1.1.4，113 工具）+ 本 BRANCHES.md；2026-11-16 深夜由 2.0.1 开发内容切换为 v1.1.4。非默认分支 |
+| `customer-v2.0.1` | 2.0.1 包快照（测试版） | 与已删除的 Release v2.0.1 资产同源；2.0 代码留档，不提供下载入口 |
 | `customer-v2.0.0` | 2.0.0 历史快照（测试版） | 原归档 SHA `e8ebda5`；仅分支留档 |
 | **`customer-v1.1.4`**（默认分支） | **稳定版 v1.1.4（推荐）** | add-in 1.1.4 完整离线包，**当前推荐使用，仓库默认分支（主干）**；对应 Release v1.1.4（Latest） |
 
@@ -43,11 +43,13 @@
 
 | 分支 | 归档前 SHA | 归档日期 | 内容与恢复 |
 |---|---|---|---|
-| `history-main-pre-2.0` | `6be852d` | 2026-11-16 | 2.0 合并前的 main，是 `main` 的祖先提交，内容未丢失。恢复：`git push origin 6be852d:refs/heads/history-main-pre-2.0` |
+| `history-main-pre-2.0` | `6be852d` | 2026-11-16 | 2.0 合并前的 main，是 2.0.1 线提交的祖先，内容未丢失。恢复：`git push origin 6be852d:refs/heads/history-main-pre-2.0` |
 
 ## 变更记录
 
-- **2026-11-16（晚，默认分支）**：按用户要求，仓库默认分支（主干）由 `main` 切回 `customer-v1.1.4`，即默认展示稳定版 v1.1.4；`main` 继续作为 2.0 开发主线。GitHub 设置：`gh api -X PATCH repos/XNYGggg/arcgis-pro-mcp-optimized -f default_branch=customer-v1.1.4`。
+- **2026-11-16（深夜，main 内容切换）**：按用户要求，`main` 分支内容由 2.0.1 开发线切换为 **v1.1.4 稳定版**（tree 与 `customer-v1.1.4` 一致，额外保留本 BRANCHES.md 供文档引用；2.0.1 历史提交仍在 main 的祖先链中，未丢失）；2.x 代码保留在 `customer-v2.0.1` / `customer-v2.0.0` 分支。
+- **2026-11-16（晚，1.1.4 README 双语与徽标）**：`customer-v1.1.4` 的 README 双语化（`README.md` 英文默认 + `README.zh-CN.md` 中文），顶部带 Language 切换并补全 Version / License / ArcGIS Pro / Platform / Release 徽标。
+- **2026-11-16（晚，默认分支）**：按用户要求，仓库默认分支（主干）由 `main` 切回 `customer-v1.1.4`，即默认展示稳定版 v1.1.4；`main` 随后于当晚切换为 v1.1.4 内容。GitHub 设置：`gh api -X PATCH repos/XNYGggg/arcgis-pro-mcp-optimized -f default_branch=customer-v1.1.4`。
 - **2026-11-16（晚，版本状态标注）**：将 v1.1.4 标记为**稳定版 · 推荐**；删除 Release `v2.0.1`、`v2.0.0` 及其标签（2.0 为测试版本，优化未完成、不推荐使用），2.0 代码仅保留在分支中；README（main 双语、customer-v1.1.4）与仓库简介同步标注。
 - **2026-11-16（晚，README 强化）**：恢复 `customer-v2.0.0` 分支（原归档 SHA `e8ebda5`）；四个分支 README 均增补"出图制图 / 守卫 / 蒸馏"三模块的使用方法与提示词指南。
 - **2026-11-16**：V2.01 正式发布与仓库重整（后于当晚按用户决定移除 2.0 发布物）。

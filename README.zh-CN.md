@@ -1,89 +1,14 @@
 [![English](https://img.shields.io/badge/Language-English-1f6feb?style=flat-square)](README.md) [![简体中文](https://img.shields.io/badge/Language-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-d1242f?style=flat-square)](README.zh-CN.md) [![Version](https://img.shields.io/badge/Version-1.1.4%20(stable)-2ea44f?style=flat-square)](../../releases/tag/v1.1.4) [![License: AGPL v3+](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue?style=flat-square)](LICENSE) [![ArcGIS Pro](https://img.shields.io/badge/ArcGIS%20Pro-3.7%2B-00a1e0?style=flat-square)](https://www.esri.com/en-us/arcgis/products/arcgis-pro/overview) [![Platform](https://img.shields.io/badge/Platform-Windows%2011-lightgrey?style=flat-square)]() [![Release](https://img.shields.io/github/v/release/XNYGggg/arcgis-pro-mcp-optimized?style=flat-square&label=release)](../../releases)
 
-# 🗺️ ArcGIS Pro MCP · 优化版（AgentKit）⚡
+# 🗺️ ArcGIS Pro MCP 优化版 · 客户版 v1.1.4 · 稳定版（推荐）🎁
 
-**一个仓库、三部分——让你的 AI 助手直接上手你正开着的 ArcGIS Pro 工程 (｀・ω・´)ゞ**
+用一句自然语言，让 AI 助手直接操作你正开着的 ArcGIS Pro 工程：加图层、改符号、查属性、跑地理处理、出图导出。数据不出本机，所有通信都走 `127.0.0.1` 🔒。
 
-告别"导出 → 上传 → 下载"的往返折腾 🏃‍♂️💨。助手直接跟你眼前的 Pro 会话对话:你的数据、你的地图、你的布局。🔒 所有通信只走 `127.0.0.1`,数据不出本机。
+> **📌 版本说明（2026-11-16 更新）**：v1.1.4（add-in 1.1.4，113 工具）为 **稳定版 · 推荐使用**。另一条 2.0 线（v2.0.0 / v2.0.1）为**测试版**，优化尚未完成，其 GitHub Release 资产与 tag 已移除、**不推荐使用**（NuGet 2.0.x 将无法下载）；2.0 代码仅保留在 `customer-v2.0.1` / `customer-v2.0.0` 分支中。分支 / 标签 / Release 对照见 [BRANCHES.md](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/blob/main/BRANCHES.md)。
 
-> **📌 版本状态（2026-11-16 更新）**
->
-> - ✅ **v1.1.4 · 稳定版 · 推荐使用**（113 工具）：[**Release v1.1.4**](../../releases/tag/v1.1.4) → `ArcGIS-Pro-MCP-v1.1.4.zip`；NuGet 安装固定 `dotnet tool install --global ArcGISProMCP.Install --version 1.1.4`。
-> - 🧪 **v2.0.0 / v2.0.1 · 测试版 · 不推荐**：2.0 优化尚未完成，GitHub Release 资产与对应 tag 已移除（NuGet 2.0.x 安装将无法下载）；2.0 代码仅保留在 `customer-v2.0.1` / `main` 分支中，待优化完成后再发布。
+> **🙏 上游项目与原作者**：本客户版基于 **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**（原作者 **Pisut Nakmuenwai**，AGPL-3.0-or-later），在其基础上累计本地补丁至 **v1.1.4**。完整署名与修改声明见包根 `NOTICE` 与 `source/SOURCE-NOTICE.md`。
 
-> ### 🙏 上游项目与原作者
-> 本项目站在巨人的肩膀上:**[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**,
-> 原作者 **Pisut Nakmuenwai**,**AGPL-3.0-or-later** 许可。感谢原作者!🌟
-> 我们在其基础上累计本地补丁至 **V2.01（v2.0.1）**，并新增守卫与蒸馏两个模块；上游署名与修改声明保留在 [NOTICE](NOTICE) 与客户包内的源码快照中。
-
----
-
-## 🆙 V2.01 相对 V2.0 的升级（v2.0.1）
-
-V2.01 是 2.0 线的**实机验证补丁版**：本机安装 2.0.0 并在 ArcGIS Pro 3.7 中真实驱动后，修复 3 个用户可见问题；其余能力与 2.0 一致，**只修问题、不改变架构**。
-
-| # | 问题（v2.0.0） | V2.01 的修复 | 实机验证（Pro 3.7） |
-|---|---|---|---|
-| 1 | 守卫误报警：信任框文字先于按钮出现在 UIA 树，首次扫描找不到按钮就弹 30 秒警报 | 按钮暂缺时等待 2.5 秒再警报（日志 `dialog_button_wait`） | 全新未信任 `.pyt`：检测 → 自动点「是(Y)」→ 无警报 |
-| 2 | `template_preview` 失败：`run-distill.ps1` 使用 `ValueFromRemainingArguments`，`--out` 被误绑定为 `-OutVariable` | 启动器改为 `$args` 简单脚本 | `template_preview` 正常返回 PNG |
-| 3 | 升级丢失模板库：安装器整目录替换 runtime，会把用户 `library/` 移进 `.bak` | 替换前先合并用户 `library/` | 重装后模板列表仍为 1，preview 正常 |
-
-> 2.0 线的主体能力（125 工具、按需守卫、模板蒸馏、RunCode 自动守卫）见下文（**开发记录；测试版本，不推荐部署**）。完整记录见 [CHANGELOG.md](CHANGELOG.md)（Release v2.0.1 已移除）。
-
----
-
-## ✨ 这是什么
-
-一句话就能改图——"按面积给区县做分级色彩,浅红到深绿"——然后看着地图自己变 🎨。
-
-| | 模块 | 作用 | 状态 |
-|---|---|---|---|
-| 🧩 | **MCP** | ArcGIS Pro 插件:**125 个原生工具**(进程内执行,约 9 ms ⚡)、全部地理处理工具、可选 RunCode / Python 桥 arcpy 通道。监听 `127.0.0.1:6520/mcp`。 | **🧪 测试版 · 不推荐（Release 已移除）** |
-| 🛡️ | **Guard** | 按需弹窗守卫:只在可能触发"第三方代码库"信任框的操作前被召唤,操作结束立刻收队。🥷 | **已完成**——见 [guard.md](docs/guard.md) |
-| 🧪 | **Distill** | 按需模板蒸馏:样本成图 → 可复用版式 spec。一次作业、无守护进程、完全可复现。🧬 | **已完成**——见 [distill.md](docs/distill.md) |
-
-### 🧠 为什么强调"按需"?(因为没人喜欢打不死的小强进程 🧟)
-
-- 🥷 **零常驻**:没有危险操作时,没有守卫进程、没有后台轮询——任务管理器安静得能听见风声 🍃。
-- 🛡️ **守卫只活一次操作**:在信任框可能出现之前召唤,操作结束立即退出。自动点击成功 = 你完全无感 ✨;失败 = 置顶警报(≥30 秒、响铃)🚨。它只点"第三方代码库执行"信任框,覆盖/删除确认框?绝不碰 🙅。
-- 🧪 **蒸馏是一次性作业**:不监听 inbox、不起服务,需要时才运行;每一步幂等、可断点续做 ✅。
-
-```mermaid
-flowchart LR
-  AI[🤖 AI 客户端<br/>Claude · Codex · 其他] -->|MCP over HTTP<br/>127.0.0.1:6520| M[🧩 ArcGIS Pro MCP 插件<br/>运行在 Pro 内]
-  M -.->|需要时才召唤 🛡️| G[弹窗守卫<br/>短生命周期进程]
-  M -->|可选 arcpy 🐍| R[RunCode 工具箱 /<br/>Pro 内 Python 桥]
-  F[🖼️ 样本成图] -->|一次性作业 🧪| D[模板蒸馏]
-  D -->|版式 spec 📐| M
-```
-
----
-
-## 🚀 快速开始 —— 稳定版 v1.1.4（推荐）
-
-✅ **v1.1.4（113 工具）是本仓库当前稳定推荐版本**：[**Release v1.1.4**](../../releases/tag/v1.1.4) → **`ArcGIS-Pro-MCP-v1.1.4.zip`**（SHA256 `29e01ae4…82d7`，171 个文件校验通过）。
-
-1. 📂 解压到任意目录 → 双击 `install/00-install.cmd`（不需要管理员；要求 ArcGIS Pro **3.7+**）
-2. 🖥️ 打开 ArcGIS Pro → 首次加载未签名 add-in 时选"是/信任" → 确认顶部 **MCP 选项卡** 显示 **running**（端口 `127.0.0.1:6520`）
-3. 🔌 接入你的 AI 客户端（见下方"配置方法"）
-4. ✅ 运行 `install/01-check.cmd`，全部 `[OK]` 就大功告成 (๑•̀ㅂ•́)و✧
-
-> 🧪 **2.0 线（v2.0.0 / v2.0.1）为测试版，不推荐使用**：优化尚未完成，GitHub Release 资产与 tag 已移除（NuGet 2.0.x 将无法下载）。2.0 代码仅保留在分支（`customer-v2.0.1`、`main`）中，待优化完成后再发布；下文相关能力介绍仅作开发记录，请勿据此部署。
-
-### 🛺 通过 NuGet 一键安装（GitHub Packages）
-
-dotnet 工具 [`ArcGISProMCP.Install`](../../pkgs/nuget/ArcGISProMCP.Install) 会自动从 Releases 下载离线包、逐文件校验 `SHA256SUMS.txt` 后启动 `install/00-install.cmd`。需要 .NET SDK，以及带 `read:packages` 权限的 [PAT](https://github.com/settings/tokens)：
-
-```powershell
-# 首次：注册 GitHub Packages 的 NuGet 源
-dotnet nuget add source "https://nuget.pkg.github.com/XNYGggg/index.json" --name github --username XNYGggg --password <你的PAT> --store-password-in-clear-text
-
-# 稳定版（推荐）：固定安装 1.1.4
-dotnet tool install --global ArcGISProMCP.Install --version 1.1.4
-arcgis-pro-mcp-install              # 加 --dry-run 则只下载与校验，不启动安装
-```
-
-> NuGet 上的 2.0.0 / 2.0.1 为测试版本，对应 Release 资产已移除，**请勿安装**。
+本客户版把运行所需的**全部组件**打包在一起，离线可用，**不需要安装 Python、不需要 pip、不需要联网**，除 ArcGIS Pro 本身外没有任何额外依赖。电池都给你装好了 🔋
 
 ---
 
@@ -91,31 +16,33 @@ arcgis-pro-mcp-install              # 加 --dry-run 则只下载与校验，不�
 
 | 项目 | 要求 |
 |---|---|
-| 🪟 操作系统 | **Windows 11**（ArcGIS Pro 3.7 官方支持，64 位 Home / Pro / Enterprise）。Windows 10 22H2 可运行但不在 3.7 官方支持清单内，**未验证** |
-| 🗺️ ArcGIS Pro | **3.7 已验证**；更新版本待验证 |
+| 🪟 操作系统 | Windows 10 / 11（64 位；以 ArcGIS Pro 3.7 官方支持的系统为准，Pro 3.7 推荐 Windows 11） |
+| 🗺️ ArcGIS Pro | **3.7 或更高**（本 add-in 基于 3.7 / .NET 10 构建） |
 | 🔑 权限 | 普通用户即可，安装**不需要管理员** |
 | 📦 其他依赖 | 无（PowerShell 与 .NET 由 Windows / Pro 自带） |
 
 ---
 
-## ⚠️ 已知边界
+## 🚀 5 分钟上手
 
-- 🔏 add-in **未签名**：首次加载需在 Pro 内点"信任"；部分组织的安全策略可能阻止未签名加载项，需管理员放行。
-- 🧪 **干净 Windows 虚拟机全流程演练尚未完成**——建议先在测试机试装。
-- 🪟 仅 Windows；ArcGIS Pro 3.7 已验证，更新版本未验证。
-- 🚨 覆盖 / 删除类确认框的负向测试以规则测试为主，未在真实弹窗矩阵上穷举。
+1. 📂 **解压**本包到任意目录（例如 `D:\ArcGIS-Pro-MCP-客户版`）。
+2. 🛠️ **关闭 ArcGIS Pro**，双击 `install\00-install.cmd`。脚本会自动安装 add-in、部署运行时、并尝试配置 Claude Desktop / Claude Code。
+3. 🖥️ **打开 ArcGIS Pro**。首次加载时如提示“加载项不受信任”，点“是 / 信任”（放心点 😄）。在 Pro 顶部找到 **MCP 选项卡**，确认状态为 **running**（端口 `127.0.0.1:6520`）。
+4. 🔌 **接入你的 AI 客户端**（见下方“配置方法”），然后双击 `install\01-check.cmd` 自检，全部 `[OK]` 即可使用 (๑•̀ㅂ•́)و✧
+
+> 自检时若 ArcGIS Pro 没开，端口检查会显示警告——先打开 Pro 再跑一次即可 👌
 
 ---
 
 ## 🎛️ 配置方法 —— 接入你的 AI 客户端
 
-**前提**:ArcGIS Pro 已打开,**MCP 选项卡**显示 **running**。所有端口只绑定本机:
+**前提**：ArcGIS Pro 已打开，**MCP 选项卡**显示 **running**。所有端口只绑定本机：
 
 | 端口 | 用途 |
 |---|---|
 | `6520` | MCP over HTTP —— 所有 AI 客户端都连这里 |
-| `6510` | 旧版 TCP 桥(现代客户端不用) |
-| `6511` | 可选 Pro 内 Python 桥(`execute_arcpy_code`) |
+| `6510` | 旧版 TCP 桥（现代客户端不用） |
+| `6511` | 可选 Pro 内 Python 桥（`execute_arcpy_code`） |
 
 ### 🟣 Claude Code
 
@@ -124,21 +51,21 @@ claude mcp add --transport http arcgis http://127.0.0.1:6520/mcp
 claude mcp list
 ```
 
-手工等价配置(`~/.claude.json`):
+手工等价配置（`~/.claude.json`）：
 
 ```json
 { "mcpServers": { "arcgis": { "type": "http", "url": "http://127.0.0.1:6520/mcp" } } }
 ```
 
-移除用 `claude mcp remove arcgis`,再加回用上面的命令。
+移除用 `claude mcp remove arcgis`，再加回用上面的命令。
 
-### 🖥️ Claude Desktop(使用自带的 stdio 桥)
+### 🖥️ Claude Desktop（使用自带的 stdio 桥）
 
-Claude Desktop 不能直连 HTTP,只能启动本地进程——用包内纯 PowerShell 的桥(无需 Python):
+Claude Desktop 不能直连 HTTP，只能启动本地进程——用包内纯 PowerShell 的桥（无需 Python）：
 
-1. **完全退出 Claude Desktop**(含托盘图标)。
-2. 运行 `install/02-configure-claude.cmd`,或手工编辑配置(脚本/手工都请先备份)。
-3. 配置文件位于以下目录中"已存在"的第一个:
+1. **完全退出 Claude Desktop**（含托盘图标）。
+2. 运行 `install\02-configure-claude.cmd`，或手工编辑配置（请先备份）。
+3. 配置文件位于以下目录中“已存在”的第一个：
    `%APPDATA%\Claude`、`%APPDATA%\Claude-3p`、`%LOCALAPPDATA%\Claude-3p`、`%LOCALAPPDATA%\Claude` —— 文件名 `claude_desktop_config.json`。
 
 ```json
@@ -153,11 +80,11 @@ Claude Desktop 不能直连 HTTP,只能启动本地进程——用包内纯 Powe
 }
 ```
 
-4. 重新打开 Claude Desktop,工具列表里出现 `arcgis` 即成功。
+4. 重新打开 Claude Desktop，工具列表里出现 `arcgis` 即成功。
 
 ### 🟢 Codex
 
-在 `~/.codex/config.toml` 中加入(如已有旧 `arcgis` 段,整段替换,包括旧的 `env` 子表):
+在 `~/.codex/config.toml` 中加入（如已有旧 `arcgis` 段，整段替换，包括旧的 `env` 子表）：
 
 ```toml
 [mcp_servers.arcgis]
@@ -168,38 +95,35 @@ url = "http://127.0.0.1:6520/mcp"
 
 ### 🔧 其他 MCP 客户端
 
-以 Streamable HTTP 连接 `http://127.0.0.1:6520/mcp`,或用上面的通用 JSON。(Antigravity 用 `serverUrl` 且不要 `type`。)
+以 Streamable HTTP 连接 `http://127.0.0.1:6520/mcp`，或用上面的通用 JSON。（Antigravity 用 `serverUrl` 且不要 `type`。）
 
 ### ✅ 验证连接
 
-- `install/01-check.cmd` —— 检查 Pro 版本、add-in 哈希、运行时、端口与客户端配置。
+- `install\01-check.cmd` —— 检查 Pro 版本、add-in 哈希、运行时、端口与客户端配置。
 - `netstat -ano | findstr 6520` —— 确认端口在监听。
-- 日志:`%LOCALAPPDATA%\ArcGIS-MCP\addin.log`。
+- 日志：`%LOCALAPPDATA%\ArcGIS-MCP\addin.log`。
 
 ---
 
 ## 🎯 使用方法
 
-**基本循环**:打开有数据的工程 → 说出你的需求 → 助手自动选择工具 → 查看结果(图片会直接内联返回)🎨
+**基本循环**：打开有数据的工程 → 说出你的需求 → 助手自动选择工具 → 查看结果（图片会直接内联返回）🎨
 
 | 你可以说 | 实际发生什么 |
 |---|---|
-| "按面积给区县做分级色彩,浅红到深绿" | `set_layer_renderer`(分级色彩) |
-| "选出人口大于 50 万的县并导出成新要素类" | `select_features` → `export_features` |
-| "给道路做 500 米缓冲区" | `run_geoprocessing_tool`(Buffer) |
-| "统计每个乡镇的耕地面积" | `summarize_features` / `zonal_statistics` |
-| "把当前地图视图截给我看" | `export_map_view`(返回 PNG) |
-| "出一张 A3 竖版 PDF,带标题、图例、比例尺、指北针" | `create_layout` → `add_map_frame` → `add_layout_*` → `export_layout` |
-| "把 12 个图层按同一套符号批量导出" | `run_batch` 或 `execute_arcpy_code` |
+| “按面积给区县做分级色彩，浅红到深绿” | `set_layer_renderer`（分级色彩） |
+| “选出人口大于 50 万的县并导出成新要素类” | `select_features` → `export_features` |
+| “给道路做 500 米缓冲区” | `run_geoprocessing_tool`（Buffer） |
+| “统计每个乡镇的耕地面积” | `summarize_features` / `zonal_statistics` |
+| “把当前地图视图截给我看” | `export_map_view`（返回 PNG） |
+| “出一张 A3 竖版 PDF，带标题、图例、比例尺、指北针” | `create_layout` → `add_map_frame` → `add_layout_*` → `export_layout` |
+| “把 12 个图层按同一套符号批量导出” | `run_batch` 或 `execute_arcpy_code` |
 
-**按工具名调用**:下表中的每个工具都可以被客户端按名字直接调用;`run_batch` 可在一次往返里串起多条命令;没有专用工具时用 `execute_arcpy_code` 兜底。
+**按工具名调用**：下表中的每个工具都可以被客户端按名字直接调用；`run_batch` 可在一次往返里串起多条命令；没有专用工具时用 `execute_arcpy_code` 兜底。
 
-**编辑规则**:编辑在 `save_edits` 之前一直挂起,挂起期间数据被锁定(删除/覆盖会失败);`discard_edits` 丢弃挂起编辑。`delete_features` / `delete_dataset` 不可撤销——先让助手说明影响范围再执行。
+**编辑规则**：编辑在 `save_edits` 之前一直挂起，挂起期间数据被锁定（删除/覆盖会失败）；`discard_edits` 丢弃挂起编辑。`delete_features` / `delete_dataset` 不可撤销——先让助手说明影响范围再执行。
 
-**可选组件的按需用法:**
-- 🐍 RunCode 工具箱:`%LOCALAPPDATA%\ArcGIS Pro MCP\runcode\RunCode.pyt`;每个 Pro 会话首次运行会弹信任框,可先启动弹窗守护。
-- 🔌 Python 桥:在 Pro 的 Python 窗口粘贴 `sys.path.insert(0, r"...\ArcGIS Pro MCP\plugin")` 并执行 `mcp_bridge.start_server(port=6511)`;需要 `CURRENT` 时再加 `mcp_bridge.start_pump()`。
-- 🛡️ 弹窗守护:`install\03-dialog-guard.cmd`(600 秒)、`-AlertOnly`、`-NotifyTest`。
+**批量与提速**：重复度高、数据量大时，让助手用 RunCode 写一个幂等 arcpy 脚本一次执行；大工程按范围/OID 分块并留检查点。
 
 ---
 
@@ -218,7 +142,7 @@ url = "http://127.0.0.1:6520/mcp"
 
 **好提示词 vs 坏提示词**
 - ❌ "帮我美化一下地图" —— 没有目标，助手只能猜。
-- ✅ "把 `土地利用` 按 `DLMC` 做唯一值符号化，配色参考模板 `tpl-xxx`，图例放右下角，然后导出一张 A3 横向 PDF 到 `D:\out\landuse.pdf`，300 dpi。"
+- ✅ "把 `土地利用` 按 `DLMC` 做唯一值符号化，图例放右下角，然后导出一张 A3 横向 PDF 到 `D:\out\landuse.pdf`，300 dpi。"
 - ❌ "出个图" —— 没说范围、版式、输出。
 - ✅ "以 `研究区` 图层为范围，比例尺 1:10000，出一张 A4 纵向 PNG，标题‘研究区土地利用现状’，带图例、比例尺、指北针，先发预览图给我确认。"
 
@@ -263,129 +187,111 @@ url = "http://127.0.0.1:6520/mcp"
 
 - "图例压住主图了" → 助手调整 `legend` 坐标或版式。
 - "页面比例不对/留白太多" → 调整 map frame 与页面比例。
-- "配色太跳/不符合论文风格" → 给出色带、十六进制或模板 ID。
+- "配色太跳/不符合论文风格" → 给出色带、十六进制或参考图。
 - "先别导出，给我预览" → 助手先 `export_map_view` 或布局预览。
 
 **效果**：把"数据、操作、风格、输出"一次讲全，助手通常一轮就能做出接近终稿的图；后续修改只需指出差异（"图例右移 1 cm"），不用重述全部。
 
 ---
 
-## 🛡️ 守卫模块怎么用（按需弹窗守卫）
+## 🛡️ 弹窗守护怎么用（1.x 版）
 
-**它解决什么**：ArcGIS Pro 第一次运行第三方 `.pyt` / Python 工具（如 RunCode.pyt）会弹"第三方代码库"信任框；无人值守时任务会卡住。守卫只在可能弹框的操作前被唤起，自动点"是(Y)"，操作结束立即退出。
+**它解决什么**：ArcGIS Pro 第一次运行第三方 `.pyt` / Python 工具（如 RunCode.pyt）会弹"第三方代码库"信任框；无人值守时任务会卡住。1.1.4 没有 MCP 守卫工具，而是包内自带一个**独立守护脚本**：启动后轮询 Pro 窗口，只点这一类"是(Y)"，按设定时长自动退出。
 
-**两种触发方式**
-1. **自动（2.x 默认）**：助手调用 `run_python_toolbox_tool` / `execute_arcpy_code` 前，add-in 自动 arm 守卫、操作结束 settle 收队，通常不用你说话。
-2. **手动召唤 `guard_summon`**：你自己在 Pro 里手动运行 `.pyt`、做 ENVI→Pro 导入，或任何助手之外的操作。
+**启动方式**
+
+```text
+install\03-dialog-guard.cmd                    # 默认 600 秒
+install\03-dialog-guard.cmd -DurationSeconds 120
+install\03-dialog-guard.cmd -AlertOnly         # 只置顶提醒，不自动点击
+install\03-dialog-guard.cmd -NotifyTest        # 只测提醒窗（30 秒）
+```
+
+也可以直接双击 `03-dialog-guard.cmd`，或让支持终端操作的 AI 助手在后台启动它。
 
 **提示词示例**
 
 | 你说 | 助手会做什么 |
 |---|---|
-| "接下来我要在 Pro 里手动运行 RunCode.pyt，先召守护 10 分钟；出现第三方代码信任框自动点‘是’，点不到就置顶响铃提醒我" | `guard_summon`（timeout_s≈600） |
-| "这次只提醒、不自动点" | `guard_summon`（alert_only） |
-| "看看刚才守卫有没有正常结束" | `guard_status` |
-| "跑 RunCode 前把守护开上" | 自动 arm + settle |
+| "我要在 Pro 里手动跑 RunCode.pyt。先帮我启动弹窗守护 600 秒；出现第三方代码信任框自动点‘是’，点不到就置顶响铃提醒我" | 在后台运行 `install\03-dialog-guard.cmd -DurationSeconds 600` |
+| "这次只提醒、不自动点" | 启动 `-AlertOnly` |
+| "测试一下提醒窗能不能弹出来" | 启动 `-NotifyTest`（30 秒） |
+| "守护的日志在哪？" | `%LOCALAPPDATA%\ArcGIS Pro MCP\guard\watch_pro_dialog.log` |
 
-**边界与参数**
-- 只点"第三方代码库执行"信任框；覆盖、删除等其他确认框一律不碰。
+**边界与效果**
+- 只处理带"第三方 / 代码库 / third-party / code library"上下文的信任框；覆盖、删除等其他确认框一律不碰。
 - 点不到按钮时，置顶提醒窗至少 30 秒并每 10 秒响铃。
-- `timeout_s` 控制守卫存活时间，超时自动退出；`guard_status` 可查引擎路径、版本和最近 20 次会话。
 - 每个 Pro 进程首次信任后不再弹；重启 Pro 后恢复需要。
-- 1.1.4 没有 `guard_summon`，用包内 `install\03-dialog-guard.cmd`（默认 600 秒）启动同样的守护。
-
-**效果**：无人值守的 RunCode / ENVI 联合作图不再卡在弹窗；即使自动点击失败，也有置顶 + 响铃兜底，不会静默挂死。
+- 2.x 把同一能力升级成了 `guard_summon` / `guard_status`，并在 RunCode 调用前自动 arm/settle；1.1.4 需要手动启动脚本。
 
 ---
 
-## 🧪 蒸馏模块怎么用（样本图 → 可复用版式模板）
+## 🐍 RunCode 与 Python 桥怎么用（提示词指南）
 
-"蒸馏"不是模型训练，而是把一张**样本成图**（论文图、教材图、优秀制图样例）里的版式知识——图框位置、配色、字号、图例/比例尺/指北针布局、易翻车点——提取成一份可复用的 JSON 模板（spec），以后出图直接套用。
+1.1.4 的 arcpy 通道有两级：**RunCode 工具箱**适合一次性/批量脚本；**Python 桥**适合需要跨调用保持变量的交互式会话。
 
-**蒸出来的是什么**：`template_id` + 一份 spec，包含 `canvas`（画布尺寸/DPI）、`map_frame`、`title / legend / scale_bar / north_arrow`、`palette`、`typography`、`regions[]`、`pitfalls[]`、`measured`（测量证据）、`review`（评审记录）。模板库默认在 `%LOCALAPPDATA%\ArcGIS Pro MCP\library`。
+### RunCode 工具箱
 
-**效果**
-- 版式一致：同一课题组/同一项目的多张图，图框、字号、图例位置统一。
-- 少反复：不用每次口述"图例放右下、标题 22 号、配色浅红到深绿"。
-- 可审计：每个模板都有测量来源、patch 内容、评审人和日期，换人也能复现。
-- 防翻车：`pitfalls[]` 把"图例压图"这类问题变成可执行检查。
+路径：`%LOCALAPPDATA%\ArcGIS Pro MCP\runcode\RunCode.pyt`。让助手调用 `run_python_toolbox_tool` 时传入该路径即可；也可以自己在 Pro 里"插入 → 工具箱 → 添加工具箱"。
 
-**完整流程与提示词**
+**提示词示例**
+- "用 RunCode.pyt 批量把当前工程所有图层的标注打开，标注字段用 `NAME`，字号 10。"
+- "写一个幂等 arcpy 脚本，用 RunCode 给每个图层名加前缀 `LYR_`，已经加过就跳过。"
+- "这段脚本要在 RunCode.pyt 里跑，先帮我检查参数和路径，再执行。"
 
-| 步骤 | 你可以这样说 | 助手调用 | 你要验收什么 |
-|---|---|---|---|
-| 1 入库 | "把 `D:\samples\fig3.png` 蒸馏成模板，名称‘研究区总览图’，标签：论文风格" | `template_import` | 返回的 `template_id` |
-| 2 测量 | "继续测量" | `template_measure` | `h_lines/v_lines`、`palette_top`、DPI 是否合理 |
-| 3 语义 | 助手看图写 patch（图框、图例、字号、分区、pitfalls） | `template_patch` | patch 里的坐标/字号是否符合预期 |
-| 4 校验 | "校验一下" | `template_validate` | 错误为 0；warning 是否可接受 |
-| 5 预览 | "给我看预览图" | `template_preview` | 线框与样本并排是否一致 |
-| 6 评审/批准 | "我确认，评审人柳皓文，备注版式核对通过" → "批准" | `template_review` → `template_approve` | 状态变 `ready` |
-| 7 套用 | "用模板 `tpl-xxx` 给当前工程出图" | `template_apply` → 制图工具 | 成品图与模板版式一致 |
+**首次运行**会弹"第三方代码库"信任框：先启动上面的弹窗守护，或手动点一次"是"。同一 Pro 进程只需信任一次。
 
-**可直接复制的提示词**
+### Python 桥（需要 `CURRENT` 或持久变量时）
 
-1. **单图完整蒸馏**
+1. 在 Pro 菜单 **分析 → Python** 打开 Python 窗口；
+2. 粘贴执行（路径按默认安装位置）：
 
-```text
-把 `D:\samples\fig3.png` 蒸馏成版式模板：
-- 名称：研究区总览图；标签：论文风格、A4 横向
-- 按完整流程做 import → measure → patch → validate → preview
-- 语义字段（图框、图例、比例尺、指北针、字号、配色、regions、pitfalls）你来看图判断
-- 每一步把关键结果告诉我；预览图先给我确认，我点头后再 review + approve
-- 不要手改 measured 数值
+```python
+import sys; sys.path.insert(0, r"C:\Users\<你的用户名>\AppData\Local\ArcGIS Pro MCP\plugin")
+import mcp_bridge; print(mcp_bridge.start_server(port=6511))
 ```
 
-2. **批量入库（先只测量）**
+3. 需要 `CURRENT`（当前工程）时再加一行（必须在主线程执行）：
 
-```text
-扫描 `D:\samples\` 下的所有 PNG，逐张 import + measure，名称用文件名，
-标签统一加 `候选模板`。先不要写语义 patch；把测量汇总表给我，我挑选后再逐张精修。
+```python
+print(mcp_bridge.start_pump())
 ```
 
-3. **用模板出图**
+**提示词示例**
+- "接下来的 arcpy 需要 `CURRENT`。请提醒我在 Pro 的 Python 窗口粘贴桥的启动代码，然后我用 `execute_arcpy_code` 执行。"
+- "帮我把桥启动代码按我的用户名填好，复制给我；我自己粘贴到 Pro。"
+- "先 `get_pump_status` 看看 pump 是否就绪；没就绪就提醒我粘贴。"
+- "用持久会话分三步：先读图层，再建字段，最后计算——变量要跨调用保留。"
 
-```text
-用模板 `tpl-20261116-172854-57ec` 给当前工程出图：
-先 template_apply 读取模板，再按 map_frame/palette/typography/pitfalls 制作
-A4 横向布局，标题“研究区土地利用现状”，导出 300 dpi PDF 到 `D:\out\landuse.pdf`。
-完成后把自检结果和预览图发我验收。
-```
-
-4. **修改已就绪模板**
-
-```text
-把 `tpl-xxx` 的图例移到右下角（x=0.78, y=0.78, w=0.16, h=0.16），标题字号改 22，
-重新 validate 和 preview 后给我看；不要动 measured。确认后重新 review + approve。
-```
-
-5. **模板迁移/分享**
-
-```text
-把 `tpl-xxx` 导出成 bundle.zip；然后在另一台机器的模板库里 bundle-import，
-列出导入后的 template_id 和状态。
-```
-
-**助手必须遵守的硬规则**
-- 语义判读按 [skills/template-distill/SKILL.md](skills/template-distill/SKILL.md) 执行；确定性步骤不要"发挥"。
-- `measured / id / image_sha256 / source_image / schema_version` 是受保护字段，patch 里出现会被拒绝；要改画布就重跑 `measure --force` 或用 `canvas.height_in` 对齐（与实测容差 3%）。
-- `ready` 必须同时通过校验和人工 review；`approve` 缺 review 会拒绝。`--force` 只在你明确要求时使用，并会写入评审记录。
-- 预览图必须给你看并与样本并排核对后，才能批准。
-- 期刊/教材样本图默认只入本地库，不要导出公开 bundle（版权）。
-
-**常见问题**
-- **预览失败/没有弹图**：v2.0.0 的 `run-distill.ps1` 有 `--out` 参数绑定问题，v2.0.1 已修复；升级到 V2.01。
-- **测量不到图幅**：样图太暗/太糊或没有明显亮带，换清晰的整图截图。
-- **校验报 3% 容差**：`canvas.height_in` 与实测不符；不要手改 measured，改 canvas 或重测。
-- **模板状态 `ready` 不能改**：复制一份 spec 或用新 id 重新导入，避免破坏已交付模板。
+**效果**：RunCode 解决"批量脚本一次跑完"；Python 桥解决"多步交互、需要当前工程"；两者都不需要另装 Python。
 
 ---
 
-## 🧰 全部 125 个 MCP 工具(14 组)
+## 🧪 关于蒸馏模块（2.x 功能）
 
-助手能做的全部事情,按名字列在这里。点开看看 👇
+1.1.4 **不包含**模板蒸馏：没有 `template_*` 工具，也没有 `guard_summon` / `guard_status`。如果你想把样图版式变成可复用模板、让多张图版式统一，请升级到 **V2.01（v2.0.1）**：
+
+- 2.x 提供 10 个 `template_*` 工具：import / measure / patch / validate / preview / review / approve / apply / list / get；
+- 模板库在 `%LOCALAPPDATA%\ArcGIS Pro MCP\library`，升级安装会保留已有模板；
+- 典型用法："把 `D:\samples\fig3.png` 蒸馏成模板，名称研究区总览图；按 import → measure → patch → validate → preview 流程，预览给我确认后再 review + approve。"
+
+1.1.4 与 2.x 的能力对照：
+
+| 能力 | 1.1.4（本分支） | 2.0.1（推荐） |
+|---|---|---|
+| 原生 MCP 工具 | 113 个（12 组） | 125 个（14 组） |
+| RunCode / Python 桥 | ✅ | ✅ |
+| 弹窗守护 | 独立脚本 `03-dialog-guard.cmd` | `guard_summon` / `guard_status` + RunCode 自动 arm/settle |
+| 模板蒸馏 | ❌ | ✅ 10 个 `template_*` 工具 + schema v1.1 |
+
+---
+
+## 🧰 全部 113 个 MCP 工具（12 组）
+
+助手能做的全部事情，按名字列在这里。点开看看 👇
 
 <details>
-<summary><b>📜 完整工具清单 —— 会话 15 · 图层 19 · 数据 11 · 选择 6 · 字段/数据集 11 · 地理处理 7 · 符号化 6 · 视图 7 · 布局 16 · 栅格 5 · 目录 6 · 实用工具 4 · 守卫 2 · 模板 10</b></summary>
+<summary><b>📜 完整工具清单 —— 会话 15 · 图层 19 · 数据 11 · 选择 6 · 字段/数据集 11 · 地理处理 7 · 符号化 6 · 视图 7 · 布局 16 · 栅格 5 · 目录 6 · 实用工具 4</b></summary>
 
 ### 会话与工程（15）
 
@@ -560,76 +466,79 @@ A4 横向布局，标题“研究区土地利用现状”，导出 300 dpi PDF �
 | `stop_pump` | 移除主线程调度器；实时工程类命令将停止工作，直到用户重新安装。 |
 | `run_batch` | 一次往返运行多条命令，多步工作流会快很多。 |
 
-### 守卫（2）
-
-| 工具 | 用途 |
-|---|---|
-| `guard_summon` | 为手工步骤召唤按需弹窗守卫：只点“第三方代码库执行”信任框；点不到时置顶警报 ≥30 秒；按 `timeout_s` 自行退出。 |
-| `guard_status` | 守卫引擎路径/版本、会话根目录与最近 20 个召唤会话。 |
-
-### 模板蒸馏（10）
-
-| 工具 | 用途 |
-|---|---|
-| `template_list` | 列出模板库中的模板，可按状态或标签过滤。 |
-| `template_get` | 读取模板 spec（版式、配色、字体、分区、易翻车点与评审记录）。 |
-| `template_import` | 导入样本成图作为草稿（按 sha256 去重）。 |
-| `template_measure` | 测量图幅包围盒、长宽比、强框线、主色与 DPI。 |
-| `template_patch` | 以校验合并方式提交语义字段；受保护字段会被拒绝。 |
-| `template_validate` | schema + 几何一致性校验。 |
-| `template_review` | 记录人工评审结论。 |
-| `template_approve` | 批准已评审、已校验的模板（置为 ready）。 |
-| `template_preview` | 返回线框预览图。 |
-| `template_apply` | 把 ready 模板写成制图任务上下文文件。 |
-
 </details>
 
 ---
 
-## 🗂️ 仓库结构
+## 📦 包里有什么
 
-```
-├── main 🏠                   开发主线:AgentKit 2.0.1(MCP 2.0.1 + 守卫 + 蒸馏;非默认分支)
-├── customer-v2.0.1 🧪        2.0.1 包快照(测试版;Release 已移除)
-├── customer-v2.0.0 🗄️        2.0.0 客户版历史快照(仅分支留档)
-├── customer-v1.1.4 ✅        默认分支(主干)·稳定版客户版(add-in 1.1.4,推荐)
-├── installer/ 🛺             ArcGISProMCP.Install——NuGet 安装器工具(下载→校验→启动安装)
-├── addin/ArcGISProMCP/ 🧩     C# 插件(125 个工具、GuardClient、模板命令)
-├── src/arcgis_pro_mcp/ 🐍     上游 Python stdio/CLI 服务(保留便于 rebase)
-├── src/arcgis_agentkit/ 🧰    guard / distill Python 包(CLI + 引擎)
-├── skills/ 🎓                给助手的技能说明(template-distill、arcgis-pro-mapping)
-├── library/ 📚               模板库 schema(v1.1)与示例
-├── docs/ 📖                  设计、架构、守卫与蒸馏文档
-└── tests/ 🧪                 pytest(守卫握手/规则、完整蒸馏流水线)
-```
+| 路径 | 内容 | 说明 |
+|---|---|---|
+| `install\ArcGISProMCP.esriAddinX` | 🧩 add-in v1.1.4 | 113 个原生工具 + 全部 GP 工具；HTTP MCP 6520 / 旧 TCP 6510 |
+| `install\runtime\stdio-bridge.ps1` | 🌉 stdio 桥 | 给只能启动本地进程的客户端（如 Claude Desktop）转接 6520；纯 PowerShell，无需 Python |
+| `install\runtime\runcode\RunCode.pyt` | 🐍 RunCode 工具箱 | 需要高频执行任意 arcpy 时使用；首次运行会弹一次信任框 |
+| `install\runtime\guard\` | 🛡️ 弹窗守护 | 自动点击“第三方代码库执行”信任框；失败时置顶提醒（≥30 秒、响铃） |
+| `install\runtime\plugin\` | 🔌 Python 桥（可选） | 在 Pro 的 Python 窗口里启动，提供 `execute_arcpy_code` 持久会话（端口 6511） |
+| `install\*.cmd / *.ps1` | 🛠️ 安装与自检 | 安装 / 自检 / 配置 Claude / 弹窗守护 / 卸载 |
+| `clients\` | 📁 客户端接入说明 | Claude Code、Claude Desktop、Codex、通用 JSON |
+| `docs\` | 📖 使用指南、排障、工作规则、更新日志 | 先看使用指南 |
+| `source\` | 📜 完整源码快照 | 与本包二进制对应的源码（AGPL-3.0 合规要求），含上游 LICENSE / NOTICE |
 
-分支 / 标签 / Release 的完整对照(含已归档分支的 SHA 与恢复命令)见 [BRANCHES.md](BRANCHES.md)。
+### 🔍 依赖审计（为什么说“全打包”）
 
-开发安装:
-
-```powershell
-python -m pip install -e .
-arcgis-guard doctor
-arcgis-distill doctor
-```
-
-## 🛣️ 路线图
-
-1. ✅ **M1 — 守卫 2.0**:召唤协议、UIA 事件优先检测、add-in 自动 arm/settle、规则 schema、CLI、测试
-2. ✅ **M2 — 蒸馏 2.0**:import / measure / patch / validate / preview / review / approve / apply、schema v1.1、模板 MCP 工具
-3. ✅ **M3 — 发布 V2.01**:2.0.1 版本归一、Tag v2.0.1 转正、Release 资产与 NuGet 包发布、客户版包快照分支 customer-v2.0.1、README/分支体系重整
-4. ⏳ **M4 — 打磨**:add-in 代码签名、干净 Windows 虚拟机全流程演练、弹窗矩阵负向测试、安装器 URL 修复随下一 NuGet 版本发布
-
-详细设计、验收标准与取舍记录:[docs/design-2026-11-16.md](docs/design-2026-11-16.md)。V2.01 已到场 (๑•̀ㅂ•́)و✧
+- 🧩 add-in：自包含 C# 程序集，运行在 Pro 3.7 受支持环境自带的 .NET Desktop Runtime 10 x64 上——本包无需另装 .NET。
+- 🌉 stdio 桥、🛡️ 弹窗守护：Windows 自带的 PowerShell 5.1 + WinForms——无需另装。
+- 🐍 RunCode 工具箱、Python 桥：运行在 ArcGIS Pro 自带的 Python（arcpy）里——无需另装 Python。
+- ✅ **因此本包没有任何需要 pip / 联网安装的外部依赖。**“离线可用”指本包自身的安装与运行链路；ArcGIS Pro 3.7 的安装前提（.NET Desktop Runtime 10 x64、WebView2 ≥132）由 Pro 的安装程序提供。
 
 ---
 
-## 📜 许可、致谢与免责声明
+## 🧪 可选组件怎么用
 
-- ⚖️ **许可**:[AGPL-3.0-or-later](LICENSE)。MCP 模块衍生自 AGPL-3.0-or-later 项目,合并仓库同样采用 AGPL-3.0-or-later。
-- 🙏 **上游项目与原作者**:[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP),作者 **Pisut Nakmuenwai**——感谢原作者!💐 本地修改声明见 [NOTICE](NOTICE)、[RELEASE-NOTES.md](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/blob/customer-v2.0.1/RELEASE-NOTES.md) 与客户包内 `source/SOURCE-NOTICE.md`。
-- 🏷️ **商标**:本项目与 Esri 无隶属关系;"ArcGIS"是 Esri 的商标,本项目为第三方工具。
-- 🔒 **隐私/网络**:所有服务仅绑定 `127.0.0.1`;无遥测、无云端调用。
-- 👤 **维护者**:Law([@XNYGggg](https://github.com/XNYGggg))。
+**🐍 RunCode 工具箱**（高频 arcpy 场景）
+- 路径：`%LOCALAPPDATA%\ArcGIS Pro MCP\runcode\RunCode.pyt`
+- 让 AI 调用 `run_python_toolbox_tool` 时传入该路径即可；或在 Pro 里“插入 → 工具箱 → 添加工具箱”选择它。
+- 每个 Pro 会话首次运行会弹“第三方代码库”信任框：可先运行 `03-dialog-guard.cmd`，守护会自动点“是” ✨。
 
-[🇬🇧 English version](README.md) · 用 ☕ + 🗺️ + 一点点强迫症做出来的
+**🔌 Python 桥**（需要跨调用保持 arcpy 会话时）
+1. 在 ArcGIS Pro 菜单 **分析 → Python** 打开 Python 窗口；
+2. 粘贴执行（路径已按默认安装位置写好）：
+   ```python
+   import sys; sys.path.insert(0, r"C:\Users\<你的用户名>\AppData\Local\ArcGIS Pro MCP\plugin")
+   import mcp_bridge; print(mcp_bridge.start_server(port=6511))
+   ```
+3. 需要 `CURRENT`（当前工程）时再加一行（必须在主线程执行）：
+   ```python
+   print(mcp_bridge.start_pump())
+   ```
+
+**🛡️ 弹窗守护**（推荐在跑 RunCode / ENVI→Pro 联合流程前启动）
+```
+03-dialog-guard.cmd                 # 600 秒守护
+03-dialog-guard.cmd -DurationSeconds 120
+03-dialog-guard.cmd -NotifyTest     # 只测提醒窗（30 秒）
+03-dialog-guard.cmd -AlertOnly      # 只提醒，不自动点击
+```
+安全边界：只处理带“第三方 / 代码库 / third-party / code library”上下文的信任框；**绝不触碰覆盖、删除等其他确认框** 🙅。日志在 `%LOCALAPPDATA%\ArcGIS Pro MCP\guard\watch_pro_dialog.log`。
+
+---
+
+## 🔒 安全说明
+
+- 🏠 add-in 与所有桥接服务只监听 `127.0.0.1`，局域网其他机器无法连接。
+- ⚖️ 本软件仅在 `127.0.0.1` 提供本机服务，不向第三方提供网络服务；如你在修改后通过网络向他人提供服务，AGPL-3.0 §13 的源码提供义务适用。
+- 🔏 add-in 为未签名构建：首次加载时 ArcGIS Pro 会要求你确认信任，这是正常流程；请核对本包 `SHA256SUMS.txt`。
+- 🕵️ 本包不包含任何遥测或联网上报。
+- 🧹 卸载：`99-uninstall.cmd`（可选择保留客户端配置）。
+
+---
+
+## 📜 版本与许可
+
+- 🏷️ 版本：**1.1.4**（构建日期见 `VERSION.json`；工具数 113）
+- 👤 维护者：**Law**（[@XNYGggg](https://github.com/XNYGggg)）
+- 🙏 上游项目与原作者：**[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**，作者 **Pisut Nakmuenwai**（AGPL-3.0-or-later）。本包在其基础上累计补丁至 1.1.4（修改点见 `docs\CHANGELOG.md` 与 `RELEASE-NOTES.md`）。
+- ⚖️ 许可证：**AGPL-3.0-or-later**（本包附带完整源码快照与上游 NOTICE）
+- 🏷️ 商标：“ArcGIS”为 Esri 商标；本项目为第三方工具，与 Esri 无隶属关系。
+
+🆘 常见问题见 `docs\排障手册.md`；进阶用法见 `docs\使用指南.md`。祝你出图愉快 🎨 (｀・ω・´)ゞ
