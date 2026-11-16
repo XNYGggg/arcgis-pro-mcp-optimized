@@ -6,6 +6,8 @@
 
 No file juggling, no "export → upload → download" ritual. Your assistant talks to the ArcGIS Pro session right in front of you: your data, your maps, your layouts. 🔒 Everything stays on `127.0.0.1`.
 
+> **📌 Version notice (2026-11-16):** **the 1.0 edition ([v1.1.4](../../releases/tag/v1.1.4)) is very stable and recommended for daily use.** **v2.0.0 is currently in the testing stage** and not yet recommended for production — download the stable package from [Release v1.1.4](../../releases/tag/v1.1.4).
+
 > ### 🙏 Upstream project & original author
 > This project stands on the shoulders of **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**,
 > originally created by **Pisut Nakmuenwai**, licensed **AGPL-3.0-or-later**. Huge thanks! 🌟
@@ -19,7 +21,7 @@ Say it in plain language — *"color the counties by area, pastel red to green"*
 
 | | Part | What it does | Status |
 |---|---|---|---|
-| 🧩 | **MCP** | ArcGIS Pro add-in: **125 native tools** (in-process, ~9 ms ⚡), every geoprocessing tool, optional arcpy via RunCode / Python bridge. Listens on `127.0.0.1:6520/mcp`. | **Released v2.0.0** on `main` 🎉 |
+| 🧩 | **MCP** | ArcGIS Pro add-in: **125 native tools** (in-process, ~9 ms ⚡), every geoprocessing tool, optional arcpy via RunCode / Python bridge. Listens on `127.0.0.1:6520/mcp`. | **v2.0.0 in testing** 🧪 · stable: v1.1.4 |
 | 🛡️ | **Guard** | On-demand dialog guard for the "third-party code library" trust dialog. Summoned only when needed, gone right after. 🥷 | **Ready** — see [guard.md](docs/guard.md) |
 | 🧪 | **Distill** | On-demand template distillation: sample figure → reusable layout spec. One shot, no daemon, fully repeatable. 🧬 | **Ready** — see [distill.md](docs/distill.md) |
 
@@ -40,12 +42,13 @@ flowchart LR
 
 ---
 
-## 🚀 Quick start — customer edition (v2.0.0)
+## 🚀 Quick start — customer edition
 
-Everything is packed, batteries included 🔋 — add-in 2.0.0, stdio bridge, RunCode, the new on-demand guard engine, the bundled Distill runtime, Python bridge, installers, docs, and the full AGPL source snapshot:
+Two editions ship today — pick the stable one unless you are helping test:
 
-- 📦 Download: [**Release v2.0.0**](../../releases/tag/v2.0.0) → `ArcGIS-Pro-MCP-v2.0.0.zip` (every file verifies against the bundled `SHA256SUMS.txt`)
-- 👀 Browse source: [**`customer-v2.0.0`**](../../tree/customer-v2.0.0) · previous edition: [**v1.1.4**](../../releases/tag/v1.1.4) (preserved)
+- ✅ **Stable · recommended:** [**Release v1.1.4**](../../releases/tag/v1.1.4) → `ArcGIS-Pro-MCP-v1.1.4.zip` — add-in 1.1.4, stdio bridge, RunCode, dialog guard, Python bridge, installers, docs, full AGPL source snapshot (every file verifies against the bundled `SHA256SUMS.txt`)
+- 🧪 **Testing · not yet recommended:** [**Release v2.0.0**](../../releases/tag/v2.0.0) → `ArcGIS-Pro-MCP-v2.0.0.zip` — add-in 2.0.0, the new on-demand guard engine and the bundled Distill runtime; still under test
+- 👀 Browse source: [**`customer-v1.1.4`**](../../tree/customer-v1.1.4) (stable) · [**`customer-v2.0.0`**](../../tree/customer-v2.0.0) (testing)
 - 🛺 Prefer one command? Use the [NuGet installer](#-install-via-nuget-github-packages) below ⬇️
 
 1. 📂 Unzip anywhere → double-click `install/00-install.cmd` (no admin needed; ArcGIS Pro **3.7+** required).
@@ -63,7 +66,7 @@ Prefer one command? The [`ArcGISProMCP.Install`](../../pkgs/nuget/ArcGISProMCP.I
 # one-time: register the GitHub Packages NuGet source
 dotnet nuget add source "https://nuget.pkg.github.com/XNYGggg/index.json" --name github --username XNYGggg --password <YOUR_PAT> --store-password-in-clear-text
 
-dotnet tool install --global ArcGISProMCP.Install
+dotnet tool install --global ArcGISProMCP.Install --version 1.1.4   # stable edition; v2.0.0 is still under test
 arcgis-pro-mcp-install              # add --dry-run to download + verify only
 ```
 

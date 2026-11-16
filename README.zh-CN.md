@@ -6,6 +6,8 @@
 
 告别"导出 → 上传 → 下载"的往返折腾 🏃‍♂️💨。助手直接跟你眼前的 Pro 会话对话:你的数据、你的地图、你的布局。🔒 所有通信只走 `127.0.0.1`,数据不出本机。
 
+> **📌 版本说明（2026-11-16）**：**1.0 版本（[v1.1.4](../../releases/tag/v1.1.4)）非常稳定，推荐日常使用**；**2.0 版本（v2.0.0）现在正在测试阶段**，尚未完成优化，暂不推荐用于正式工作——稳定版请从 [Release v1.1.4](../../releases/tag/v1.1.4) 下载。
+
 > ### 🙏 上游项目与原作者
 > 本项目站在巨人的肩膀上:**[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**,
 > 原作者 **Pisut Nakmuenwai**,**AGPL-3.0-or-later** 许可。感谢原作者!🌟
@@ -19,7 +21,7 @@
 
 | | 模块 | 作用 | 状态 |
 |---|---|---|---|
-| 🧩 | **MCP** | ArcGIS Pro 插件:**125 个原生工具**(进程内执行,约 9 ms ⚡)、全部地理处理工具、可选 RunCode / Python 桥 arcpy 通道。监听 `127.0.0.1:6520/mcp`。 | **v2.0.0 已发布**(`main`)🎉 |
+| 🧩 | **MCP** | ArcGIS Pro 插件:**125 个原生工具**(进程内执行,约 9 ms ⚡)、全部地理处理工具、可选 RunCode / Python 桥 arcpy 通道。监听 `127.0.0.1:6520/mcp`。 | **v2.0.0 测试中** 🧪 · 稳定版标记：v1.1.4 |
 | 🛡️ | **Guard** | 按需弹窗守卫:只在可能触发"第三方代码库"信任框的操作前被召唤,操作结束立刻收队。🥷 | **已完成**——见 [guard.md](docs/guard.md) |
 | 🧪 | **Distill** | 按需模板蒸馏:样本成图 → 可复用版式 spec。一次作业、无守护进程、完全可复现。🧬 | **已完成**——见 [distill.md](docs/distill.md) |
 
@@ -40,12 +42,13 @@ flowchart LR
 
 ---
 
-## 🚀 快速开始 —— 客户版(v2.0.0)
+## 🚀 快速开始 —— 客户版
 
-电池已装好,开箱即用 🔋——add-in 2.0.0、stdio 桥、RunCode、新版按需守卫引擎、内置蒸馏运行时、Python 桥、安装器、文档与 AGPL 源码快照,一个包全带走:
+目前有两个版本,除参与测试外请优先用稳定版:
 
-- 📦 下载:[**Release v2.0.0**](../../releases/tag/v2.0.0) → `ArcGIS-Pro-MCP-v2.0.0.zip`(包内每个文件都可用自带 `SHA256SUMS.txt` 校验)
-- 👀 浏览源码:[**`customer-v2.0.0`**](../../tree/customer-v2.0.0) · 上一版:[**v1.1.4**](../../releases/tag/v1.1.4)(已保留)
+- ✅ **稳定版 · 推荐**:[**Release v1.1.4**](../../releases/tag/v1.1.4) → `ArcGIS-Pro-MCP-v1.1.4.zip`——add-in 1.1.4、stdio 桥、RunCode、弹窗守卫、Python 桥、安装器、文档与 AGPL 源码快照,一个包全带走(包内每个文件都可用自带 `SHA256SUMS.txt` 校验)
+- 🧪 **测试版 · 暂不推荐**:[**Release v2.0.0**](../../releases/tag/v2.0.0) → `ArcGIS-Pro-MCP-v2.0.0.zip`——add-in 2.0.0、新版按需守卫引擎与内置蒸馏运行时,仍在测试阶段
+- 👀 浏览源码:[**`customer-v1.1.4`**](../../tree/customer-v1.1.4)(稳定)· [**`customer-v2.0.0`**](../../tree/customer-v2.0.0)(测试)
 - 🛺 想一条命令装好?看下面的 NuGet 安装器 ⬇️
 
 1. 📂 解压到任意目录 → 双击 `install/00-install.cmd`(不需要管理员;要求 ArcGIS Pro **3.7+**)
@@ -63,7 +66,7 @@ flowchart LR
 # 首次:注册 GitHub Packages 的 NuGet 源
 dotnet nuget add source "https://nuget.pkg.github.com/XNYGggg/index.json" --name github --username XNYGggg --password <你的PAT> --store-password-in-clear-text
 
-dotnet tool install --global ArcGISProMCP.Install
+dotnet tool install --global ArcGISProMCP.Install --version 1.1.4   # 稳定版；v2.0.0 仍在测试
 arcgis-pro-mcp-install              # 加 --dry-run 则只下载与校验,不启动安装
 ```
 
