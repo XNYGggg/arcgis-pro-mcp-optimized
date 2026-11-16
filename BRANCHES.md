@@ -6,10 +6,10 @@
 
 | 分支 | 角色 | 说明 |
 |---|---|---|
-| **`main`** | 稳定版 v1.1.4 主线 | 内容与 `customer-v1.1.4` 一致（v1.1.4 完整离线包，add-in 1.1.4，113 工具）+ 本 BRANCHES.md；2026-11-16 深夜由 2.0.1 开发内容切换为 v1.1.4。非默认分支 |
+| **`main`**（默认分支） | 稳定版 v1.1.4 主线 | 内容与 `customer-v1.1.4` 一致（v1.1.4 完整离线包，add-in 1.1.4，113 工具）+ 本 BRANCHES.md；2026-11-16 深夜由 2.0.1 开发内容切换为 v1.1.4，并恢复为**仓库默认分支（主干）** |
 | `customer-v2.0.1` | 2.0.1 包快照（测试版） | 与已删除的 Release v2.0.1 资产同源；2.0 代码留档，不提供下载入口 |
 | `customer-v2.0.0` | 2.0.0 历史快照（测试版） | 原归档 SHA `e8ebda5`；仅分支留档 |
-| **`customer-v1.1.4`**（默认分支） | **稳定版 v1.1.4（推荐）** | add-in 1.1.4 完整离线包，**当前推荐使用，仓库默认分支（主干）**；对应 Release v1.1.4（Latest） |
+| **`customer-v1.1.4`** | **稳定版 v1.1.4（推荐）** | add-in 1.1.4 完整离线包，**当前推荐使用**；与 main 同内容的稳定版包快照；对应 Release v1.1.4（Latest） |
 
 ## 标签（Tag）
 
@@ -47,6 +47,7 @@
 
 ## 变更记录
 
+- **2026-11-16（深夜，默认分支回到 main）**：按用户要求，仓库默认分支由 `customer-v1.1.4` 切回 `main`（此时 main 已是 v1.1.4 内容）；`customer-v1.1.4` 继续作为同内容的稳定版包快照。GitHub 设置：`gh api -X PATCH repos/XNYGggg/arcgis-pro-mcp-optimized -f default_branch=main`。
 - **2026-11-16（深夜，main 内容切换）**：按用户要求，`main` 分支内容由 2.0.1 开发线切换为 **v1.1.4 稳定版**（tree 与 `customer-v1.1.4` 一致，额外保留本 BRANCHES.md 供文档引用；2.0.1 历史提交仍在 main 的祖先链中，未丢失）；2.x 代码保留在 `customer-v2.0.1` / `customer-v2.0.0` 分支。
 - **2026-11-16（晚，1.1.4 README 双语与徽标）**：`customer-v1.1.4` 的 README 双语化（`README.md` 英文默认 + `README.zh-CN.md` 中文），顶部带 Language 切换并补全 Version / License / ArcGIS Pro / Platform / Release 徽标。
 - **2026-11-16（晚，默认分支）**：按用户要求，仓库默认分支（主干）由 `main` 切回 `customer-v1.1.4`，即默认展示稳定版 v1.1.4；`main` 随后于当晚切换为 v1.1.4 内容。GitHub 设置：`gh api -X PATCH repos/XNYGggg/arcgis-pro-mcp-optimized -f default_branch=customer-v1.1.4`。
