@@ -4,7 +4,7 @@
 
 One natural-language sentence lets your AI assistant drive the ArcGIS Pro project you already have open: add layers, change symbology, query attributes, run geoprocessing, export maps. Your data never leaves your machine — all traffic stays on `127.0.0.1` 🔒.
 
-> **📌 Version status (updated 2026-11-16)**: v1.1.4 (add-in 1.1.4, 113 tools) is the **stable · recommended** release. The other 2.0 line (v2.0.0 / v2.0.1) is a **testing** line: the optimization is unfinished, its GitHub Release assets and tags have been removed, and it is **not recommended** (NuGet 2.0.x downloads will fail); the 2.0 code now lives only on the `customer-v2.0.1` / `main` branches. See [BRANCHES.md](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/blob/main/BRANCHES.md) for the branch / tag / release map.
+> **📌 Version status (updated 2026-11-16)**: v1.1.4 (add-in 1.1.4, 113 tools) is the **stable · recommended** release. The other 2.0 line (v2.0.0 / v2.0.1) is a **testing** line: the optimization is unfinished, its GitHub Release assets and tags have been removed, and it is **not recommended** (NuGet 2.0.x downloads will fail); the 2.0 code now lives only on the `customer-v2.0.1` / `customer-v2.0.0` branches. See [BRANCHES.md](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/blob/main/BRANCHES.md) for the branch / tag / release map.
 
 > **🙏 Upstream project & original author**: This customer edition is based on **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)** (original author **Pisut Nakmuenwai**, AGPL-3.0-or-later), with local patches accumulated up to **v1.1.4**. Full attribution and modification notices are in `NOTICE` and `source/SOURCE-NOTICE.md` at the package root.
 

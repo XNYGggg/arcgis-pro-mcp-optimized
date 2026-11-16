@@ -4,7 +4,7 @@
 
 用一句自然语言，让 AI 助手直接操作你正开着的 ArcGIS Pro 工程：加图层、改符号、查属性、跑地理处理、出图导出。数据不出本机，所有通信都走 `127.0.0.1` 🔒。
 
-> **📌 版本说明（2026-11-16 更新）**：v1.1.4（add-in 1.1.4，113 工具）为 **稳定版 · 推荐使用**。另一条 2.0 线（v2.0.0 / v2.0.1）为**测试版**，优化尚未完成，其 GitHub Release 资产与 tag 已移除、**不推荐使用**（NuGet 2.0.x 将无法下载）；2.0 代码仅保留在 `customer-v2.0.1` / `main` 分支中。分支 / 标签 / Release 对照见 [BRANCHES.md](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/blob/main/BRANCHES.md)。
+> **📌 版本说明（2026-11-16 更新）**：v1.1.4（add-in 1.1.4，113 工具）为 **稳定版 · 推荐使用**。另一条 2.0 线（v2.0.0 / v2.0.1）为**测试版**，优化尚未完成，其 GitHub Release 资产与 tag 已移除、**不推荐使用**（NuGet 2.0.x 将无法下载）；2.0 代码仅保留在 `customer-v2.0.1` / `customer-v2.0.0` 分支中。分支 / 标签 / Release 对照见 [BRANCHES.md](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/blob/main/BRANCHES.md)。
 
 > **🙏 上游项目与原作者**：本客户版基于 **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**（原作者 **Pisut Nakmuenwai**，AGPL-3.0-or-later），在其基础上累计本地补丁至 **v1.1.4**。完整署名与修改声明见包根 `NOTICE` 与 `source/SOURCE-NOTICE.md`。
 
