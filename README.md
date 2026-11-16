@@ -44,8 +44,8 @@ flowchart LR
 
 Everything is packed, batteries included 🔋 — add-in 2.0.0, stdio bridge, RunCode, the new on-demand guard engine, the bundled Distill runtime, Python bridge, installers, docs, and the full AGPL source snapshot:
 
-- 📦 Download: [**branch archive**](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/archive/refs/heads/customer-v2.0.0.zip) (a Release is created after the branch is reviewed)
-- 👀 Browse source: [**`customer-v2.0.0`**](../../tree/customer-v2.0.0)
+- 📦 Download: [**Release v2.0.0**](../../releases/tag/v2.0.0) → `ArcGIS-Pro-MCP-v2.0.0.zip` (every file verifies against the bundled `SHA256SUMS.txt`)
+- 👀 Browse source: [**`customer-v2.0.0`**](../../tree/customer-v2.0.0) · previous edition: [**v1.1.4**](../../releases/tag/v1.1.4) (preserved)
 - 🛺 Prefer one command? Use the [NuGet installer](#-install-via-nuget-github-packages) below ⬇️
 
 1. 📂 Unzip anywhere → double-click `install/00-install.cmd` (no admin needed; ArcGIS Pro **3.7+** required).
@@ -374,9 +374,10 @@ Everything the assistant can do, by name. Click to expand 👇
 ## 🗂️ Repository layout
 
 ```
-├── main (this branch) 🏠      project skeleton + AgentKit modules and design docs
-├── customer-v1.1.4 🎁         previous customer edition (add-in 1.1.4), kept as history
-├── customer-v2.0.0 🎁         current customer edition (add-in 2.0.0 + guard engine + Distill runtime)
+├── main (this branch) 🏠      AgentKit 2.0.0: MCP add-in 2.0.0 + guard + distill
+├── customer-v2.0.0 🎁         v2.0.0 release branch (merged into main)
+├── customer-v1.1.4 🎁         previous customer edition (add-in 1.1.4), preserved
+├── history-main-pre-2.0 🗄️    main before the 2.0 merge, preserved as history
 ├── installer/ 🛺              ArcGISProMCP.Install — NuGet tool: download → verify → run setup
 ├── addin/ArcGISProMCP/ 🧩     C# add-in (125 tools, GuardClient, template commands)
 ├── src/arcgis_pro_mcp/ 🐍     upstream Python stdio/CLI server (kept for rebase)
@@ -399,7 +400,7 @@ arcgis-distill doctor
 
 1. ✅ **M1 — Guard 2.0**: summon protocol, event-first UIA detection, add-in auto-arm, rules schema, CLI, tests.
 2. ✅ **M2 — Distill 2.0**: import / measure / patch / validate / preview / review / approve / apply, schema v1.1, template MCP tools.
-3. 🚧 **M3 — Release**: 2.0.0 version normalization done; clean-VM walkthrough, add-in signing and the public release remain.
+3. ✅ **M3 — Release**: 2.0.0 version normalization, tag, release assets and NuGet package shipped; code signing and the clean-VM walkthrough remain.
 
 Details, acceptance criteria and trade-offs: [docs/design-2026-11-16.md](docs/design-2026-11-16.md). 2.0 已到场 (๑•̀ㅂ•́)و✧
 

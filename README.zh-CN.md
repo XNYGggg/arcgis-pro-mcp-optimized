@@ -44,8 +44,8 @@ flowchart LR
 
 电池已装好,开箱即用 🔋——add-in 2.0.0、stdio 桥、RunCode、新版按需守卫引擎、内置蒸馏运行时、Python 桥、安装器、文档与 AGPL 源码快照,一个包全带走:
 
-- 📦 下载:[**分支 ZIP**](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/archive/refs/heads/customer-v2.0.0.zip)(评审通过后再建 Release)
-- 👀 浏览源码:[**`customer-v2.0.0`**](../../tree/customer-v2.0.0)
+- 📦 下载:[**Release v2.0.0**](../../releases/tag/v2.0.0) → `ArcGIS-Pro-MCP-v2.0.0.zip`(包内每个文件都可用自带 `SHA256SUMS.txt` 校验)
+- 👀 浏览源码:[**`customer-v2.0.0`**](../../tree/customer-v2.0.0) · 上一版:[**v1.1.4**](../../releases/tag/v1.1.4)(已保留)
 - 🛺 想一条命令装好?看下面的 NuGet 安装器 ⬇️
 
 1. 📂 解压到任意目录 → 双击 `install/00-install.cmd`(不需要管理员;要求 ArcGIS Pro **3.7+**)
@@ -374,9 +374,10 @@ url = "http://127.0.0.1:6520/mcp"
 ## 🗂️ 仓库结构
 
 ```
-├── main(本分支)🏠           项目骨架 + AgentKit 模块与设计文档
-├── customer-v1.1.4 🎁        上一版客户版(add-in 1.1.4),保留为历史
-├── customer-v2.0.0 🎁        当前客户版(add-in 2.0.0 + 守卫引擎 + 蒸馏运行时)
+├── main(本分支)🏠           AgentKit 2.0.0:MCP add-in 2.0.0 + 守卫 + 蒸馏
+├── customer-v2.0.0 🎁        v2.0.0 发布分支(已合并进 main)
+├── customer-v1.1.4 🎁        上一版客户版(add-in 1.1.4),保留
+├── history-main-pre-2.0 🗄️   2.0 合并前的 main,作为历史保留
 ├── installer/ 🛺             ArcGISProMCP.Install——NuGet 安装器工具(下载→校验→启动安装)
 ├── addin/ArcGISProMCP/ 🧩     C# 插件(125 个工具、GuardClient、模板命令)
 ├── src/arcgis_pro_mcp/ 🐍     上游 Python stdio/CLI 服务(保留便于 rebase)
@@ -399,7 +400,7 @@ arcgis-distill doctor
 
 1. ✅ **M1 — 守卫 2.0**:召唤协议、UIA 事件优先检测、add-in 自动 arm/settle、规则 schema、CLI、测试
 2. ✅ **M2 — 蒸馏 2.0**:import / measure / patch / validate / preview / review / approve / apply、schema v1.1、模板 MCP 工具
-3. 🚧 **M3 — 发布**:2.0.0 版本归一已完成;干净虚拟机演练、add-in 签名与公开发布待做
+3. ✅ **M3 — 发布**:2.0.0 版本归一、Tag、Release 资产与 NuGet 包均已发布;代码签名与干净虚拟机演练待做
 
 详细设计、验收标准与取舍记录:[docs/design-2026-11-16.md](docs/design-2026-11-16.md)。2.0 已到场 (๑•̀ㅂ•́)و✧
 
