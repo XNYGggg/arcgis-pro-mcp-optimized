@@ -1,8 +1,8 @@
-# 🗺️ ArcGIS Pro MCP 优化版 · 客户版 v1.1.4 🎁
+# 🗺️ ArcGIS Pro MCP 优化版 · 客户版 v1.1.4（legacy）🎁
 
 用一句自然语言，让 AI 助手直接操作你正开着的 ArcGIS Pro 工程：加图层、改符号、查属性、跑地理处理、出图导出。数据不出本机，所有通信都走 `127.0.0.1` 🔒。
 
-> **📌 版本说明（2026-11-16）**：**1.0 版本（本页 v1.1.4）非常稳定，推荐日常使用**；**2.0 版本（v2.0.0）现在正在测试阶段**，尚未完成优化，暂不推荐用于正式工作。
+> **📌 版本说明（2026-11-16 更新）**：本分支是 **1.x legacy**（add-in 1.1.4），仅作历史保留，不再作为推荐下载。**最新推荐版本为 [V2.01（v2.0.1）](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/releases/tag/v2.0.1)** → `ArcGIS-Pro-MCP-v2.0.1-r2.zip`（125 工具、按需守卫、模板蒸馏）。分支 / 标签 / Release 对照见 [BRANCHES.md](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/blob/main/BRANCHES.md)。
 
 > **🙏 上游项目与原作者**：本客户版基于 **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**（原作者 **Pisut Nakmuenwai**，AGPL-3.0-or-later），在其基础上累计本地补丁至 **v1.1.4**。完整署名与修改声明见包根 `NOTICE` 与 `source/SOURCE-NOTICE.md`。
 
