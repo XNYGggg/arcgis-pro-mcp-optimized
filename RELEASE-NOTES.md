@@ -1,5 +1,7 @@
 # 发布说明 · 客户版 v1.1.4（2026-11-16）
 
+> **📌 文档修订（2026-11-16 晚）**：系统要求更新为 **Windows 11 x64（仅 x64 / AMD64，不支持 ARM64）**；本包二进制与运行脚本零改动，仅文档（README / 本说明 / VERSION.json）与包内 `SHA256SUMS.txt` 更新。
+
 ## 三方会谈评审结论
 
 发布前由 Claude 主持，Codex 与 DeepSeek 参与评审（2026-11-16，议题：客户版发布前审查）。
@@ -18,7 +20,7 @@
 | 7 | 包根缺少 LICENSE/NOTICE（DeepSeek，AGPL §5） | 已在包根加入 `LICENSE` 与 `NOTICE`（含上游署名与本包修改声明） |
 | 8 | `source/dist/` 内上游 1.1.1 二进制可能被误用（DeepSeek） | 增加 `source/dist/README.md` 明确标注“非本客户版安装包” |
 | 9 | `pyproject.toml=1.1.1` 与交付物 1.1.4 冲突（Codex） | 源码快照内版本号对齐为 1.1.4，描述同步为 113 工具 |
-| 10 | README 系统要求不准确（Codex） | 明确 Windows 10/11 以 Pro 3.7 官方支持为准；补充 .NET Desktop Runtime 10 与 WebView2 由 Pro 受支持环境提供；补充 AGPL §13 网络条款说明 |
+| 10 | README 系统要求不准确（Codex） | 明确 Windows 11 x64（仅 x64，不支持 ARM64）以 Pro 3.7 官方支持为准；补充 .NET Desktop Runtime 10 与 WebView2 由 Pro 受支持环境提供；补充 AGPL §13 网络条款说明 |
 
 ## 有意保留（不视为缺陷）
 

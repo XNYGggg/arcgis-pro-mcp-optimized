@@ -4,7 +4,7 @@
   "built": "2026-11-16",
   "tools": 113,
   "requirements": {
-    "os": "Windows 10/11 x64",
+    "os": "Windows 11 x64 (AMD64); ARM64 not supported",
     "arcgis_pro": ">=3.7",
     "external_deps": "none (PowerShell/.NET provided by Windows and ArcGIS Pro)"
   },

@@ -23,7 +23,7 @@
 
 | Release | 状态 | 资产 | 说明 |
 |---|---|---|---|
-| **v1.1.4** | ✅ **Latest · 稳定版 · 推荐** | `ArcGIS-Pro-MCP-v1.1.4.zip` + 兼容别名 `ArcGIS-Pro-MCP-1.1.4.zip` | 1.x 稳定版（113 工具），当前唯一发布 |
+| **v1.1.4** | ✅ **Latest · 稳定版 · 推荐** | `ArcGIS-Pro-MCP-v1.1.4.zip` + 兼容别名 `ArcGIS-Pro-MCP-1.1.4.zip` | 1.x 稳定版（113 工具），当前唯一发布；系统要求 **Windows 11 x64（仅 x64 / AMD64，不支持 ARM64）**；资产于 2026-11-16 深夜重发（文档修订，二进制零改动），SHA256 `d475f47c…c914` |
 | ~~v2.0.1~~ | ❌ 已删除（2026-11-16） | 资产不可再下载 | 测试版本（优化未完成）；r2 / 兼容别名 / 初版资产随 Release 一并移除 |
 | ~~v2.0.0~~ | ❌ 已删除（2026-11-16） | 资产不可再下载 | 测试版本 |
 
@@ -47,6 +47,7 @@
 
 ## 变更记录
 
+- **2026-11-16（深夜，平台说明与 v1.1.4 资产重发）**：全部分支与发布包的系统要求统一为 **Windows 11 x64（仅 x64 / AMD64，不支持 ARM64）**，删除全部 Windows 10 字样（README 双语、RELEASE-NOTES、VERSION.json、包内文档）；v1.1.4 Release 资产按用户要求重发——仅文档更新、add-in 与运行时二进制零改动，包内 SHA256SUMS 重算 171/171 通过，新 SHA256 `d475f47c3300929d07764efe5ed9e358285fbdb193932bdb40394e43e819c914`（1,712,641 B）；此为「Release 资产只增不改」约定的用户批准例外。
 - **2026-11-16（深夜，默认分支回到 main）**：按用户要求，仓库默认分支由 `customer-v1.1.4` 切回 `main`（此时 main 已是 v1.1.4 内容）；`customer-v1.1.4` 继续作为同内容的稳定版包快照。GitHub 设置：`gh api -X PATCH repos/XNYGggg/arcgis-pro-mcp-optimized -f default_branch=main`。
 - **2026-11-16（深夜，main 内容切换）**：按用户要求，`main` 分支内容由 2.0.1 开发线切换为 **v1.1.4 稳定版**（tree 与 `customer-v1.1.4` 一致，额外保留本 BRANCHES.md 供文档引用；2.0.1 历史提交仍在 main 的祖先链中，未丢失）；2.x 代码保留在 `customer-v2.0.1` / `customer-v2.0.0` 分支。
 - **2026-11-16（晚，1.1.4 README 双语与徽标）**：`customer-v1.1.4` 的 README 双语化（`README.md` 英文默认 + `README.zh-CN.md` 中文），顶部带 Language 切换并补全 Version / License / ArcGIS Pro / Platform / Release 徽标。
