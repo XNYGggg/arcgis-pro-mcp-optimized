@@ -1,46 +1,48 @@
-# 🗺️ ArcGIS Pro MCP 优化版 · 客户版 v1.1.4 · 稳定版（推荐）🎁
+[![English](https://img.shields.io/badge/Language-English-1f6feb?style=flat-square)](README.md) [![简体中文](https://img.shields.io/badge/Language-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-d1242f?style=flat-square)](README.zh-CN.md)
 
-用一句自然语言，让 AI 助手直接操作你正开着的 ArcGIS Pro 工程：加图层、改符号、查属性、跑地理处理、出图导出。数据不出本机，所有通信都走 `127.0.0.1` 🔒。
+# 🗺️ ArcGIS Pro MCP (Optimized) · Customer Edition v1.1.4 · Stable (Recommended) 🎁
 
-> **📌 版本说明（2026-11-16 更新）**：v1.1.4（add-in 1.1.4，113 工具）为 **稳定版 · 推荐使用**。另一条 2.0 线（v2.0.0 / v2.0.1）为**测试版**，优化尚未完成，其 GitHub Release 资产与 tag 已移除、**不推荐使用**（NuGet 2.0.x 将无法下载）；2.0 代码仅保留在 `customer-v2.0.1` / `main` 分支中。分支 / 标签 / Release 对照见 [BRANCHES.md](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/blob/main/BRANCHES.md)。
+One natural-language sentence lets your AI assistant drive the ArcGIS Pro project you already have open: add layers, change symbology, query attributes, run geoprocessing, export maps. Your data never leaves your machine — all traffic stays on `127.0.0.1` 🔒.
 
-> **🙏 上游项目与原作者**：本客户版基于 **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**（原作者 **Pisut Nakmuenwai**，AGPL-3.0-or-later），在其基础上累计本地补丁至 **v1.1.4**。完整署名与修改声明见包根 `NOTICE` 与 `source/SOURCE-NOTICE.md`。
+> **📌 Version status (updated 2026-11-16)**: v1.1.4 (add-in 1.1.4, 113 tools) is the **stable · recommended** release. The other 2.0 line (v2.0.0 / v2.0.1) is a **testing** line: the optimization is unfinished, its GitHub Release assets and tags have been removed, and it is **not recommended** (NuGet 2.0.x downloads will fail); the 2.0 code now lives only on the `customer-v2.0.1` / `main` branches. See [BRANCHES.md](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/blob/main/BRANCHES.md) for the branch / tag / release map.
 
-本客户版把运行所需的**全部组件**打包在一起，离线可用，**不需要安装 Python、不需要 pip、不需要联网**，除 ArcGIS Pro 本身外没有任何额外依赖。电池都给你装好了 🔋
+> **🙏 Upstream project & original author**: This customer edition is based on **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)** (original author **Pisut Nakmuenwai**, AGPL-3.0-or-later), with local patches accumulated up to **v1.1.4**. Full attribution and modification notices are in `NOTICE` and `source/SOURCE-NOTICE.md` at the package root.
+
+This customer edition bundles **every component** needed to run. It works offline and **requires no Python, no pip, and no network access** — no dependencies beyond ArcGIS Pro itself. Batteries included 🔋
 
 ---
 
-## 🖥️ 系统要求
+## 🖥️ System requirements
 
-| 项目 | 要求 |
+| Item | Requirement |
 |---|---|
-| 🪟 操作系统 | Windows 10 / 11（64 位；以 ArcGIS Pro 3.7 官方支持的系统为准，Pro 3.7 推荐 Windows 11） |
-| 🗺️ ArcGIS Pro | **3.7 或更高**（本 add-in 基于 3.7 / .NET 10 构建） |
-| 🔑 权限 | 普通用户即可，安装**不需要管理员** |
-| 📦 其他依赖 | 无（PowerShell 与 .NET 由 Windows / Pro 自带） |
+| 🪟 OS | Windows 10 / 11 (64-bit; follow the systems officially supported by ArcGIS Pro 3.7, which recommends Windows 11) |
+| 🗺️ ArcGIS Pro | **3.7 or later** (this add-in is built against 3.7 / .NET 10) |
+| 🔑 Privileges | A standard user is enough; installing needs **no administrator** rights |
+| 📦 Other dependencies | None (PowerShell and .NET ship with Windows / Pro) |
 
 ---
 
-## 🚀 5 分钟上手
+## 🚀 Quick start (5 minutes)
 
-1. 📂 **解压**本包到任意目录（例如 `D:\ArcGIS-Pro-MCP-客户版`）。
-2. 🛠️ **关闭 ArcGIS Pro**，双击 `install\00-install.cmd`。脚本会自动安装 add-in、部署运行时、并尝试配置 Claude Desktop / Claude Code。
-3. 🖥️ **打开 ArcGIS Pro**。首次加载时如提示“加载项不受信任”，点“是 / 信任”（放心点 😄）。在 Pro 顶部找到 **MCP 选项卡**，确认状态为 **running**（端口 `127.0.0.1:6520`）。
-4. 🔌 **接入你的 AI 客户端**（见下方“配置方法”），然后双击 `install\01-check.cmd` 自检，全部 `[OK]` 即可使用 (๑•̀ㅂ•́)و✧
+1. 📂 **Extract** the package to any folder (e.g. `D:\ArcGIS-Pro-MCP-customer`).
+2. 🛠️ **Close ArcGIS Pro**, then double-click `install\00-install.cmd`. The script installs the add-in, deploys the runtime, and tries to configure Claude Desktop / Claude Code.
+3. 🖥️ **Open ArcGIS Pro**. If you see "add-in not trusted" on first load, click "Yes / Trust" (safe 😄). Find the **MCP tab** in Pro and confirm the status is **running** (port `127.0.0.1:6520`).
+4. 🔌 **Connect your AI client** (see "Configuration" below), then double-click `install\01-check.cmd` for a self-check; all `[OK]` means you're good to go (๑•̀ㅂ•́)و✧
 
-> 自检时若 ArcGIS Pro 没开，端口检查会显示警告——先打开 Pro 再跑一次即可 👌
+> If ArcGIS Pro is not running during the self-check, the port check shows a warning — open Pro and run it again 👌
 
 ---
 
-## 🎛️ 配置方法 —— 接入你的 AI 客户端
+## 🎛️ Configuration — connect your AI client
 
-**前提**：ArcGIS Pro 已打开，**MCP 选项卡**显示 **running**。所有端口只绑定本机：
+**Prerequisite**: ArcGIS Pro is open and the **MCP tab** shows **running**. All ports bind to localhost only:
 
-| 端口 | 用途 |
+| Port | Purpose |
 |---|---|
-| `6520` | MCP over HTTP —— 所有 AI 客户端都连这里 |
-| `6510` | 旧版 TCP 桥（现代客户端不用） |
-| `6511` | 可选 Pro 内 Python 桥（`execute_arcpy_code`） |
+| `6520` | MCP over HTTP — every AI client connects here |
+| `6510` | Legacy TCP bridge (not used by modern clients) |
+| `6511` | Optional in-Pro Python bridge (`execute_arcpy_code`) |
 
 ### 🟣 Claude Code
 
@@ -49,22 +51,22 @@ claude mcp add --transport http arcgis http://127.0.0.1:6520/mcp
 claude mcp list
 ```
 
-手工等价配置（`~/.claude.json`）：
+Manual equivalent configuration (`~/.claude.json`):
 
 ```json
 { "mcpServers": { "arcgis": { "type": "http", "url": "http://127.0.0.1:6520/mcp" } } }
 ```
 
-移除用 `claude mcp remove arcgis`，再加回用上面的命令。
+To remove it, use `claude mcp remove arcgis`; to add it back, run the commands above.
 
-### 🖥️ Claude Desktop（使用自带的 stdio 桥）
+### 🖥️ Claude Desktop (uses the bundled stdio bridge)
 
-Claude Desktop 不能直连 HTTP，只能启动本地进程——用包内纯 PowerShell 的桥（无需 Python）：
+Claude Desktop cannot connect over HTTP directly — it only launches local processes. Use the pure-PowerShell bridge bundled in the package (no Python needed):
 
-1. **完全退出 Claude Desktop**（含托盘图标）。
-2. 运行 `install\02-configure-claude.cmd`，或手工编辑配置（请先备份）。
-3. 配置文件位于以下目录中“已存在”的第一个：
-   `%APPDATA%\Claude`、`%APPDATA%\Claude-3p`、`%LOCALAPPDATA%\Claude-3p`、`%LOCALAPPDATA%\Claude` —— 文件名 `claude_desktop_config.json`。
+1. **Fully quit Claude Desktop** (including the tray icon).
+2. Run `install\02-configure-claude.cmd`, or edit the configuration manually (back it up first).
+3. The configuration file lives in the first **existing** directory of:
+   `%APPDATA%\Claude`, `%APPDATA%\Claude-3p`, `%LOCALAPPDATA%\Claude-3p`, `%LOCALAPPDATA%\Claude` — file name `claude_desktop_config.json`.
 
 ```json
 {
@@ -72,471 +74,471 @@ Claude Desktop 不能直连 HTTP，只能启动本地进程——用包内纯 Po
     "arcgis": {
       "command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
       "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
-               "C:\\Users\\<你的用户名>\\AppData\\Local\\ArcGIS Pro MCP\\stdio-bridge.ps1"]
+               "C:\\Users\\<your-username>\\AppData\\Local\\ArcGIS Pro MCP\\stdio-bridge.ps1"]
     }
   }
 }
 ```
 
-4. 重新打开 Claude Desktop，工具列表里出现 `arcgis` 即成功。
+4. Reopen Claude Desktop; once `arcgis` appears in the tool list, you're done.
 
 ### 🟢 Codex
 
-在 `~/.codex/config.toml` 中加入（如已有旧 `arcgis` 段，整段替换，包括旧的 `env` 子表）：
+Add the following to `~/.codex/config.toml` (if an old `arcgis` section exists, replace the whole section, including the old `env` sub-table):
 
 ```toml
 [mcp_servers.arcgis]
 url = "http://127.0.0.1:6520/mcp"
 ```
 
-保存后重启 Codex。
+Save and restart Codex.
 
-### 🔧 其他 MCP 客户端
+### 🔧 Other MCP clients
 
-以 Streamable HTTP 连接 `http://127.0.0.1:6520/mcp`，或用上面的通用 JSON。（Antigravity 用 `serverUrl` 且不要 `type`。）
+Connect over Streamable HTTP to `http://127.0.0.1:6520/mcp`, or use the generic JSON above. (Antigravity uses `serverUrl` and no `type`.)
 
-### ✅ 验证连接
+### ✅ Verify the connection
 
-- `install\01-check.cmd` —— 检查 Pro 版本、add-in 哈希、运行时、端口与客户端配置。
-- `netstat -ano | findstr 6520` —— 确认端口在监听。
-- 日志：`%LOCALAPPDATA%\ArcGIS-MCP\addin.log`。
+- `install\01-check.cmd` — checks the Pro version, add-in hash, runtime, ports, and client configuration.
+- `netstat -ano | findstr 6520` — confirms the port is listening.
+- Log: `%LOCALAPPDATA%\ArcGIS-MCP\addin.log`.
 
 ---
 
-## 🎯 使用方法
+## 🎯 How to use it
 
-**基本循环**：打开有数据的工程 → 说出你的需求 → 助手自动选择工具 → 查看结果（图片会直接内联返回）🎨
+**Basic loop**: open a project with data → say what you need → the assistant picks the tools → review the result (images come back inline) 🎨
 
-| 你可以说 | 实际发生什么 |
+| You can say | What actually happens |
 |---|---|
-| “按面积给区县做分级色彩，浅红到深绿” | `set_layer_renderer`（分级色彩） |
-| “选出人口大于 50 万的县并导出成新要素类” | `select_features` → `export_features` |
-| “给道路做 500 米缓冲区” | `run_geoprocessing_tool`（Buffer） |
-| “统计每个乡镇的耕地面积” | `summarize_features` / `zonal_statistics` |
-| “把当前地图视图截给我看” | `export_map_view`（返回 PNG） |
-| “出一张 A3 竖版 PDF，带标题、图例、比例尺、指北针” | `create_layout` → `add_map_frame` → `add_layout_*` → `export_layout` |
-| “把 12 个图层按同一套符号批量导出” | `run_batch` 或 `execute_arcpy_code` |
+| "Graduated colors by area for the counties, light red to dark green" | `set_layer_renderer` (graduated colors) |
+| "Select counties with population above 500,000 and export them as a new feature class" | `select_features` → `export_features` |
+| "Buffer the roads by 500 meters" | `run_geoprocessing_tool` (Buffer) |
+| "Total cultivated land area per township" | `summarize_features` / `zonal_statistics` |
+| "Show me a screenshot of the current map view" | `export_map_view` (returns PNG) |
+| "Make an A3 portrait PDF with title, legend, scale bar, and north arrow" | `create_layout` → `add_map_frame` → `add_layout_*` → `export_layout` |
+| "Export 12 layers in batch with the same symbology" | `run_batch` or `execute_arcpy_code` |
 
-**按工具名调用**：下表中的每个工具都可以被客户端按名字直接调用；`run_batch` 可在一次往返里串起多条命令；没有专用工具时用 `execute_arcpy_code` 兜底。
+**Call tools by name**: every tool in the tables below can be invoked directly by name. `run_batch` chains multiple commands in a single round trip; when no dedicated tool exists, fall back to `execute_arcpy_code`.
 
-**编辑规则**：编辑在 `save_edits` 之前一直挂起，挂起期间数据被锁定（删除/覆盖会失败）；`discard_edits` 丢弃挂起编辑。`delete_features` / `delete_dataset` 不可撤销——先让助手说明影响范围再执行。
+**Edit rules**: edits stay pending until `save_edits` — while pending, the data is locked (delete/overwrite will fail); `discard_edits` throws pending edits away. `delete_features` / `delete_dataset` cannot be undone — ask the assistant to explain the impact before running them.
 
-**批量与提速**：重复度高、数据量大时，让助手用 RunCode 写一个幂等 arcpy 脚本一次执行；大工程按范围/OID 分块并留检查点。
-
----
-
-## 🎨 出图制图怎么用（提示词指南）
-
-这一节把"怎么跟 AI 说"讲透：不需要记工具名，按下面四要素交代，助手会自动拆成 MCP 工具调用。
-
-### 说清四件事，一次做对
-
-| 要素 | 要交代什么 | 示例 |
-|---|---|---|
-| 数据 | 图层名、数据路径、当前选择集 | "当前地图里的 `区县边界` 图层" |
-| 操作 | 分级字段/方法、缓冲距离、统计口径 | "按 `AREA` 分 5 级，自然断点" |
-| 风格 | 配色、字号、图例/比例尺/指北针位置、底图 | "浅红到深绿，图例放右下角" |
-| 输出 | 图片/PDF/新要素类，分辨率与保存路径 | "A3 横向 PDF，300 dpi，存到 `D:\out\`" |
-
-**好提示词 vs 坏提示词**
-- ❌ "帮我美化一下地图" —— 没有目标，助手只能猜。
-- ✅ "把 `土地利用` 按 `DLMC` 做唯一值符号化，图例放右下角，然后导出一张 A3 横向 PDF 到 `D:\out\landuse.pdf`，300 dpi。"
-- ❌ "出个图" —— 没说范围、版式、输出。
-- ✅ "以 `研究区` 图层为范围，比例尺 1:10000，出一张 A4 纵向 PNG，标题‘研究区土地利用现状’，带图例、比例尺、指北针，先发预览图给我确认。"
-
-### 各工具组提示词速查
-
-| 模块（工具组） | 你可以这样说 | 助手会用 |
-|---|---|---|
-| 会话与工程 | "先 `diagnose` 看看连接和当前工程；然后把工程另存到 `D:\proj\成果.aprx`" | diagnose / save_project |
-| 图层 | "把 `roads` 移进 `底图` 组，透明度 40%，只显示 1:50000 以近；`POI` 图层关掉" | move_layer / set_layer_transparency / set_layer_scale_range / set_layer_visibility |
-| 数据与属性 | "读一下 `parcels` 的前 20 行，按面积降序；统计 `DLMC` 各类面积" | get_features / summarize_features |
-| 选择 | "选出 `POP` 大于 50 万的县，导出成 `D:\out\counties_big.shp`；再按位置选出落在 `研究区` 内的地块" | select_features / select_by_location / export_features |
-| 字段与数据集 | "给 `parcels` 加 DOUBLE 字段 `AREA_HA`，用 `!Shape_Area!/10000` 计算；新建 EPSG:4547 的面要素类 `成果_2026`" | add_field / calculate_field / create_feature_class |
-| 地理处理 | "道路做 500 米缓冲并融合；用 `研究区` 掩膜裁剪土地利用栅格" | run_geoprocessing_tool / run_batch |
-| 符号化 | "按面积分 5 级、自然断点、浅红到深绿；或按 `TYPE` 唯一值配色" | set_layer_renderer |
-| 地图视图 | "缩放到 `研究区`，比例尺 1:10000，截一张 1600×900 的 PNG 给我" | set_map_view / zoom_to_layer / export_map_view |
-| 布局与出图 | "建 A3 横向布局，标题…，图例只保留 3 个图层，加比例尺和指北针，导出 300 dpi PDF" | create_layout / add_layout_* / export_layout |
-| 栅格 | "读 DEM 的波段、像元大小和统计值；用 NDVI 公式算植被指数" | get_raster_info / raster_calculator / zonal_statistics |
-| 目录与数据发现 | "在工程和文件夹连接里搜名字含 `2025` 的 shapefile" | search_data / describe_dataset / list_folder |
-| 实用工具 | "一次完成：隐藏底图→缩放到区县→导出 PNG；用 arcpy 给所有图层名加前缀" | run_batch / execute_arcpy_code |
-
-### 标准出图提示词模板（复制即用）
-
-```text
-用当前工程的 <地图名> 出图：
-- 范围：<研究区图层/范围>，比例尺 1:<...>
-- 数据：<图层1>、<图层2>（需要时说明字段和筛选条件）
-- 符号：<按字段分级/唯一值/单色>，配色 <色带或十六进制>
-- 版式：<A3 横向 / A4 纵向>，标题 "<标题>"，图例 <位置>，比例尺 <位置>，指北针 <位置>
-- 输出：<PDF / PNG>，<300> dpi，保存到 <绝对路径>
-- 流程：先自检版式，把预览图发给我确认，确认后再导出正式文件。
-```
-
-### 批量出图提示词
-
-```text
-对 `maps` 里的每个地图，套用同一套 A3 横向布局模板导出 PDF：
-标题用地图名，图例保留可见图层，比例尺和指北针放右下角，
-输出到 `D:\out\maps\`，300 dpi。先导出第一张给我看，确认后再批量。
-```
-
-### 常见翻车怎么用一句话补救
-
-- "图例压住主图了" → 助手调整 `legend` 坐标或版式。
-- "页面比例不对/留白太多" → 调整 map frame 与页面比例。
-- "配色太跳/不符合论文风格" → 给出色带、十六进制或参考图。
-- "先别导出，给我预览" → 助手先 `export_map_view` 或布局预览。
-
-**效果**：把"数据、操作、风格、输出"一次讲全，助手通常一轮就能做出接近终稿的图；后续修改只需指出差异（"图例右移 1 cm"），不用重述全部。
+**Batch and speed**: for highly repetitive or large jobs, have the assistant write an idempotent arcpy script with RunCode and run it once; for big projects, process in chunks by extent/OID with checkpoints.
 
 ---
 
-## 🛡️ 弹窗守护怎么用（1.x 版）
+## 🎨 Mapping and map production (prompt guide)
 
-**它解决什么**：ArcGIS Pro 第一次运行第三方 `.pyt` / Python 工具（如 RunCode.pyt）会弹"第三方代码库"信任框；无人值守时任务会卡住。1.1.4 没有 MCP 守卫工具，而是包内自带一个**独立守护脚本**：启动后轮询 Pro 窗口，只点这一类"是(Y)"，按设定时长自动退出。
+This section explains "how to talk to the AI": you don't need to remember tool names — just cover the four elements below and the assistant will break it down into MCP tool calls.
 
-**启动方式**
+### Say four things and get it right the first time
+
+| Element | What to state | Example |
+|---|---|---|
+| Data | Layer name, data path, current selection | "the `county_boundaries` layer in the current map" |
+| Operation | Classification field/method, buffer distance, statistics definition | "5 classes on `AREA`, natural breaks" |
+| Style | Color scheme, font size, legend/scale-bar/north-arrow placement, basemap | "light red to dark green, legend in the lower right" |
+| Output | Image/PDF/new feature class, resolution, save path | "A3 landscape PDF, 300 dpi, save to `D:\out\`" |
+
+**Good prompt vs. bad prompt**
+- ❌ "Make my map prettier" — no goal; the assistant can only guess.
+- ✅ "Symbolize `landuse` by unique values on `DLMC`, put the legend in the lower right, then export an A3 landscape PDF to `D:\out\landuse.pdf` at 300 dpi."
+- ❌ "Export a map" — no extent, layout, or output specified.
+- ✅ "Using the `study_area` layer as the extent, scale 1:10000, produce an A4 portrait PNG titled 'Study Area Land Use', with legend, scale bar, and north arrow; send me a preview first for confirmation."
+
+### Prompt cheat sheet by tool group
+
+| Module (tool group) | What you can say | Tools the assistant uses |
+|---|---|---|
+| Session & project | "Run `diagnose` first to check the connection and current project; then save the project as `D:\proj\result.aprx`" | diagnose / save_project |
+| Layers | "Move `roads` into the `basemap` group, set transparency 40%, show only at 1:50000 and closer; turn off the `POI` layer" | move_layer / set_layer_transparency / set_layer_scale_range / set_layer_visibility |
+| Data & attributes | "Read the first 20 rows of `parcels` sorted by area descending; summarize area by `DLMC`" | get_features / summarize_features |
+| Selection | "Select counties with `POP` above 500,000 and export them to `D:\out\counties_big.shp`; then select parcels within `study_area` by location" | select_features / select_by_location / export_features |
+| Fields & datasets | "Add a DOUBLE field `AREA_HA` to `parcels` and compute it with `!Shape_Area!/10000`; create a polygon feature class `result_2026` in EPSG:4547" | add_field / calculate_field / create_feature_class |
+| Geoprocessing | "Buffer the roads by 500 meters and dissolve; clip the land-use raster with the `study_area` mask" | run_geoprocessing_tool / run_batch |
+| Symbology | "5 classes by area, natural breaks, light red to dark green; or unique-value colors by `TYPE`" | set_layer_renderer |
+| Map view | "Zoom to `study_area`, scale 1:10000, and capture a 1600×900 PNG for me" | set_map_view / zoom_to_layer / export_map_view |
+| Layout & export | "Create an A3 landscape layout, title…, legend for only 3 layers, add scale bar and north arrow, export a 300 dpi PDF" | create_layout / add_layout_* / export_layout |
+| Raster | "Read the DEM's bands, cell size, and statistics; compute a vegetation index with the NDVI formula" | get_raster_info / raster_calculator / zonal_statistics |
+| Catalog & data discovery | "Search the project and folder connections for shapefiles whose name contains `2025`" | search_data / describe_dataset / list_folder |
+| Utilities | "In one go: hide the basemap → zoom to the counties → export a PNG; use arcpy to prefix all layer names" | run_batch / execute_arcpy_code |
+
+### Standard mapping prompt template (copy and use)
 
 ```text
-install\03-dialog-guard.cmd                    # 默认 600 秒
+Produce a map from the current project's <map name>:
+- Extent: <study-area layer/extent>, scale 1:<...>
+- Data: <layer1>, <layer2> (state fields and filters where needed)
+- Symbology: <graduated/unique-value/single color by field>, palette <ramp or hex>
+- Layout: <A3 landscape / A4 portrait>, title "<title>", legend <position>, scale bar <position>, north arrow <position>
+- Output: <PDF / PNG>, <300> dpi, save to <absolute path>
+- Process: check the layout first, send me a preview for confirmation, then export the final file.
+```
+
+### Batch mapping prompt
+
+```text
+For each map in `maps`, export a PDF with the same A3 landscape layout template:
+use the map name as the title, keep visible layers in the legend, put the scale bar and north arrow in the lower right,
+output to `D:\out\maps\` at 300 dpi. Export the first one for me to review, then batch the rest after confirmation.
+```
+
+### One-line fixes for common mishaps
+
+- "The legend is covering the main map" → the assistant adjusts the `legend` position or the layout.
+- "The page ratio is wrong / too much white space" → adjust the map frame vs. page ratio.
+- "The colors are too loud / not suitable for a paper" → give a palette, hex colors, or a reference image.
+- "Don't export yet, show me a preview" → the assistant runs `export_map_view` or a layout preview first.
+
+**Effect**: state data, operation, style, and output all at once, and the assistant usually gets close to the final map in one round; afterwards just point out the differences ("move the legend right by 1 cm") instead of repeating everything.
+
+---
+
+## 🛡️ Using the dialog guard (1.x edition)
+
+**What it solves**: the first time ArcGIS Pro runs a third-party `.pyt` / Python tool (such as RunCode.pyt), it shows a "third-party code library" trust dialog; unattended tasks get stuck on it. 1.1.4 has no MCP guard tools — instead the package ships a **standalone guard script**: once started, it polls Pro windows, clicks only this kind of "Yes(Y)" dialog, and exits automatically after the configured duration.
+
+**How to start it**
+
+```text
+install\03-dialog-guard.cmd                    # 600 seconds by default
 install\03-dialog-guard.cmd -DurationSeconds 120
-install\03-dialog-guard.cmd -AlertOnly         # 只置顶提醒，不自动点击
-install\03-dialog-guard.cmd -NotifyTest        # 只测提醒窗（30 秒）
+install\03-dialog-guard.cmd -AlertOnly         # topmost alert only, no auto-click
+install\03-dialog-guard.cmd -NotifyTest        # test the alert window only (30 s)
 ```
 
-也可以直接双击 `03-dialog-guard.cmd`，或让支持终端操作的 AI 助手在后台启动它。
+You can also double-click `03-dialog-guard.cmd`, or have an AI assistant that can control a terminal start it in the background.
 
-**提示词示例**
+**Prompt examples**
 
-| 你说 | 助手会做什么 |
+| You say | What the assistant does |
 |---|---|
-| "我要在 Pro 里手动跑 RunCode.pyt。先帮我启动弹窗守护 600 秒；出现第三方代码信任框自动点‘是’，点不到就置顶响铃提醒我" | 在后台运行 `install\03-dialog-guard.cmd -DurationSeconds 600` |
-| "这次只提醒、不自动点" | 启动 `-AlertOnly` |
-| "测试一下提醒窗能不能弹出来" | 启动 `-NotifyTest`（30 秒） |
-| "守护的日志在哪？" | `%LOCALAPPDATA%\ArcGIS Pro MCP\guard\watch_pro_dialog.log` |
+| "I'm going to run RunCode.pyt manually in Pro. Start the dialog guard for 600 seconds first; auto-click 'Yes' on the third-party code trust dialog, and if it can't click, show a topmost alert with a beep" | Runs `install\03-dialog-guard.cmd -DurationSeconds 600` in the background |
+| "This time only alert, don't auto-click" | Starts with `-AlertOnly` |
+| "Test whether the alert window pops up" | Starts with `-NotifyTest` (30 s) |
+| "Where is the guard log?" | `%LOCALAPPDATA%\ArcGIS Pro MCP\guard\watch_pro_dialog.log` |
 
-**边界与效果**
-- 只处理带"第三方 / 代码库 / third-party / code library"上下文的信任框；覆盖、删除等其他确认框一律不碰。
-- 点不到按钮时，置顶提醒窗至少 30 秒并每 10 秒响铃。
-- 每个 Pro 进程首次信任后不再弹；重启 Pro 后恢复需要。
-- 2.x 把同一能力升级成了 `guard_summon` / `guard_status`，并在 RunCode 调用前自动 arm/settle；1.1.4 需要手动启动脚本。
+**Boundaries and behavior**
+- It only handles trust dialogs whose context contains "third-party / code library / 第三方 / 代码库"; overwrite, delete, and other confirmation dialogs are never touched.
+- When it cannot click the button, the topmost alert window stays for at least 30 seconds and beeps every 10 seconds.
+- Each Pro process asks only once after trust is granted; it reappears after Pro restarts.
+- 2.x upgraded this into the `guard_summon` / `guard_status` tools with automatic arm/settle before RunCode calls; in 1.1.4 you start the script manually.
 
 ---
 
-## 🐍 RunCode 与 Python 桥怎么用（提示词指南）
+## 🐍 RunCode and the Python bridge (prompt guide)
 
-1.1.4 的 arcpy 通道有两级：**RunCode 工具箱**适合一次性/批量脚本；**Python 桥**适合需要跨调用保持变量的交互式会话。
+The arcpy channels in 1.1.4 come in two tiers: the **RunCode toolbox** suits one-off / batch scripts; the **Python bridge** suits interactive sessions that need variables to persist across calls.
 
-### RunCode 工具箱
+### RunCode toolbox
 
-路径：`%LOCALAPPDATA%\ArcGIS Pro MCP\runcode\RunCode.pyt`。让助手调用 `run_python_toolbox_tool` 时传入该路径即可；也可以自己在 Pro 里"插入 → 工具箱 → 添加工具箱"。
+Path: `%LOCALAPPDATA%\ArcGIS Pro MCP\runcode\RunCode.pyt`. Have the assistant pass this path to `run_python_toolbox_tool`; you can also add it yourself in Pro via "Insert → Toolbox → Add Toolbox".
 
-**提示词示例**
-- "用 RunCode.pyt 批量把当前工程所有图层的标注打开，标注字段用 `NAME`，字号 10。"
-- "写一个幂等 arcpy 脚本，用 RunCode 给每个图层名加前缀 `LYR_`，已经加过就跳过。"
-- "这段脚本要在 RunCode.pyt 里跑，先帮我检查参数和路径，再执行。"
+**Prompt examples**
+- "Use RunCode.pyt to turn on labels for every layer in the current project, label field `NAME`, font size 10."
+- "Write an idempotent arcpy script and run it with RunCode to prefix every layer name with `LYR_`, skipping ones already prefixed."
+- "This script is going to run in RunCode.pyt — check the parameters and paths for me first, then execute."
 
-**首次运行**会弹"第三方代码库"信任框：先启动上面的弹窗守护，或手动点一次"是"。同一 Pro 进程只需信任一次。
+**First run** shows the "third-party code library" trust dialog: start the dialog guard above first, or click "Yes" once manually. Each Pro process needs trusting only once.
 
-### Python 桥（需要 `CURRENT` 或持久变量时）
+### Python bridge (when you need `CURRENT` or persistent variables)
 
-1. 在 Pro 菜单 **分析 → Python** 打开 Python 窗口；
-2. 粘贴执行（路径按默认安装位置）：
+1. Open the Python window from the Pro menu **Analysis → Python**;
+2. Paste and run (path as in the default install location):
 
 ```python
-import sys; sys.path.insert(0, r"C:\Users\<你的用户名>\AppData\Local\ArcGIS Pro MCP\plugin")
+import sys; sys.path.insert(0, r"C:\Users\<your-username>\AppData\Local\ArcGIS Pro MCP\plugin")
 import mcp_bridge; print(mcp_bridge.start_server(port=6511))
 ```
 
-3. 需要 `CURRENT`（当前工程）时再加一行（必须在主线程执行）：
+3. When you need `CURRENT` (the open project), add one more line (must run on the main thread):
 
 ```python
 print(mcp_bridge.start_pump())
 ```
 
-**提示词示例**
-- "接下来的 arcpy 需要 `CURRENT`。请提醒我在 Pro 的 Python 窗口粘贴桥的启动代码，然后我用 `execute_arcpy_code` 执行。"
-- "帮我把桥启动代码按我的用户名填好，复制给我；我自己粘贴到 Pro。"
-- "先 `get_pump_status` 看看 pump 是否就绪；没就绪就提醒我粘贴。"
-- "用持久会话分三步：先读图层，再建字段，最后计算——变量要跨调用保留。"
+**Prompt examples**
+- "The next arcpy work needs `CURRENT`. Remind me to paste the bridge startup code into Pro's Python window; then I'll run it via `execute_arcpy_code`."
+- "Fill in the bridge startup code with my username and copy it for me; I'll paste it into Pro myself."
+- "Check with `get_pump_status` first whether the pump is ready; if not, remind me to paste the code."
+- "Use a persistent session in three steps: read the layer, create the field, then compute — variables must persist across calls."
 
-**效果**：RunCode 解决"批量脚本一次跑完"；Python 桥解决"多步交互、需要当前工程"；两者都不需要另装 Python。
+**Effect**: RunCode handles "run a batch script in one go"; the Python bridge handles "multi-step interaction needing the current project". Neither requires a separate Python installation.
 
 ---
 
-## 🧪 关于蒸馏模块（2.x 功能）
+## 🧪 About the distillation module (2.x feature)
 
-1.1.4 **不包含**模板蒸馏：没有 `template_*` 工具，也没有 `guard_summon` / `guard_status`。如果你想把样图版式变成可复用模板、让多张图版式统一，请升级到 **V2.01（v2.0.1）**：
+1.1.4 **does not include** template distillation: there are no `template_*` tools and no `guard_summon` / `guard_status`. If you want to turn a sample figure's layout into a reusable template and keep multiple maps consistent, upgrade to **V2.01 (v2.0.1)**:
 
-- 2.x 提供 10 个 `template_*` 工具：import / measure / patch / validate / preview / review / approve / apply / list / get；
-- 模板库在 `%LOCALAPPDATA%\ArcGIS Pro MCP\library`，升级安装会保留已有模板；
-- 典型用法："把 `D:\samples\fig3.png` 蒸馏成模板，名称研究区总览图；按 import → measure → patch → validate → preview 流程，预览给我确认后再 review + approve。"
+- 2.x provides 10 `template_*` tools: import / measure / patch / validate / preview / review / approve / apply / list / get;
+- The template library lives in `%LOCALAPPDATA%\ArcGIS Pro MCP\library`, and upgrading preserves existing templates;
+- Typical usage: "Distill `D:\samples\fig3.png` into a template named Study Area Overview; follow the import → measure → patch → validate → preview flow, show me the preview for confirmation, then review + approve."
 
-1.1.4 与 2.x 的能力对照：
+Capability comparison between 1.1.4 and 2.x:
 
-| 能力 | 1.1.4（本分支） | 2.0.1（推荐） |
+| Capability | 1.1.4 (this branch) | 2.0.1 (not recommended) |
 |---|---|---|
-| 原生 MCP 工具 | 113 个（12 组） | 125 个（14 组） |
-| RunCode / Python 桥 | ✅ | ✅ |
-| 弹窗守护 | 独立脚本 `03-dialog-guard.cmd` | `guard_summon` / `guard_status` + RunCode 自动 arm/settle |
-| 模板蒸馏 | ❌ | ✅ 10 个 `template_*` 工具 + schema v1.1 |
+| Native MCP tools | 113 (12 groups) | 125 (14 groups) |
+| RunCode / Python bridge | ✅ | ✅ |
+| Dialog guard | Standalone script `03-dialog-guard.cmd` | `guard_summon` / `guard_status` + automatic arm/settle before RunCode |
+| Template distillation | ❌ | ✅ 10 `template_*` tools + schema v1.1 |
 
 ---
 
-## 🧰 全部 113 个 MCP 工具（12 组）
+## 🧰 All 113 MCP tools (12 groups)
 
-助手能做的全部事情，按名字列在这里。点开看看 👇
+Everything the assistant can do, listed by name. Click to expand 👇
 
 <details>
-<summary><b>📜 完整工具清单 —— 会话 15 · 图层 19 · 数据 11 · 选择 6 · 字段/数据集 11 · 地理处理 7 · 符号化 6 · 视图 7 · 布局 16 · 栅格 5 · 目录 6 · 实用工具 4</b></summary>
+<summary><b>📜 Full tool list — session 15 · layers 19 · data 11 · selection 6 · fields/datasets 11 · geoprocessing 7 · symbology 6 · view 7 · layout 16 · raster 5 · catalog 6 · utilities 4</b></summary>
 
-### 会话与工程（15）
+### Session & project (15)
 
-| 工具 | 用途 |
+| Tool | Purpose |
 |---|---|
-| `ping` | 检查桥接连通性，并返回所连接的工程。 |
-| `get_capabilities` | 列出桥接支持的全部命令（按领域分组），用于发现具名工具之外的能力。 |
-| `get_queue_status` | 查看三车道队列状态：各车道深度、当前命令与最近完成记录；调用变慢或被排队时先看它。 |
-| `diagnose` | 连接自检：Pro 版本、许可、打开的工程、活动地图、地图视图与写权限；出问题先跑它。 |
-| `get_arcgis_info` | ArcGIS Pro 版本、许可级别、可用扩展与当前工程路径。 |
-| `get_project_info` | 工程路径、默认地理数据库与工具箱、地图、布局、文件夹与数据库连接。 |
-| `save_project` | 保存工程（.aprx），或另存副本到指定位置。 |
-| `list_maps` | 列出所有地图与场景，含坐标系与图层数量。 |
-| `create_map` | 在工程中新建地图或场景。 |
-| `remove_map` | 从工程中删除地图。 |
-| `activate_map` | 在 Pro 界面中打开/激活地图视图；相机类命令与 export_map_view 之前必需。 |
-| `set_map_properties` | 重命名地图或修改其坐标系。 |
-| `get_map_extent` | 地图中全部数据图层的合并范围。 |
-| `get_environment` | 读取当前 arcpy 地理处理环境设置。 |
-| `set_environment` | 设置 arcpy 环境（工作空间、输出坐标系、范围、掩膜、像元大小、覆盖输出、并行因子等）。 |
+| `ping` | Check bridge connectivity and return the connected project. |
+| `get_capabilities` | List every command the bridge supports (grouped by area), for discovering capabilities beyond the named tools. |
+| `get_queue_status` | Three-lane queue status: per-lane depth, the command running now, and recent completions; check it first when calls feel slow or queued. |
+| `diagnose` | Connection self-check: Pro version, license, open project, active map, map view, and write access; run it first when something is wrong. |
+| `get_arcgis_info` | ArcGIS Pro version, license level, available extensions, and the current project path. |
+| `get_project_info` | Project path, default geodatabase and toolbox, maps, layouts, folder and database connections. |
+| `save_project` | Save the project (.aprx), or save a copy elsewhere. |
+| `list_maps` | List all maps and scenes with coordinate system and layer counts. |
+| `create_map` | Create a new map or scene in the project. |
+| `remove_map` | Delete a map from the project. |
+| `activate_map` | Open/activate a map's view in the Pro UI; required before camera commands and export_map_view. |
+| `set_map_properties` | Rename a map or change its coordinate system. |
+| `get_map_extent` | The combined extent of all data layers in a map. |
+| `get_environment` | Read the current arcpy geoprocessing environment settings. |
+| `set_environment` | Set arcpy environments (workspace, output coordinate system, extent, mask, cell size, overwrite output, parallel factor, etc.). |
 
-### 图层（19）
+### Layers (19)
 
-| 工具 | 用途 |
+| Tool | Purpose |
 |---|---|
-| `get_layers` | 列出地图中的图层（含绘制顺序与组嵌套）与独立表；了解工程内容从这里开始。 |
-| `get_layer_info` | 单图层完整详情：数据源、坐标系、范围、字段、要素数、渲染器与标注状态。 |
-| `add_layer` | 按路径或服务 URL 向地图添加数据：要素类、shapefile、栅格、表、.lyrx 图层文件或 Web 服务。 |
-| `add_web_layer` | 按 URL 添加 Web 图层（Feature/Map/Image 服务、WMS、WMTS、矢量瓦片）。 |
-| `remove_layer` | 从地图中移除图层或独立表。 |
-| `rename_layer` | 重命名内容列表中的图层。 |
-| `duplicate_layer` | 在地图内复制图层，便于用不同符号化展示。 |
-| `set_layer_visibility` | 显示或隐藏单个、多个或地图中的全部图层。 |
-| `set_layer_transparency` | 设置图层透明度（0 不透明，100 全透明）。 |
-| `set_layer_scale_range` | 限制图层的可见比例范围。 |
-| `set_definition_query` | 设置图层定义查询（SQL where），空字符串表示清除。 |
-| `move_layer` | 调整图层相对顺序，或移入组图层。 |
-| `create_group_layer` | 创建组图层，可把已有图层移入其中。 |
-| `zoom_to_layer` | 将地图视图缩放到图层范围。 |
-| `set_basemap` | 设置底图：地形、影像、影像混合、街道、导航、浅灰画布、深灰画布、地形晕渲、海洋、OpenStreetMap、国家地理风格等。 |
-| `get_broken_layers` | 列出所有地图中数据源缺失的图层。 |
-| `repair_layer_source` | 将图层重新指向新的工作空间或数据集，修复失效数据源。 |
-| `add_join` | 按公共字段把表连接到图层。 |
-| `remove_join` | 移除图层的连接。 |
+| `get_layers` | List the map's layers (with draw order and group nesting) and standalone tables; start here to see what's in the project. |
+| `get_layer_info` | Full detail for one layer: data source, coordinate system, extent, fields, feature count, renderer, and label state. |
+| `add_layer` | Add data to a map by path or service URL: feature class, shapefile, raster, table, .lyrx layer file, or web service. |
+| `add_web_layer` | Add a web layer by URL (Feature/Map/Image service, WMS, WMTS, vector tiles). |
+| `remove_layer` | Remove a layer or standalone table from a map. |
+| `rename_layer` | Rename a layer in the table of contents. |
+| `duplicate_layer` | Copy a layer within the map so it can be symbolized differently. |
+| `set_layer_visibility` | Show or hide one layer, several layers, or every layer in the map. |
+| `set_layer_transparency` | Set layer transparency (0 opaque, 100 fully transparent). |
+| `set_layer_scale_range` | Limit the scale range a layer draws at. |
+| `set_definition_query` | Set a layer's definition query (SQL where); an empty string clears it. |
+| `move_layer` | Reorder a layer relative to another, or move it into a group layer. |
+| `create_group_layer` | Create a group layer, optionally moving existing layers into it. |
+| `zoom_to_layer` | Zoom the map view to a layer's extent. |
+| `set_basemap` | Set the basemap: Topographic, Imagery, Imagery Hybrid, Streets, Navigation, Light Gray Canvas, Dark Gray Canvas, Terrain, Oceans, OpenStreetMap, National Geographic, and more. |
+| `get_broken_layers` | List layers in all maps whose data sources are missing. |
+| `repair_layer_source` | Repoint a layer at a new workspace or dataset to fix a broken source. |
+| `add_join` | Join a table to a layer on a common field. |
+| `remove_join` | Remove a layer's join. |
 
-### 数据与属性（11）
+### Data & attributes (11)
 
-| 工具 | 用途 |
+| Tool | Purpose |
 |---|---|
-| `get_features` | 读取图层、表或数据集路径的属性行，支持 where、字段子集、排序与 WKT 几何。 |
-| `count_features` | 统计要素数量，可带 where 条件。 |
-| `get_unique_values` | 返回字段的唯一值及各自行数。 |
-| `get_field_statistics` | 数值字段的 min/max/mean/median/sum/标准差。 |
-| `summarize_features` | 按一个或多个字段分组聚合，是回答“每类多少/总量多少”的快捷方式（无需 GP）。 |
-| `insert_features` | 向图层或表插入新行。 |
-| `update_features` | 按 where 条件更新行的属性与/或几何。 |
-| `delete_features` | 按 where 条件删除行。 |
-| `save_edits` | 提交挂起的编辑；未保存的编辑会锁定数据，导致删除或覆盖失败。 |
-| `discard_edits` | 丢弃挂起的编辑。 |
-| `calculate_field` | 字段计算，例如表达式 "!Shape_Area! / 10000"。 |
+| `get_features` | Read attribute rows from a layer, table, or dataset path, with where, field subset, ordering, and WKT geometry. |
+| `count_features` | Count features, optionally with a where clause. |
+| `get_unique_values` | Distinct values of a field with the count of rows for each. |
+| `get_field_statistics` | min/max/mean/median/sum/standard deviation of a numeric field. |
+| `summarize_features` | Group by one or more fields and aggregate — the quick way to answer "how much per category" without geoprocessing. |
+| `insert_features` | Insert new rows into a layer or table. |
+| `update_features` | Update attributes and/or geometry of rows matching a where clause. |
+| `delete_features` | Delete rows matching a where clause. |
+| `save_edits` | Commit pending edits; unsaved edits lock the data, so delete or overwrite operations fail until then. |
+| `discard_edits` | Throw away pending edits. |
+| `calculate_field` | Calculate a field, e.g. the expression "!Shape_Area! / 10000". |
 
-### 选择（6）
+### Selection (6)
 
-| 工具 | 用途 |
+| Tool | Purpose |
 |---|---|
-| `select_features` | 按 SQL where 条件选择要素。 |
-| `select_by_location` | 按与另一图层的空间关系选择要素。 |
-| `get_selection` | 报告当前选择情况（按图层，含 ObjectID 与可选属性行）。 |
-| `set_selection` | 按 ObjectID 选择指定要素。 |
-| `clear_selection` | 清除单个图层或地图中全部选择。 |
-| `zoom_to_selection` | 将地图视图缩放到当前选中的要素。 |
+| `select_features` | Select features by SQL where clause. |
+| `select_by_location` | Select features by spatial relationship to another layer. |
+| `get_selection` | Report the current selection (per layer, with ObjectIDs and optionally attribute rows). |
+| `set_selection` | Select specific features by ObjectID. |
+| `clear_selection` | Clear the selection on one layer, or on every layer in the map. |
+| `zoom_to_selection` | Zoom the map view to the currently selected features. |
 
-### 字段与数据集（11）
+### Fields & datasets (11)
 
-| 工具 | 用途 |
+| Tool | Purpose |
 |---|---|
-| `list_fields` | 列出图层字段及类型、别名、长度与域。 |
-| `add_field` | 向图层或表添加字段。 |
-| `add_fields` | 一次调用添加多个字段。 |
-| `delete_field` | 删除一个或多个字段。 |
-| `alter_field` | 重命名字段，或修改别名/长度。 |
-| `create_feature_class` | 创建空要素类（默认放在工程默认地理数据库）并加入地图。 |
-| `create_table` | 创建空独立表。 |
-| `create_file_geodatabase` | 新建文件地理数据库。 |
-| `truncate_table` | 清空表或要素类的全部行，保留结构。 |
-| `delete_dataset` | 从磁盘或地理数据库删除数据集；不可撤销。 |
-| `export_features` | 按当前选择与定义查询导出图层为新数据集。 |
+| `list_fields` | List a layer's fields with type, alias, length, and domain. |
+| `add_field` | Add a field to a layer or table. |
+| `add_fields` | Add several fields in one call. |
+| `delete_field` | Delete one or more fields. |
+| `alter_field` | Rename a field, or change its alias/length. |
+| `create_feature_class` | Create an empty feature class (in the project's default geodatabase by default) and add it to the map. |
+| `create_table` | Create an empty standalone table. |
+| `create_file_geodatabase` | Create a new file geodatabase. |
+| `truncate_table` | Delete every row of a table or feature class, keeping the schema. |
+| `delete_dataset` | Delete a dataset from disk or a geodatabase; cannot be undone. |
+| `export_features` | Export a layer to a new dataset, honoring the current selection and definition query. |
 
-### 地理处理（7）
+### Geoprocessing (7)
 
-| 工具 | 用途 |
+| Tool | Purpose |
 |---|---|
-| `run_geoprocessing_tool` | 运行任意 arcpy 地理处理工具——分析的通用通道；图层名会解析为实时图层，选择与定义查询生效。参数名未知时先调 describe_geoprocessing_tool。 |
-| `list_geoprocessing_tools` | 按名称搜索可用的地理处理工具。 |
-| `list_toolboxes` | 列出 arcpy 工具箱模块与工程中的工具箱。 |
-| `describe_geoprocessing_tool` | 运行前查询工具的参数、数据类型、默认值与用法说明。 |
-| `run_python_toolbox_tool` | 运行磁盘上自定义 .pyt / .atbx / .tbx 工具箱中的工具。 |
-| `check_extension` | 检查并按需检出 ArcGIS 扩展许可。 |
-| `get_messages` | 最近一次地理处理操作的消息。 |
+| `run_geoprocessing_tool` | Run any arcpy geoprocessing tool — the universal analysis channel; layer names resolve to live layers so selections and definition queries apply. Call describe_geoprocessing_tool first when parameter names are unknown. |
+| `list_geoprocessing_tools` | Search available geoprocessing tools by name. |
+| `list_toolboxes` | List arcpy toolbox modules and the project's toolboxes. |
+| `describe_geoprocessing_tool` | Query a tool's parameters, data types, defaults, and usage text before running it. |
+| `run_python_toolbox_tool` | Run a tool from a custom .pyt / .atbx / .tbx toolbox on disk. |
+| `check_extension` | Check and optionally check out an ArcGIS extension license. |
+| `get_messages` | Messages from the most recent geoprocessing operation. |
 
-### 符号化（6）
+### Symbology (6)
 
-| 工具 | 用途 |
+| Tool | Purpose |
 |---|---|
-| `set_layer_renderer` | 修改图层符号化：单一符号、按类别的唯一值、按数值字段的分级/连续色带。 |
-| `get_layer_symbology` | 查看图层当前渲染器、分级断点、唯一值与标注设置。 |
-| `list_color_ramps` | 列出工程中可用的色带。 |
-| `set_layer_labeling` | 开关标注，并设置表达式、字体与晕圈。 |
-| `apply_symbology_from_layer` | 从 .lyrx 文件或另一图层复制符号化。 |
-| `save_layer_file` | 将图层及其符号化保存为 .lyrx 文件复用。 |
+| `set_layer_renderer` | Change a layer's symbology: single symbol, unique values by category, or graduated/continuous color scheme by numeric field. |
+| `get_layer_symbology` | Inspect a layer's current renderer, class breaks, unique values, and label settings. |
+| `list_color_ramps` | List the color ramps available in the project. |
+| `set_layer_labeling` | Turn labels on/off and set the expression, font, and halo. |
+| `apply_symbology_from_layer` | Copy symbology from a .lyrx file or another layer. |
+| `save_layer_file` | Save a layer with its symbology to a .lyrx file for reuse. |
 
-### 地图视图（7）
+### Map view (7)
 
-| 工具 | 用途 |
+| Tool | Purpose |
 |---|---|
-| `get_map_view` | 当前相机位置：中心、比例、旋转与可见范围；需要地图选项卡在 Pro 中打开。 |
-| `set_map_view` | 移动地图视图：设置范围、中心点、比例和/或旋转。 |
-| `export_map_view` | 把地图视图渲染为 PNG 并返回图片，用于目视检查；需要地图选项卡打开。 |
-| `list_bookmarks` | 列出地图上定义的空间书签。 |
-| `create_bookmark` | 把当前视图或指定范围保存为命名书签。 |
-| `apply_bookmark` | 将地图视图缩放到书签。 |
-| `delete_bookmark` | 删除地图书签。 |
+| `get_map_view` | Current camera position: center, scale, rotation, and visible extent; requires the map tab to be open in Pro. |
+| `set_map_view` | Move the map view: set an extent, center point, scale, and/or rotation. |
+| `export_map_view` | Render the map view to PNG and return the image for visual checking; requires the map tab to be open. |
+| `list_bookmarks` | List the spatial bookmarks defined on a map. |
+| `create_bookmark` | Save the current view, or a given extent, as a named bookmark. |
+| `apply_bookmark` | Zoom the map view to a bookmark. |
+| `delete_bookmark` | Delete a bookmark from a map. |
 
-### 布局与出图（16）
+### Layout & export (16)
 
-| 工具 | 用途 |
+| Tool | Purpose |
 |---|---|
-| `list_layouts` | 列出打印布局及页面尺寸与元素数量。 |
-| `get_layout_info` | 查看布局：页面设置与每个元素的位置尺寸。 |
-| `create_layout` | 新建布局页（默认含铺满页面的地图框）。 |
-| `delete_layout` | 从工程删除布局。 |
-| `add_map_frame` | 在布局页面指定位置添加地图框。 |
-| `set_map_frame_extent` | 将布局地图框指向某个图层、范围或比例。 |
-| `add_layout_text` | 向布局添加标题、署名等文本元素。 |
-| `add_layout_legend` | 添加与布局地图框关联的图例。 |
-| `add_layout_scale_bar` | 添加与地图框关联的比例尺。 |
-| `add_layout_north_arrow` | 添加与地图框关联的指北针。 |
-| `add_layout_picture` | 在布局上放置图片（如 Logo）。 |
-| `set_layout_element` | 移动、缩放、重命名、隐藏或修改任意布局元素的文本。 |
-| `delete_layout_element` | 从布局中删除元素。 |
-| `export_layout` | 导出布局为 PDF / PNG / JPEG / SVG / TIFF；PNG/JPEG 以图片内联返回便于检查。 |
-| `preview_layout` | 把布局渲染为临时图片返回（不写文件），便于边建边看。 |
-| `export_map_series` | 把布局的地图系列（地图册）导出为多页 PDF。 |
+| `list_layouts` | List the print layouts with page size and element counts. |
+| `get_layout_info` | Inspect a layout: page setup and every element with position and size. |
+| `create_layout` | Create a new layout page (by default with a map frame filling it). |
+| `delete_layout` | Delete a layout from the project. |
+| `add_map_frame` | Add a map frame to a layout at a page position. |
+| `set_map_frame_extent` | Point a layout's map frame at a layer, an extent, or a scale. |
+| `add_layout_text` | Add text elements such as a title or credits to a layout. |
+| `add_layout_legend` | Add a legend tied to a layout's map frame. |
+| `add_layout_scale_bar` | Add a scale bar tied to a map frame. |
+| `add_layout_north_arrow` | Add a north arrow tied to a map frame. |
+| `add_layout_picture` | Place an image such as a logo on a layout. |
+| `set_layout_element` | Move, resize, rename, hide, or change the text of any layout element. |
+| `delete_layout_element` | Remove an element from a layout. |
+| `export_layout` | Export a layout to PDF / PNG / JPEG / SVG / TIFF; PNG/JPEG come back inline as images for checking. |
+| `preview_layout` | Render a layout to a temporary image without writing a file — check it while building. |
+| `export_map_series` | Export a layout's map series (map book) to a multi-page PDF. |
 
-### 栅格（5）
+### Raster (5)
 
-| 工具 | 用途 |
+| Tool | Purpose |
 |---|---|
-| `get_raster_info` | 栅格详情：波段、大小、像元大小、像素类型、统计与坐标系。 |
-| `set_raster_symbology` | 设置栅格图层的配色器与色带。 |
-| `raster_calculator` | 栅格计算（地图代数）：为栅格绑定短名后写 Python 表达式；需要 Spatial Analyst 扩展。 |
-| `sample_raster_values` | 按地图坐标或点图层要素读取栅格像元值。 |
-| `zonal_statistics` | 分区统计：汇总分区多边形内的栅格值并返回表格；需要 Spatial Analyst 扩展。 |
+| `get_raster_info` | Raster detail: bands, size, cell size, pixel type, statistics, and coordinate system. |
+| `set_raster_symbology` | Set a raster layer's colorizer and color ramp. |
+| `raster_calculator` | Map algebra: bind rasters to short aliases, then write a Python expression; requires the Spatial Analyst extension. |
+| `sample_raster_values` | Read raster cell values at map coordinates or at a point layer's features. |
+| `zonal_statistics` | Summarize raster values inside zone polygons and return a table; requires the Spatial Analyst extension. |
 
-### 目录与数据发现（6）
+### Catalog & data discovery (6)
 
-| 工具 | 用途 |
+| Tool | Purpose |
 |---|---|
-| `list_workspace_contents` | 列出地理数据库或文件夹内的数据集；默认工程默认地理数据库。 |
-| `list_folder` | 列出磁盘上的 GIS 文件与子文件夹；默认工程主目录。 |
-| `describe_dataset` | 按路径描述任意数据集：类型、几何、坐标系、范围、字段与行数（无需加入地图）。 |
-| `search_data` | 在工程地理数据库、主目录与文件夹连接中按名称查找数据，是加数据前最快的定位方式。 |
-| `get_project_items` | 工程中注册的文件夹连接、数据库连接与工具箱。 |
-| `add_folder_connection` | 把文件夹注册到工程，便于浏览其数据。 |
+| `list_workspace_contents` | List the datasets inside a geodatabase or folder; defaults to the project's default geodatabase. |
+| `list_folder` | List GIS files and subfolders on disk; defaults to the project's home folder. |
+| `describe_dataset` | Describe any dataset by path: type, geometry, coordinate system, extent, fields, and row count (without adding it to a map). |
+| `search_data` | Find datasets by name across the project's geodatabase, home folder, and folder connections — the fastest way to locate data before adding it. |
+| `get_project_items` | Folder connections, database connections, and toolboxes registered in the project. |
+| `add_folder_connection` | Register a folder with the project so its data is easy to browse. |
 
-### 实用工具（4）
+### Utilities (4)
 
-| 工具 | 用途 |
+| Tool | Purpose |
 |---|---|
-| `execute_arcpy_code` | 在 ArcGIS Pro 内运行 Python：arcpy 已导入，arcpy.mp.ArcGISProject('CURRENT') 为打开工程，变量跨调用保持，print 输出被捕获，末尾表达式值会返回。没有专用工具时用它。 |
-| `get_pump_status` | 主线程调度器是否已安装；它决定命令能否访问打开的 Pro 工程，没有时只能做基于路径的工作。 |
-| `stop_pump` | 移除主线程调度器；实时工程类命令将停止工作，直到用户重新安装。 |
-| `run_batch` | 一次往返运行多条命令，多步工作流会快很多。 |
+| `execute_arcpy_code` | Run Python inside ArcGIS Pro: arcpy is already imported, arcpy.mp.ArcGISProject('CURRENT') is the open project, variables persist across calls, print output is captured, and the final expression's value is returned. Use it when no dedicated tool fits. |
+| `get_pump_status` | Whether the main-thread dispatcher is installed; it decides whether commands can reach the open Pro project — without it only path-based work runs. |
+| `stop_pump` | Remove the main-thread dispatcher; live-project commands stop working until the user installs it again. |
+| `run_batch` | Run several commands in one round trip — much faster for multi-step workflows. |
 
 </details>
 
 ---
 
-## 📦 包里有什么
+## 📦 What's in the package
 
-| 路径 | 内容 | 说明 |
+| Path | Contents | Notes |
 |---|---|---|
-| `install\ArcGISProMCP.esriAddinX` | 🧩 add-in v1.1.4 | 113 个原生工具 + 全部 GP 工具；HTTP MCP 6520 / 旧 TCP 6510 |
-| `install\runtime\stdio-bridge.ps1` | 🌉 stdio 桥 | 给只能启动本地进程的客户端（如 Claude Desktop）转接 6520；纯 PowerShell，无需 Python |
-| `install\runtime\runcode\RunCode.pyt` | 🐍 RunCode 工具箱 | 需要高频执行任意 arcpy 时使用；首次运行会弹一次信任框 |
-| `install\runtime\guard\` | 🛡️ 弹窗守护 | 自动点击“第三方代码库执行”信任框；失败时置顶提醒（≥30 秒、响铃） |
-| `install\runtime\plugin\` | 🔌 Python 桥（可选） | 在 Pro 的 Python 窗口里启动，提供 `execute_arcpy_code` 持久会话（端口 6511） |
-| `install\*.cmd / *.ps1` | 🛠️ 安装与自检 | 安装 / 自检 / 配置 Claude / 弹窗守护 / 卸载 |
-| `clients\` | 📁 客户端接入说明 | Claude Code、Claude Desktop、Codex、通用 JSON |
-| `docs\` | 📖 使用指南、排障、工作规则、更新日志 | 先看使用指南 |
-| `source\` | 📜 完整源码快照 | 与本包二进制对应的源码（AGPL-3.0 合规要求），含上游 LICENSE / NOTICE |
+| `install\ArcGISProMCP.esriAddinX` | 🧩 add-in v1.1.4 | 113 native tools + all GP tools; HTTP MCP 6520 / legacy TCP 6510 |
+| `install\runtime\stdio-bridge.ps1` | 🌉 stdio bridge | Bridges clients that can only launch local processes (such as Claude Desktop) to 6520; pure PowerShell, no Python needed |
+| `install\runtime\runcode\RunCode.pyt` | 🐍 RunCode toolbox | For frequent execution of arbitrary arcpy; the first run shows a trust dialog once |
+| `install\runtime\guard\` | 🛡️ Dialog guard | Auto-clicks the "third-party code library" trust dialog; shows a topmost alert on failure (≥30 s, with beeps) |
+| `install\runtime\plugin\` | 🔌 Python bridge (optional) | Started in Pro's Python window; provides persistent `execute_arcpy_code` sessions (port 6511) |
+| `install\*.cmd / *.ps1` | 🛠️ Install & self-check | Install / self-check / configure Claude / dialog guard / uninstall |
+| `clients\` | 📁 Client setup docs | Claude Code, Claude Desktop, Codex, generic JSON |
+| `docs\` | 📖 Usage guide, troubleshooting, work rules, changelog | Start with the usage guide |
+| `source\` | 📜 Full source snapshot | Source corresponding to this package's binaries (an AGPL-3.0 compliance requirement), including the upstream LICENSE / NOTICE |
 
-### 🔍 依赖审计（为什么说“全打包”）
+### 🔍 Dependency audit (why "fully bundled")
 
-- 🧩 add-in：自包含 C# 程序集，运行在 Pro 3.7 受支持环境自带的 .NET Desktop Runtime 10 x64 上——本包无需另装 .NET。
-- 🌉 stdio 桥、🛡️ 弹窗守护：Windows 自带的 PowerShell 5.1 + WinForms——无需另装。
-- 🐍 RunCode 工具箱、Python 桥：运行在 ArcGIS Pro 自带的 Python（arcpy）里——无需另装 Python。
-- ✅ **因此本包没有任何需要 pip / 联网安装的外部依赖。**“离线可用”指本包自身的安装与运行链路；ArcGIS Pro 3.7 的安装前提（.NET Desktop Runtime 10 x64、WebView2 ≥132）由 Pro 的安装程序提供。
+- 🧩 add-in: a self-contained C# assembly that runs on the .NET Desktop Runtime 10 x64 included with Pro 3.7's supported environment — no separate .NET install needed.
+- 🌉 stdio bridge, 🛡️ dialog guard: PowerShell 5.1 + WinForms, included with Windows — nothing extra to install.
+- 🐍 RunCode toolbox, Python bridge: run on the Python (arcpy) that ships with ArcGIS Pro — no separate Python installation.
+- ✅ **So this package has no external dependency requiring pip or network access.** "Works offline" refers to the package's own install and run path; ArcGIS Pro 3.7's installation prerequisites (.NET Desktop Runtime 10 x64, WebView2 ≥132) are provided by Pro's own installer.
 
 ---
 
-## 🧪 可选组件怎么用
+## 🧪 Using the optional components
 
-**🐍 RunCode 工具箱**（高频 arcpy 场景）
-- 路径：`%LOCALAPPDATA%\ArcGIS Pro MCP\runcode\RunCode.pyt`
-- 让 AI 调用 `run_python_toolbox_tool` 时传入该路径即可；或在 Pro 里“插入 → 工具箱 → 添加工具箱”选择它。
-- 每个 Pro 会话首次运行会弹“第三方代码库”信任框：可先运行 `03-dialog-guard.cmd`，守护会自动点“是” ✨。
+**🐍 RunCode toolbox** (for frequent arcpy work)
+- Path: `%LOCALAPPDATA%\ArcGIS Pro MCP\runcode\RunCode.pyt`
+- Have the AI pass this path to `run_python_toolbox_tool`; or add it in Pro via "Insert → Toolbox → Add Toolbox".
+- The first run in each Pro session shows the "third-party code library" trust dialog: run `03-dialog-guard.cmd` first and the guard clicks "Yes" for you ✨.
 
-**🔌 Python 桥**（需要跨调用保持 arcpy 会话时）
-1. 在 ArcGIS Pro 菜单 **分析 → Python** 打开 Python 窗口；
-2. 粘贴执行（路径已按默认安装位置写好）：
+**🔌 Python bridge** (when an arcpy session must persist across calls)
+1. Open the Python window from the ArcGIS Pro menu **Analysis → Python**;
+2. Paste and run (the path is already written for the default install location):
    ```python
-   import sys; sys.path.insert(0, r"C:\Users\<你的用户名>\AppData\Local\ArcGIS Pro MCP\plugin")
+   import sys; sys.path.insert(0, r"C:\Users\<your-username>\AppData\Local\ArcGIS Pro MCP\plugin")
    import mcp_bridge; print(mcp_bridge.start_server(port=6511))
    ```
-3. 需要 `CURRENT`（当前工程）时再加一行（必须在主线程执行）：
+3. When you need `CURRENT` (the open project), add one more line (must run on the main thread):
    ```python
    print(mcp_bridge.start_pump())
    ```
 
-**🛡️ 弹窗守护**（推荐在跑 RunCode / ENVI→Pro 联合流程前启动）
+**🛡️ Dialog guard** (recommended before running RunCode / ENVI→Pro joint workflows)
 ```
-03-dialog-guard.cmd                 # 600 秒守护
+03-dialog-guard.cmd                 # 600-second guard
 03-dialog-guard.cmd -DurationSeconds 120
-03-dialog-guard.cmd -NotifyTest     # 只测提醒窗（30 秒）
-03-dialog-guard.cmd -AlertOnly      # 只提醒，不自动点击
+03-dialog-guard.cmd -NotifyTest     # test the alert window only (30 s)
+03-dialog-guard.cmd -AlertOnly      # alert only, no auto-click
 ```
-安全边界：只处理带“第三方 / 代码库 / third-party / code library”上下文的信任框；**绝不触碰覆盖、删除等其他确认框** 🙅。日志在 `%LOCALAPPDATA%\ArcGIS Pro MCP\guard\watch_pro_dialog.log`。
+Safety boundary: it only handles trust dialogs whose context contains "third-party / code library / 第三方 / 代码库"; it **never touches overwrite, delete, or other confirmation dialogs** 🙅. The log is at `%LOCALAPPDATA%\ArcGIS Pro MCP\guard\watch_pro_dialog.log`.
 
 ---
 
-## 🔒 安全说明
+## 🔒 Security notes
 
-- 🏠 add-in 与所有桥接服务只监听 `127.0.0.1`，局域网其他机器无法连接。
-- ⚖️ 本软件仅在 `127.0.0.1` 提供本机服务，不向第三方提供网络服务；如你在修改后通过网络向他人提供服务，AGPL-3.0 §13 的源码提供义务适用。
-- 🔏 add-in 为未签名构建：首次加载时 ArcGIS Pro 会要求你确认信任，这是正常流程；请核对本包 `SHA256SUMS.txt`。
-- 🕵️ 本包不包含任何遥测或联网上报。
-- 🧹 卸载：`99-uninstall.cmd`（可选择保留客户端配置）。
+- 🏠 The add-in and all bridge services listen on `127.0.0.1` only; other machines on the LAN cannot connect.
+- ⚖️ This software provides local services on `127.0.0.1` only and does not serve third parties over a network; if you modify it to serve others over a network, the AGPL-3.0 §13 source-offer obligation applies.
+- 🔏 The add-in is an unsigned build: ArcGIS Pro asks you to confirm trust on first load — this is the normal flow; verify `SHA256SUMS.txt` in this package.
+- 🕵️ This package contains no telemetry and no network reporting.
+- 🧹 Uninstall: `99-uninstall.cmd` (optionally keeping client configuration).
 
 ---
 
-## 📜 版本与许可
+## 📜 Version & license
 
-- 🏷️ 版本：**1.1.4**（构建日期见 `VERSION.json`；工具数 113）
-- 👤 维护者：**Law**（[@XNYGggg](https://github.com/XNYGggg)）
-- 🙏 上游项目与原作者：**[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**，作者 **Pisut Nakmuenwai**（AGPL-3.0-or-later）。本包在其基础上累计补丁至 1.1.4（修改点见 `docs\CHANGELOG.md` 与 `RELEASE-NOTES.md`）。
-- ⚖️ 许可证：**AGPL-3.0-or-later**（本包附带完整源码快照与上游 NOTICE）
-- 🏷️ 商标：“ArcGIS”为 Esri 商标；本项目为第三方工具，与 Esri 无隶属关系。
+- 🏷️ Version: **1.1.4** (build date in `VERSION.json`; 113 tools)
+- 👤 Maintainer: **Law** ([@XNYGggg](https://github.com/XNYGggg))
+- 🙏 Upstream project & original author: **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)** by **Pisut Nakmuenwai** (AGPL-3.0-or-later). This package accumulates patches on top of it up to 1.1.4 (changes are listed in `docs\CHANGELOG.md` and `RELEASE-NOTES.md`).
+- ⚖️ License: **AGPL-3.0-or-later** (the package includes a full source snapshot and the upstream NOTICE)
+- 🏷️ Trademark: "ArcGIS" is a trademark of Esri; this project is a third-party tool and is not affiliated with Esri.
 
-🆘 常见问题见 `docs\排障手册.md`；进阶用法见 `docs\使用指南.md`。祝你出图愉快 🎨 (｀・ω・´)ゞ
+🆘 FAQ in `docs\排障手册.md`; advanced usage in `docs\使用指南.md`. Happy mapping 🎨 (｀・ω・´)ゞ
