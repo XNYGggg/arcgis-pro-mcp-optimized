@@ -27,7 +27,7 @@ EXIT_ENV = 3
 EXIT_RUNTIME = 4
 EXIT_VALIDATION = 5
 
-MODULE_VERSION = "2.0.0"
+MODULE_VERSION = "2.0.1"
 
 
 def agentkit_home() -> Path:

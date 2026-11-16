@@ -1,4 +1,4 @@
-# Distill · 按需模板蒸馏（2.0.0）
+# Distill · 按需模板蒸馏（2.0.1）
 
 把一张样本成图蒸馏成可复用的版式 spec：`import → measure → patch → validate →
 preview → review → approve → apply`。一次作业、无守护进程、以输入 sha256 幂等；

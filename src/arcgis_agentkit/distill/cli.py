@@ -25,6 +25,7 @@ from ..common.runtime import (
     EXIT_RUNTIME,
     EXIT_USAGE,
     EXIT_VALIDATION,
+    MODULE_VERSION,
     agentkit_home,
     emit,
     fail,
@@ -124,7 +125,7 @@ def _doctor(args, as_json: bool) -> int:
         check("writable", False, str(exc), True)
     check("templates", True, str(len(library.list())) + " in index")
     healthy = all(item["ok"] for item in checks if item["critical"])
-    payload = ok(module="distill", version="2.0.0",
+    payload = ok(module="distill", version=MODULE_VERSION,
                  status="ready" if healthy else "not-ready", checks=checks)
     if as_json:
         emit(payload, True)

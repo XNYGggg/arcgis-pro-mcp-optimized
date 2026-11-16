@@ -23,6 +23,7 @@ from ..common.runtime import (
     EXIT_OK,
     EXIT_RUNTIME,
     EXIT_USAGE,
+    MODULE_VERSION,
     fail,
     load_config,
     ok,
@@ -94,7 +95,7 @@ def _doctor(client: GuardClient, args, as_json: bool) -> int:
     ok_all = all(item["ok"] for item in checks if item["critical"])
     payload = ok(**{
         "module": "guard",
-        "version": "2.0.0",
+        "version": MODULE_VERSION,
         "status": "ready" if ok_all else "not-ready",
         "checks": checks,
     })

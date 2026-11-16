@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 
 const string Repo = "XNYGggg/arcgis-pro-mcp-optimized";
-const string DefaultTag = "v2.0.0";
+const string DefaultTag = "v2.0.1";
 
 string tag = DefaultTag;
 string? zipOverride = null;
@@ -52,7 +52,7 @@ if (zipOverride is null)
     try
     {
         using var http = new HttpClient { Timeout = TimeSpan.FromMinutes(10) };
-        http.DefaultRequestHeaders.UserAgent.ParseAdd("ArcGISProMCP.Install/2.0.0");
+        http.DefaultRequestHeaders.UserAgent.ParseAdd("ArcGISProMCP.Install/2.0.1");
         using var resp = http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).GetAwaiter().GetResult();
         if (!resp.IsSuccessStatusCode)
         {
@@ -197,7 +197,7 @@ static void PrintUsage()
         运行 install/00-install.cmd 完成安装。
 
         选项:
-          --tag <tag>   指定发布标签（默认 v2.0.0）
+          --tag <tag>   指定发布标签（默认 v2.0.1）
           --zip <path>  改用本地 zip（跳过下载，仍做完整校验）
           --dry-run     只下载与校验，不启动安装
           -h, --help    显示本帮助

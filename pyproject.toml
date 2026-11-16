@@ -1,6 +1,6 @@
 [project]
 name = "arcgis-pro-agentkit"
-version = "2.0.0"
+version = "2.0.1"
 description = "Unified ArcGIS Pro toolkit: MCP add-in, on-demand dialog guard, on-demand template distillation"
 readme = "README.md"
 requires-python = ">=3.10"

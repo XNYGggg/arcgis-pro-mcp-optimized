@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.0.1 — 2026-11-16
+
+Live-test fixes found by installing 2.0.0 and driving a real ArcGIS Pro session.
+
+- **Guard engine**: a trust dialog's text appears in the UIA tree before its
+  buttons do. The 2.0.0 engine alerted immediately when the first scan found
+  no 是/允许 button, producing a false 30-second alarm even though the
+  auto-click succeeded a second later. The engine now waits 2.5 s for the
+  button tree before alerting (`dialog_button_wait` in the JSONL log). Verified
+  against a fresh, untrusted `.pyt`: detection → click 是(Y) → resolved, no alert.
+- **Distill launcher**: `run-distill.ps1` used `[Parameter(ValueFromRemainingArguments)]`,
+  which made PowerShell bind CLI flags such as `--out` to the common parameter
+  `-OutVariable`, breaking `template_preview`. The launcher is now a simple
+  script using `$args`; `template_preview` returns an image again.
+- Version bump to 2.0.1 across add-in, Python packages, installer and NuGet
+  workflow. v2.0.0 remains available as a historical Release.
+
 ## 2.0.0 — 2026-11-16
 
 The unified AgentKit release: MCP + on-demand guard + on-demand distillation.

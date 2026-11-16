@@ -18,7 +18,7 @@ param(
     [switch]$NoEventHook
 )
 
-# ArcGIS Pro on-demand dialog guard (engine 2.0.0).
+# ArcGIS Pro on-demand dialog guard (engine 2.0.1).
 #
 # Lifecycle: summoned with a token, arms within ~2 s (ready.json), watches for
 # the *third-party code library* trust dialog while the caller's operation runs,
@@ -34,7 +34,7 @@ param(
 #   <token>\result.json     engine summary, written on exit
 
 $ErrorActionPreference = 'Stop'
-$script:EngineVersion = '2.0.0'
+$script:EngineVersion = '2.0.1'
 $script:Token = $Token
 $script:Events = New-Object System.Collections.Generic.List[object]
 $script:DialogSeen = $false
@@ -43,6 +43,7 @@ $script:AlertForm = $null
 $script:AlertShownAt = [datetime]::MinValue
 $script:LastBeep = [datetime]::MinValue
 $script:GraceUntil = $null
+$script:NoButtonSince = $null
 $script:AlertOnlyMode = [bool]$AlertOnly
 
 if ($TestSeconds -lt 30) { $TestSeconds = 30 }
@@ -734,7 +735,32 @@ try {
             }
             [void](Bring-ProToFront $script:ProIds $candidate.Window)
 
-            if ($candidate.Action -eq 'alert' -or $candidate.Deny) {
+            # A trust dialog appears before its buttons do: the UIA tree is
+            # populated a moment later. In a live 2.0 test the first scan saw
+            # the text but no 是/否 buttons, and alerting immediately produced a
+            # false 30-second alarm even though the auto-click succeeded a
+            # second later. Give the tree 2.5 s before treating it as a failure.
+            $strongWithoutButton = (
+                $candidate.Action -eq 'alert' -and
+                -not $candidate.Deny -and
+                -not $candidate.Button -and
+                -not $script:AlertOnlyMode -and
+                $candidate.Strong)
+
+            if ($strongWithoutButton) {
+                if (-not $script:NoButtonSince) {
+                    $script:NoButtonSince = Get-Date
+                    Write-Event 'info' 'dialog_button_wait' @{
+                        window = $candidate.WinName
+                        wait_s = 2.5
+                    }
+                }
+                if (((Get-Date) - $script:NoButtonSince).TotalSeconds -ge 2.5) {
+                    Mark-Tokens 'Alerted'
+                    Show-Alert '检测到信任确认框，但未找到可安全点击的「是 / 允许」按钮。'
+                }
+            } elseif ($candidate.Action -eq 'alert' -or $candidate.Deny) {
+                $script:NoButtonSince = $null
                 Mark-Tokens 'Alerted'
                 if ($candidate.Deny) {
                     Show-Alert '检测到可能覆盖 / 删除类的确认框，守卫不会点击，请人工确认。'
@@ -742,12 +768,15 @@ try {
                     Show-Alert '检测到信任确认框，但未找到可安全点击的「是 / 允许」按钮。'
                 }
             } elseif ($script:AlertOnlyMode) {
+                $script:NoButtonSince = $null
                 Mark-Tokens 'Alerted'
                 Show-Alert '（AlertOnly 模式：需要你手动点击）'
             } elseif (-not $candidate.Button) {
+                $script:NoButtonSince = $null
                 Mark-Tokens 'Alerted'
                 Show-Alert '未找到可点击的按钮，需要你手动点击。'
             } else {
+                $script:NoButtonSince = $null
                 $clicked = Invoke-Button $candidate.Button
                 Write-Event 'warn' 'click_attempt' @{ button = $candidate.ButtonName; ok = $clicked; reason = $candidate.Reason }
                 if ($clicked) {
@@ -771,6 +800,7 @@ try {
                 }
             }
         } else {
+            $script:NoButtonSince = $null
             if ($script:DialogSeen -and -not $script:Resolved) {
                 $script:Resolved = $true
                 Mark-Tokens 'Resolved'

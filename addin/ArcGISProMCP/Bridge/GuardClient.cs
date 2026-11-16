@@ -24,7 +24,7 @@ namespace ArcGISProMCP.Bridge
     /// </summary>
     internal static class GuardClient
     {
-        public const string Version = "2.0.0";
+        public const string Version = "2.0.1";
 
         private static readonly string[] GuardedToolboxExtensions =
             { ".pyt", ".tbx", ".atbx" };

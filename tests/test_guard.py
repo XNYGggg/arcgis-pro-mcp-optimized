@@ -55,7 +55,7 @@ def test_summon_handshake_and_settle(tmp_path, monkeypatch):
         assert lease.ready, lease.warning
         assert (lease.session_dir / "ready.json").is_file()
         ready = json.loads((lease.session_dir / "ready.json").read_text(encoding="utf-8"))
-        assert ready["engine_version"] == "2.0.0"
+        assert ready["engine_version"] == "2.0.1"
     finally:
         lease.settle("test")
     result = lease.wait_result(timeout_s=15)
