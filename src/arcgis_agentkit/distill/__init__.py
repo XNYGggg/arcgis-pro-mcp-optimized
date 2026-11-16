@@ -1,10 +1,7 @@
-"""On-demand template distillation (skeleton).
+"""On-demand template distillation (one-shot, deterministic steps only).
 
-Design (docs/design-2026-11-16.md §4):
-- One-shot pipeline: import -> measure -> semantic patch -> validate -> preview
-  -> review -> ready -> apply. Idempotent per input sha256; no daemon.
-- Deterministic steps (measure/validate/preview/library) carry no LLM.
-- Semantic step is guided by skills/template-distill/SKILL.md.
+Pipeline: import -> measure -> patch (semantic fields) -> validate -> preview
+-> review -> ready -> apply. Every step is idempotent per input sha256; the
+semantic step is guided by ``skills/template-distill/SKILL.md``.
 """
 
-from .cli import main  # noqa: F401

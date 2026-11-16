@@ -4,6 +4,8 @@ __pycache__/
 venv/
 build/
 dist/
+obj/
+bin/
 *.egg-info/
 .pytest_cache/
 
@@ -15,3 +17,6 @@ library/*.bak-*
 
 # runtime artifacts
 *.log
+artifacts/
+release_test_tmp/
+wt-customer/

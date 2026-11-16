@@ -1,5 +1,6 @@
 {
   "schema_version": 1,
+  "schema_revision": "1.1",
   "type": "object",
   "required": [
     "schema_version",
@@ -21,7 +22,11 @@
     },
     "status": {
       "enum": [
+        "imported",
         "draft",
+        "measured",
+        "analyzed",
+        "validated",
         "ready"
       ]
     },
@@ -97,6 +102,161 @@
     },
     "export": {
       "type": "object"
+    },
+    "measured": {
+      "type": "object",
+      "properties": {
+        "image": {
+          "type": "string"
+        },
+        "tool_version": {
+          "type": "string"
+        },
+        "measured_at": {
+          "type": "string"
+        },
+        "pixel_size": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "figure_bbox": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "figure_size": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "aspect": {
+          "type": "number"
+        },
+        "assumed_width_in": {
+          "type": "number"
+        },
+        "canvas_height_in": {
+          "type": "number"
+        },
+        "dpi": {
+          "type": "integer"
+        },
+        "dpi_source": {
+          "type": "string"
+        },
+        "h_lines": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "v_lines": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "palette_top": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "hex": {
+                "type": "string"
+              },
+              "share": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    },
+    "regions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "role",
+          "x",
+          "y",
+          "w",
+          "h"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          },
+          "w": {
+            "type": "number"
+          },
+          "h": {
+            "type": "number"
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "pitfalls": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "issue",
+          "check"
+        ],
+        "properties": {
+          "issue": {
+            "type": "string"
+          },
+          "check": {
+            "type": "string"
+          },
+          "severity": {
+            "enum": [
+              "info",
+              "warn",
+              "error"
+            ]
+          }
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "properties": {
+        "by": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "decisions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "force": {
+          "type": "boolean"
+        }
+      }
     },
     "notes": {
       "type": "string"

@@ -9,7 +9,7 @@
 > ### 🙏 上游项目与原作者
 > 本项目站在巨人的肩膀上:**[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**,
 > 原作者 **Pisut Nakmuenwai**,**AGPL-3.0-or-later** 许可。感谢原作者!🌟
-> 我们在其基础上累计本地补丁至 **v1.1.4**,并新增守卫与蒸馏两个模块;上游署名与修改声明保留在 [NOTICE](NOTICE) 与客户包内的源码快照中。
+> 我们在其基础上累计本地补丁至 **v2.0.0**,并新增守卫与蒸馏两个模块;上游署名与修改声明保留在 [NOTICE](NOTICE) 与客户包内的源码快照中。
 
 ---
 
@@ -19,9 +19,9 @@
 
 | | 模块 | 作用 | 状态 |
 |---|---|---|---|
-| 🧩 | **MCP** | ArcGIS Pro 插件:**113 个原生工具**(进程内执行,约 9 ms ⚡)、全部地理处理工具、可选 RunCode / Python 桥 arcpy 通道。监听 `127.0.0.1:6520/mcp`。 | 客户版 v1.1.4 已发布 [`customer-v1.1.4`](../../tree/customer-v1.1.4) 分支 🎁 |
-| 🛡️ | **Guard** | 按需弹窗守卫:只在可能触发"第三方代码库"信任框的操作前被召唤,操作结束立刻收队。🥷 | 骨架(设计见 [docs/design-2026-11-16.md](docs/design-2026-11-16.md) §3) |
-| 🧪 | **Distill** | 按需模板蒸馏:样本成图 → 可复用版式 spec。一次作业、无守护进程、完全可复现。🧬 | 骨架(设计见 [docs/design-2026-11-16.md](docs/design-2026-11-16.md) §4) |
+| 🧩 | **MCP** | ArcGIS Pro 插件:**125 个原生工具**(进程内执行,约 9 ms ⚡)、全部地理处理工具、可选 RunCode / Python 桥 arcpy 通道。监听 `127.0.0.1:6520/mcp`。 | **v2.0.0** 已就绪 [`customer-v2.0.0`](../../tree/customer-v2.0.0) 分支 🎁 |
+| 🛡️ | **Guard** | 按需弹窗守卫:只在可能触发"第三方代码库"信任框的操作前被召唤,操作结束立刻收队。🥷 | **已完成**——见 [guard.md](docs/guard.md) |
+| 🧪 | **Distill** | 按需模板蒸馏:样本成图 → 可复用版式 spec。一次作业、无守护进程、完全可复现。🧬 | **已完成**——见 [distill.md](docs/distill.md) |
 
 ### 🧠 为什么强调"按需"?(因为没人喜欢打不死的小强进程 🧟)
 
@@ -40,12 +40,12 @@ flowchart LR
 
 ---
 
-## 🚀 快速开始 —— 客户版(v1.1.4)
+## 🚀 快速开始 —— 客户版(v2.0.0)
 
-电池已装好,开箱即用 🔋——add-in、stdio 桥、RunCode、弹窗守护、Python 桥、安装器、文档与 AGPL 源码快照,一个包全带走:
+电池已装好,开箱即用 🔋——add-in 2.0.0、stdio 桥、RunCode、新版按需守卫引擎、内置蒸馏运行时、Python 桥、安装器、文档与 AGPL 源码快照,一个包全带走:
 
-- 📦 下载(推荐):[**v1.1.4 Release**](../../releases/tag/v1.1.4) → `ArcGIS-Pro-MCP-v1.1.4.zip`([直链](../../releases/download/v1.1.4/ArcGIS-Pro-MCP-v1.1.4.zip),SHA256 `29e01ae4…82d7`,包内每个文件都可用自带 `SHA256SUMS.txt` 校验)
-- 👀 浏览源码:[**`customer-v1.1.4`**](../../tree/customer-v1.1.4)
+- 📦 下载:[**Release v2.0.0**](../../releases/tag/v2.0.0) → `ArcGIS-Pro-MCP-v2.0.0.zip`(包内每个文件都可用自带 `SHA256SUMS.txt` 校验)
+- 👀 浏览源码:[**`customer-v2.0.0`**](../../tree/customer-v2.0.0) · 上一版:[**v1.1.4**](../../releases/tag/v1.1.4)(已保留)
 - 🛺 想一条命令装好?看下面的 NuGet 安装器 ⬇️
 
 1. 📂 解压到任意目录 → 双击 `install/00-install.cmd`(不需要管理员;要求 ArcGIS Pro **3.7+**)
@@ -165,12 +165,12 @@ url = "http://127.0.0.1:6520/mcp"
 
 ---
 
-## 🧰 全部 113 个 MCP 工具(12 组)
+## 🧰 全部 125 个 MCP 工具(14 组)
 
 助手能做的全部事情,按名字列在这里。点开看看 👇
 
 <details>
-<summary><b>📜 完整工具清单 —— 会话 15 · 图层 19 · 数据 11 · 选择 6 · 字段/数据集 11 · 地理处理 7 · 符号化 6 · 视图 7 · 布局 16 · 栅格 5 · 目录 6 · 实用工具 4</b></summary>
+<summary><b>📜 完整工具清单 —— 会话 15 · 图层 19 · 数据 11 · 选择 6 · 字段/数据集 11 · 地理处理 7 · 符号化 6 · 视图 7 · 布局 16 · 栅格 5 · 目录 6 · 实用工具 4 · 守卫 2 · 模板 10</b></summary>
 
 ### 会话与工程（15）
 
@@ -345,6 +345,28 @@ url = "http://127.0.0.1:6520/mcp"
 | `stop_pump` | 移除主线程调度器；实时工程类命令将停止工作，直到用户重新安装。 |
 | `run_batch` | 一次往返运行多条命令，多步工作流会快很多。 |
 
+### 守卫（2）
+
+| 工具 | 用途 |
+|---|---|
+| `guard_summon` | 为手工步骤召唤按需弹窗守卫：只点“第三方代码库执行”信任框；点不到时置顶警报 ≥30 秒；按 `timeout_s` 自行退出。 |
+| `guard_status` | 守卫引擎路径/版本、会话根目录与最近 20 个召唤会话。 |
+
+### 模板蒸馏（10）
+
+| 工具 | 用途 |
+|---|---|
+| `template_list` | 列出模板库中的模板，可按状态或标签过滤。 |
+| `template_get` | 读取模板 spec（版式、配色、字体、分区、易翻车点与评审记录）。 |
+| `template_import` | 导入样本成图作为草稿（按 sha256 去重）。 |
+| `template_measure` | 测量图幅包围盒、长宽比、强框线、主色与 DPI。 |
+| `template_patch` | 以校验合并方式提交语义字段；受保护字段会被拒绝。 |
+| `template_validate` | schema + 几何一致性校验。 |
+| `template_review` | 记录人工评审结论。 |
+| `template_approve` | 批准已评审、已校验的模板（置为 ready）。 |
+| `template_preview` | 返回线框预览图。 |
+| `template_apply` | 把 ready 模板写成制图任务上下文文件。 |
+
 </details>
 
 ---
@@ -352,14 +374,18 @@ url = "http://127.0.0.1:6520/mcp"
 ## 🗂️ 仓库结构
 
 ```
-├── main(本分支)🏠           项目骨架:guard + distill 模块与设计文档
-├── customer-v1.1.4 🎁        开箱即用客户版(add-in 1.1.4 + 全部运行组件)
+├── main(本分支)🏠           AgentKit 2.0.0:MCP add-in 2.0.0 + 守卫 + 蒸馏
+├── customer-v2.0.0 🎁        v2.0.0 发布分支(已合并进 main)
+├── customer-v1.1.4 🎁        上一版客户版(add-in 1.1.4),保留
+├── history-main-pre-2.0 🗄️   2.0 合并前的 main,作为历史保留
 ├── installer/ 🛺             ArcGISProMCP.Install——NuGet 安装器工具(下载→校验→启动安装)
-├── src/arcgis_agentkit/ 🧰   guard / distill Python 包(CLI 骨架)
+├── addin/ArcGISProMCP/ 🧩     C# 插件(125 个工具、GuardClient、模板命令)
+├── src/arcgis_pro_mcp/ 🐍     上游 Python stdio/CLI 服务(保留便于 rebase)
+├── src/arcgis_agentkit/ 🧰    guard / distill Python 包(CLI + 引擎)
 ├── skills/ 🎓                给助手的技能说明(template-distill、arcgis-pro-mapping)
-├── library/ 📚               模板库 schema(v1)与示例
-├── docs/ 📖                  设计与架构文档
-└── tests/ 🧪                 pytest 冒烟测试
+├── library/ 📚               模板库 schema(v1.1)与示例
+├── docs/ 📖                  设计、架构、守卫与蒸馏文档
+└── tests/ 🧪                 pytest(守卫握手/规则、完整蒸馏流水线)
 ```
 
 开发安装:
@@ -370,20 +396,20 @@ arcgis-guard doctor
 arcgis-distill doctor
 ```
 
-## 🛣️ 路线图 —— 下一站:做大做强 🚌💨
+## 🛣️ 路线图
 
-1. 🛡️ **M1 — 守卫 v1**:召唤协议、UIA 事件优先检测、add-in 在 `run_python_toolbox_tool` 前后自动 arm/settle、Pester 测试
-2. 🧪 **M2 — 蒸馏 v1**:import / measure / validate / preview / 模板库、`template-distill` 技能与模板 MCP 工具
-3. 🎉 **M3 — 开源发布**:版本归一、双语文档、CI、Release 资产、干净机器演练
+1. ✅ **M1 — 守卫 2.0**:召唤协议、UIA 事件优先检测、add-in 自动 arm/settle、规则 schema、CLI、测试
+2. ✅ **M2 — 蒸馏 2.0**:import / measure / patch / validate / preview / review / approve / apply、schema v1.1、模板 MCP 工具
+3. ✅ **M3 — 发布**:2.0.0 版本归一、Tag、Release 资产与 NuGet 包均已发布;代码签名与干净虚拟机演练待做
 
-详细设计、验收标准与取舍记录:[docs/design-2026-11-16.md](docs/design-2026-11-16.md)。别催,在做了 (｀・ω・´)ゞ
+详细设计、验收标准与取舍记录:[docs/design-2026-11-16.md](docs/design-2026-11-16.md)。2.0 已到场 (๑•̀ㅂ•́)و✧
 
 ---
 
 ## 📜 许可、致谢与免责声明
 
 - ⚖️ **许可**:[AGPL-3.0-or-later](LICENSE)。MCP 模块衍生自 AGPL-3.0-or-later 项目,合并仓库同样采用 AGPL-3.0-or-later。
-- 🙏 **上游项目与原作者**:[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP),作者 **Pisut Nakmuenwai**——感谢原作者!💐 本地修改声明见 [NOTICE](NOTICE)、[RELEASE-NOTES.md](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/blob/customer-v1.1.4/RELEASE-NOTES.md) 与客户包内 `source/SOURCE-NOTICE.md`。
+- 🙏 **上游项目与原作者**:[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP),作者 **Pisut Nakmuenwai**——感谢原作者!💐 本地修改声明见 [NOTICE](NOTICE)、[RELEASE-NOTES.md](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/blob/customer-v2.0.0/RELEASE-NOTES.md) 与客户包内 `source/SOURCE-NOTICE.md`。
 - 🏷️ **商标**:本项目与 Esri 无隶属关系;"ArcGIS"是 Esri 的商标,本项目为第三方工具。
 - 🔒 **隐私/网络**:所有服务仅绑定 `127.0.0.1`;无遥测、无云端调用。
 - 👤 **维护者**:Law([@XNYGggg](https://github.com/XNYGggg))。

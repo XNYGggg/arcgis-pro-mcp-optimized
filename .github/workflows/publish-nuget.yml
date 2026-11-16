@@ -28,7 +28,7 @@ jobs:
 
       - name: Resolve version from release tag
         run: |
-          TAG="${{ github.event.release.tag_name || 'v1.1.4' }}"
+          TAG="${{ github.event.release.tag_name || 'v2.0.0' }}"
           echo "PKG_VERSION=${TAG#v}" >> "$GITHUB_ENV"
 
       - name: Pack
