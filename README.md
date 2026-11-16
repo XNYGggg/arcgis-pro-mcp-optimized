@@ -21,7 +21,7 @@ Say it in plain language — *"color the counties by area, pastel red to green"*
 
 | | Part | What it does | Status |
 |---|---|---|---|
-| 🧩 | **MCP** | ArcGIS Pro add-in: **125 native tools** (in-process, ~9 ms ⚡), every geoprocessing tool, optional arcpy via RunCode / Python bridge. Listens on `127.0.0.1:6520/mcp`. | **v2.0.1 live-tested** ✅ · v1.1.4 preserved |
+| 🧩 | **MCP** | ArcGIS Pro add-in: **125 native tools** (in-process, ~9 ms ⚡), every geoprocessing tool, optional arcpy via RunCode / Python bridge. Listens on `127.0.0.1:6520/mcp`. | **v2.0.1 preview · live-tested** 🧪 · stable: v1.1.4 |
 | 🛡️ | **Guard** | On-demand dialog guard for the "third-party code library" trust dialog. Summoned only when needed, gone right after. 🥷 | **Ready** — see [guard.md](docs/guard.md) |
 | 🧪 | **Distill** | On-demand template distillation: sample figure → reusable layout spec. One shot, no daemon, fully repeatable. 🧬 | **Ready** — see [distill.md](docs/distill.md) |
 
@@ -44,11 +44,12 @@ flowchart LR
 
 ## 🚀 Quick start — customer edition
 
-v2.0.1 has passed live tests on ArcGIS Pro 3.7 (125 tools, auto guard, RunCode, template_*); v1.1.4 remains available for existing installs:
+v2.0.1 has passed live tests on ArcGIS Pro 3.7 (125 tools, auto guard, RunCode, template_*) but remains a **preview/prerelease**; v1.1.4 is the stable default:
 
-- ✅ **Recommended:** [**Release v2.0.1**](../../releases/tag/v2.0.1) → `ArcGIS-Pro-MCP-v2.0.1.zip` — add-in 2.0.1, on-demand guard engine and the bundled Distill runtime (every file verifies against the bundled `SHA256SUMS.txt`)
-- 🗄️ **Previous editions (preserved):** [**v2.0.0**](../../releases/tag/v2.0.0) · [**v1.1.4**](../../releases/tag/v1.1.4)
-- 👀 Browse source: [**`customer-v2.0.0`**](../../tree/customer-v2.0.0) (current) · [**`customer-v1.1.4`**](../../tree/customer-v1.1.4) (legacy)
+- ✅ **Stable · recommended:** [**Release v1.1.4**](../../releases/tag/v1.1.4) → `ArcGIS-Pro-MCP-v1.1.4.zip` — add-in 1.1.4, stdio bridge, RunCode, dialog guard, Python bridge, installers, docs, full AGPL source snapshot (every file verifies against the bundled `SHA256SUMS.txt`)
+- 🧪 **Preview · live-tested:** [**Release v2.0.1**](../../releases/tag/v2.0.1) → `ArcGIS-Pro-MCP-v2.0.1.zip` — add-in 2.0.1, on-demand guard engine, bundled Distill runtime and the installer template-library fix
+- 🗄️ **Previous preview:** [**v2.0.0**](../../releases/tag/v2.0.0) (prerelease, preserved)
+- 👀 Browse source: [**`customer-v1.1.4`**](../../tree/customer-v1.1.4) (stable) · [**`customer-v2.0.0`**](../../tree/customer-v2.0.0) (preview)
 - 🛺 Prefer one command? Use the [NuGet installer](#-install-via-nuget-github-packages) below ⬇️
 
 1. 📂 Unzip anywhere → double-click `install/00-install.cmd` (no admin needed; ArcGIS Pro **3.7+** required).
@@ -66,7 +67,7 @@ Prefer one command? The [`ArcGISProMCP.Install`](../../pkgs/nuget/ArcGISProMCP.I
 # one-time: register the GitHub Packages NuGet source
 dotnet nuget add source "https://nuget.pkg.github.com/XNYGggg/index.json" --name github --username XNYGggg --password <YOUR_PAT> --store-password-in-clear-text
 
-dotnet tool install --global ArcGISProMCP.Install --version 2.0.1   # live-tested edition
+dotnet tool install --global ArcGISProMCP.Install --version 1.1.4   # stable; 2.0.1 is a preview
 arcgis-pro-mcp-install              # add --dry-run to download + verify only
 ```
 
@@ -377,8 +378,8 @@ Everything the assistant can do, by name. Click to expand 👇
 ## 🗂️ Repository layout
 
 ```
-├── main (this branch) 🏠      AgentKit 2.0.1: MCP add-in 2.0.1 + guard + distill
-├── customer-v2.0.0 🎁         v2.0.0/v2.0.1 release branch (merged into main)
+├── main (this branch) 🏠      AgentKit 2.0.1 preview: MCP add-in 2.0.1 + guard + distill
+├── customer-v2.0.0 🎁         v2.0.0/v2.0.1 preview release branch (merged into main)
 ├── customer-v1.1.4 🎁         previous customer edition (add-in 1.1.4), preserved
 ├── history-main-pre-2.0 🗄️    main before the 2.0 merge, preserved as history
 ├── installer/ 🛺              ArcGISProMCP.Install — NuGet tool: download → verify → run setup

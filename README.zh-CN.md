@@ -21,7 +21,7 @@
 
 | | 模块 | 作用 | 状态 |
 |---|---|---|---|
-| 🧩 | **MCP** | ArcGIS Pro 插件:**125 个原生工具**(进程内执行,约 9 ms ⚡)、全部地理处理工具、可选 RunCode / Python 桥 arcpy 通道。监听 `127.0.0.1:6520/mcp`。 | **v2.0.1 已实机验证** ✅ · v1.1.4 保留 |
+| 🧩 | **MCP** | ArcGIS Pro 插件:**125 个原生工具**(进程内执行,约 9 ms ⚡)、全部地理处理工具、可选 RunCode / Python 桥 arcpy 通道。监听 `127.0.0.1:6520/mcp`。 | **v2.0.1 预览 · 已实机验证** 🧪 · 稳定版:v1.1.4 |
 | 🛡️ | **Guard** | 按需弹窗守卫:只在可能触发"第三方代码库"信任框的操作前被召唤,操作结束立刻收队。🥷 | **已完成**——见 [guard.md](docs/guard.md) |
 | 🧪 | **Distill** | 按需模板蒸馏:样本成图 → 可复用版式 spec。一次作业、无守护进程、完全可复现。🧬 | **已完成**——见 [distill.md](docs/distill.md) |
 
@@ -44,11 +44,13 @@ flowchart LR
 
 ## 🚀 快速开始 —— 客户版
 
-v2.0.1 已在 ArcGIS Pro 3.7 实机验证(125 工具、自动守卫、RunCode、template_*);v1.1.4 继续保留供已有安装使用:
+v2.0.1 已在 ArcGIS Pro 3.7 实机验证(125 工具、自动守卫、RunCode、template_*),但仍是
+**预览/pre-release**;日常使用仍推荐稳定的 v1.1.4:
 
-- ✅ **推荐**:[**Release v2.0.1**](../../releases/tag/v2.0.1) → `ArcGIS-Pro-MCP-v2.0.1.zip`——add-in 2.0.1、按需守卫引擎与内置蒸馏运行时(包内每个文件都可用自带 `SHA256SUMS.txt` 校验)
-- 🗄️ **历史版本(保留)**:[**v2.0.0**](../../releases/tag/v2.0.0) · [**v1.1.4**](../../releases/tag/v1.1.4)
-- 👀 浏览源码:[**`customer-v2.0.0`**](../../tree/customer-v2.0.0)(当前)· [**`customer-v1.1.4`**](../../tree/customer-v1.1.4)(历史)
+- ✅ **稳定版 · 推荐**:[**Release v1.1.4**](../../releases/tag/v1.1.4) → `ArcGIS-Pro-MCP-v1.1.4.zip`——add-in 1.1.4、stdio 桥、RunCode、弹窗守卫、Python 桥、安装器、文档与 AGPL 源码快照(包内每个文件都可用自带 `SHA256SUMS.txt` 校验)
+- 🧪 **预览版 · 已实机验证**:[**Release v2.0.1**](../../releases/tag/v2.0.1) → `ArcGIS-Pro-MCP-v2.0.1.zip`——add-in 2.0.1、按需守卫引擎、内置蒸馏运行时,并修复升级丢失模板库的问题
+- 🗄️ **更早的预览**:[**v2.0.0**](../../releases/tag/v2.0.0)(prerelease,保留)
+- 👀 浏览源码:[**`customer-v1.1.4`**](../../tree/customer-v1.1.4)(稳定)· [**`customer-v2.0.0`**](../../tree/customer-v2.0.0)(预览)
 - 🛺 想一条命令装好?看下面的 NuGet 安装器 ⬇️
 
 1. 📂 解压到任意目录 → 双击 `install/00-install.cmd`(不需要管理员;要求 ArcGIS Pro **3.7+**)
@@ -66,7 +68,7 @@ v2.0.1 已在 ArcGIS Pro 3.7 实机验证(125 工具、自动守卫、RunCode、
 # 首次:注册 GitHub Packages 的 NuGet 源
 dotnet nuget add source "https://nuget.pkg.github.com/XNYGggg/index.json" --name github --username XNYGggg --password <你的PAT> --store-password-in-clear-text
 
-dotnet tool install --global ArcGISProMCP.Install --version 2.0.1   # 实机验证版
+dotnet tool install --global ArcGISProMCP.Install --version 1.1.4   # 稳定版;2.0.1 为预览
 arcgis-pro-mcp-install              # 加 --dry-run 则只下载与校验,不启动安装
 ```
 
@@ -377,8 +379,8 @@ url = "http://127.0.0.1:6520/mcp"
 ## 🗂️ 仓库结构
 
 ```
-├── main(本分支)🏠           AgentKit 2.0.1:MCP add-in 2.0.1 + 守卫 + 蒸馏
-├── customer-v2.0.0 🎁        v2.0.0/v2.0.1 发布分支(已合并进 main)
+├── main(本分支)🏠           AgentKit 2.0.1 预览:MCP add-in 2.0.1 + 守卫 + 蒸馏
+├── customer-v2.0.0 🎁        v2.0.0/v2.0.1 预览发布分支(已合并进 main)
 ├── customer-v1.1.4 🎁        上一版客户版(add-in 1.1.4),保留
 ├── history-main-pre-2.0 🗄️   2.0 合并前的 main,作为历史保留
 ├── installer/ 🛺             ArcGISProMCP.Install——NuGet 安装器工具(下载→校验→启动安装)
