@@ -8,6 +8,7 @@
 |---|---|---|
 | **`main`**（默认分支） | 开发主线 | AgentKit 2.0.1：MCP add-in 2.0.1 + 守卫 2.0 + 蒸馏 2.0；README 与全部文档以此为准 |
 | **`customer-v2.0.1`** | 当前客户版包快照 | 与 Release v2.0.1 的 `ArcGIS-Pro-MCP-v2.0.1-r2.zip` 内容一致（安装器、运行时、文档、AGPL 源码快照） |
+| `customer-v2.0.0` | 2.0.0 客户版历史快照 | 已恢复的 2.0.0 分支（原归档 SHA `e8ebda5`）；README 含三模块提示词指南，`template_preview` 问题请在 v2.0.1 使用 |
 | `customer-v1.1.4` | legacy 1.x 客户版 | add-in 1.1.4 完整离线包，仅作历史保留；README 顶部已标注 legacy |
 
 ## 标签（Tag）
@@ -41,11 +42,11 @@
 
 | 分支 | 归档前 SHA | 归档日期 | 内容与恢复 |
 |---|---|---|---|
-| `customer-v2.0.0` | `e8ebda5` | 2026-11-16 | 与 `main` 树完全相同（代码布局），已由 `customer-v2.0.1` 取代。恢复：`git push origin e8ebda5:refs/heads/customer-v2.0.0` |
 | `history-main-pre-2.0` | `6be852d` | 2026-11-16 | 2.0 合并前的 main，是 `main` 的祖先提交，内容未丢失。恢复：`git push origin 6be852d:refs/heads/history-main-pre-2.0` |
 
 ## 变更记录
 
+- **2026-11-16（晚，README 强化）**：恢复 `customer-v2.0.0` 分支（原归档 SHA `e8ebda5`）；四个分支 README 均增补"出图制图 / 守卫 / 蒸馏"三模块的使用方法与提示词指南。
 - **2026-11-16**：V2.01 正式发布与仓库重整。
   - 默认分支由 `customer-v1.1.4` 改回 `main`；新建 `customer-v2.0.1` 包快照分支。
   - 删除 `customer-v2.0.0`、`history-main-pre-2.0`（SHA 见上表）。

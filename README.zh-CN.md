@@ -68,7 +68,7 @@ V2.01（v2.0.1）为本仓库**当前推荐版本**，已在 ArcGIS Pro 3.7 实�
   - 校验：同名 `.sha256` 附件 + 包内 `SHA256SUMS.txt`（231 个文件全覆盖）
   - 初版资产 `ArcGIS-Pro-MCP-v2.0.1.zip` 保留可查；`ArcGIS-Pro-MCP-2.0.1.zip` 是 NuGet 安装器兼容别名（与 r2 字节相同）
 - 🗄️ **历史版本**：[v2.0.0](../../releases/tag/v2.0.0)（预览，保留）· [v1.1.4](../../releases/tag/v1.1.4)（1.x legacy，保留）
-- 👀 浏览源码：[**`customer-v2.0.1`**](../../tree/customer-v2.0.1)（当前客户版包快照）· [**`main`**](../../tree/main)（开发主线）· [**`customer-v1.1.4`**](../../tree/customer-v1.1.4)（legacy）
+- 👀 浏览源码：[**`customer-v2.0.1`**](../../tree/customer-v2.0.1)（当前客户版包快照）· [**`customer-v2.0.0`**](../../tree/customer-v2.0.0)（2.0.0 历史快照，已恢复）· [**`main`**](../../tree/main)（开发主线）· [**`customer-v1.1.4`**](../../tree/customer-v1.1.4)（legacy）
 - 🗂️ 分支 / 标签 / Release 全图：[BRANCHES.md](BRANCHES.md)
 - 🛺 想一条命令装好？看下面的 NuGet 安装器 ⬇️
 
@@ -208,6 +208,183 @@ url = "http://127.0.0.1:6520/mcp"
 - 🐍 RunCode 工具箱:`%LOCALAPPDATA%\ArcGIS Pro MCP\runcode\RunCode.pyt`;每个 Pro 会话首次运行会弹信任框,可先启动弹窗守护。
 - 🔌 Python 桥:在 Pro 的 Python 窗口粘贴 `sys.path.insert(0, r"...\ArcGIS Pro MCP\plugin")` 并执行 `mcp_bridge.start_server(port=6511)`;需要 `CURRENT` 时再加 `mcp_bridge.start_pump()`。
 - 🛡️ 弹窗守护:`install\03-dialog-guard.cmd`(600 秒)、`-AlertOnly`、`-NotifyTest`。
+
+---
+
+## 🎨 出图制图怎么用（提示词指南）
+
+这一节把"怎么跟 AI 说"讲透：不需要记工具名，按下面四要素交代，助手会自动拆成 MCP 工具调用。
+
+### 说清四件事，一次做对
+
+| 要素 | 要交代什么 | 示例 |
+|---|---|---|
+| 数据 | 图层名、数据路径、当前选择集 | "当前地图里的 `区县边界` 图层" |
+| 操作 | 分级字段/方法、缓冲距离、统计口径 | "按 `AREA` 分 5 级，自然断点" |
+| 风格 | 配色、字号、图例/比例尺/指北针位置、底图 | "浅红到深绿，图例放右下角" |
+| 输出 | 图片/PDF/新要素类，分辨率与保存路径 | "A3 横向 PDF，300 dpi，存到 `D:\out\`" |
+
+**好提示词 vs 坏提示词**
+- ❌ "帮我美化一下地图" —— 没有目标，助手只能猜。
+- ✅ "把 `土地利用` 按 `DLMC` 做唯一值符号化，配色参考模板 `tpl-xxx`，图例放右下角，然后导出一张 A3 横向 PDF 到 `D:\out\landuse.pdf`，300 dpi。"
+- ❌ "出个图" —— 没说范围、版式、输出。
+- ✅ "以 `研究区` 图层为范围，比例尺 1:10000，出一张 A4 纵向 PNG，标题‘研究区土地利用现状’，带图例、比例尺、指北针，先发预览图给我确认。"
+
+### 各工具组提示词速查
+
+| 模块（工具组） | 你可以这样说 | 助手会用 |
+|---|---|---|
+| 会话与工程 | "先 `diagnose` 看看连接和当前工程；然后把工程另存到 `D:\proj\成果.aprx`" | diagnose / save_project |
+| 图层 | "把 `roads` 移进 `底图` 组，透明度 40%，只显示 1:50000 以近；`POI` 图层关掉" | move_layer / set_layer_transparency / set_layer_scale_range / set_layer_visibility |
+| 数据与属性 | "读一下 `parcels` 的前 20 行，按面积降序；统计 `DLMC` 各类面积" | get_features / summarize_features |
+| 选择 | "选出 `POP` 大于 50 万的县，导出成 `D:\out\counties_big.shp`；再按位置选出落在 `研究区` 内的地块" | select_features / select_by_location / export_features |
+| 字段与数据集 | "给 `parcels` 加 DOUBLE 字段 `AREA_HA`，用 `!Shape_Area!/10000` 计算；新建 EPSG:4547 的面要素类 `成果_2026`" | add_field / calculate_field / create_feature_class |
+| 地理处理 | "道路做 500 米缓冲并融合；用 `研究区` 掩膜裁剪土地利用栅格" | run_geoprocessing_tool / run_batch |
+| 符号化 | "按面积分 5 级、自然断点、浅红到深绿；或按 `TYPE` 唯一值配色" | set_layer_renderer |
+| 地图视图 | "缩放到 `研究区`，比例尺 1:10000，截一张 1600×900 的 PNG 给我" | set_map_view / zoom_to_layer / export_map_view |
+| 布局与出图 | "建 A3 横向布局，标题…，图例只保留 3 个图层，加比例尺和指北针，导出 300 dpi PDF" | create_layout / add_layout_* / export_layout |
+| 栅格 | "读 DEM 的波段、像元大小和统计值；用 NDVI 公式算植被指数" | get_raster_info / raster_calculator / zonal_statistics |
+| 目录与数据发现 | "在工程和文件夹连接里搜名字含 `2025` 的 shapefile" | search_data / describe_dataset / list_folder |
+| 实用工具 | "一次完成：隐藏底图→缩放到区县→导出 PNG；用 arcpy 给所有图层名加前缀" | run_batch / execute_arcpy_code |
+
+### 标准出图提示词模板（复制即用）
+
+```text
+用当前工程的 <地图名> 出图：
+- 范围：<研究区图层/范围>，比例尺 1:<...>
+- 数据：<图层1>、<图层2>（需要时说明字段和筛选条件）
+- 符号：<按字段分级/唯一值/单色>，配色 <色带或十六进制>
+- 版式：<A3 横向 / A4 纵向>，标题 "<标题>"，图例 <位置>，比例尺 <位置>，指北针 <位置>
+- 输出：<PDF / PNG>，<300> dpi，保存到 <绝对路径>
+- 流程：先自检版式，把预览图发给我确认，确认后再导出正式文件。
+```
+
+### 批量出图提示词
+
+```text
+对 `maps` 里的每个地图，套用同一套 A3 横向布局模板导出 PDF：
+标题用地图名，图例保留可见图层，比例尺和指北针放右下角，
+输出到 `D:\out\maps\`，300 dpi。先导出第一张给我看，确认后再批量。
+```
+
+### 常见翻车怎么用一句话补救
+
+- "图例压住主图了" → 助手调整 `legend` 坐标或版式。
+- "页面比例不对/留白太多" → 调整 map frame 与页面比例。
+- "配色太跳/不符合论文风格" → 给出色带、十六进制或模板 ID。
+- "先别导出，给我预览" → 助手先 `export_map_view` 或布局预览。
+
+**效果**：把"数据、操作、风格、输出"一次讲全，助手通常一轮就能做出接近终稿的图；后续修改只需指出差异（"图例右移 1 cm"），不用重述全部。
+
+---
+
+## 🛡️ 守卫模块怎么用（按需弹窗守卫）
+
+**它解决什么**：ArcGIS Pro 第一次运行第三方 `.pyt` / Python 工具（如 RunCode.pyt）会弹"第三方代码库"信任框；无人值守时任务会卡住。守卫只在可能弹框的操作前被唤起，自动点"是(Y)"，操作结束立即退出。
+
+**两种触发方式**
+1. **自动（2.x 默认）**：助手调用 `run_python_toolbox_tool` / `execute_arcpy_code` 前，add-in 自动 arm 守卫、操作结束 settle 收队，通常不用你说话。
+2. **手动召唤 `guard_summon`**：你自己在 Pro 里手动运行 `.pyt`、做 ENVI→Pro 导入，或任何助手之外的操作。
+
+**提示词示例**
+
+| 你说 | 助手会做什么 |
+|---|---|
+| "接下来我要在 Pro 里手动运行 RunCode.pyt，先召守护 10 分钟；出现第三方代码信任框自动点‘是’，点不到就置顶响铃提醒我" | `guard_summon`（timeout_s≈600） |
+| "这次只提醒、不自动点" | `guard_summon`（alert_only） |
+| "看看刚才守卫有没有正常结束" | `guard_status` |
+| "跑 RunCode 前把守护开上" | 自动 arm + settle |
+
+**边界与参数**
+- 只点"第三方代码库执行"信任框；覆盖、删除等其他确认框一律不碰。
+- 点不到按钮时，置顶提醒窗至少 30 秒并每 10 秒响铃。
+- `timeout_s` 控制守卫存活时间，超时自动退出；`guard_status` 可查引擎路径、版本和最近 20 次会话。
+- 每个 Pro 进程首次信任后不再弹；重启 Pro 后恢复需要。
+- 1.1.4 没有 `guard_summon`，用包内 `install\03-dialog-guard.cmd`（默认 600 秒）启动同样的守护。
+
+**效果**：无人值守的 RunCode / ENVI 联合作图不再卡在弹窗；即使自动点击失败，也有置顶 + 响铃兜底，不会静默挂死。
+
+---
+
+## 🧪 蒸馏模块怎么用（样本图 → 可复用版式模板）
+
+"蒸馏"不是模型训练，而是把一张**样本成图**（论文图、教材图、优秀制图样例）里的版式知识——图框位置、配色、字号、图例/比例尺/指北针布局、易翻车点——提取成一份可复用的 JSON 模板（spec），以后出图直接套用。
+
+**蒸出来的是什么**：`template_id` + 一份 spec，包含 `canvas`（画布尺寸/DPI）、`map_frame`、`title / legend / scale_bar / north_arrow`、`palette`、`typography`、`regions[]`、`pitfalls[]`、`measured`（测量证据）、`review`（评审记录）。模板库默认在 `%LOCALAPPDATA%\ArcGIS Pro MCP\library`。
+
+**效果**
+- 版式一致：同一课题组/同一项目的多张图，图框、字号、图例位置统一。
+- 少反复：不用每次口述"图例放右下、标题 22 号、配色浅红到深绿"。
+- 可审计：每个模板都有测量来源、patch 内容、评审人和日期，换人也能复现。
+- 防翻车：`pitfalls[]` 把"图例压图"这类问题变成可执行检查。
+
+**完整流程与提示词**
+
+| 步骤 | 你可以这样说 | 助手调用 | 你要验收什么 |
+|---|---|---|---|
+| 1 入库 | "把 `D:\samples\fig3.png` 蒸馏成模板，名称‘研究区总览图’，标签：论文风格" | `template_import` | 返回的 `template_id` |
+| 2 测量 | "继续测量" | `template_measure` | `h_lines/v_lines`、`palette_top`、DPI 是否合理 |
+| 3 语义 | 助手看图写 patch（图框、图例、字号、分区、pitfalls） | `template_patch` | patch 里的坐标/字号是否符合预期 |
+| 4 校验 | "校验一下" | `template_validate` | 错误为 0；warning 是否可接受 |
+| 5 预览 | "给我看预览图" | `template_preview` | 线框与样本并排是否一致 |
+| 6 评审/批准 | "我确认，评审人柳皓文，备注版式核对通过" → "批准" | `template_review` → `template_approve` | 状态变 `ready` |
+| 7 套用 | "用模板 `tpl-xxx` 给当前工程出图" | `template_apply` → 制图工具 | 成品图与模板版式一致 |
+
+**可直接复制的提示词**
+
+1. **单图完整蒸馏**
+
+```text
+把 `D:\samples\fig3.png` 蒸馏成版式模板：
+- 名称：研究区总览图；标签：论文风格、A4 横向
+- 按完整流程做 import → measure → patch → validate → preview
+- 语义字段（图框、图例、比例尺、指北针、字号、配色、regions、pitfalls）你来看图判断
+- 每一步把关键结果告诉我；预览图先给我确认，我点头后再 review + approve
+- 不要手改 measured 数值
+```
+
+2. **批量入库（先只测量）**
+
+```text
+扫描 `D:\samples\` 下的所有 PNG，逐张 import + measure，名称用文件名，
+标签统一加 `候选模板`。先不要写语义 patch；把测量汇总表给我，我挑选后再逐张精修。
+```
+
+3. **用模板出图**
+
+```text
+用模板 `tpl-20261116-172854-57ec` 给当前工程出图：
+先 template_apply 读取模板，再按 map_frame/palette/typography/pitfalls 制作
+A4 横向布局，标题“研究区土地利用现状”，导出 300 dpi PDF 到 `D:\out\landuse.pdf`。
+完成后把自检结果和预览图发我验收。
+```
+
+4. **修改已就绪模板**
+
+```text
+把 `tpl-xxx` 的图例移到右下角（x=0.78, y=0.78, w=0.16, h=0.16），标题字号改 22，
+重新 validate 和 preview 后给我看；不要动 measured。确认后重新 review + approve。
+```
+
+5. **模板迁移/分享**
+
+```text
+把 `tpl-xxx` 导出成 bundle.zip；然后在另一台机器的模板库里 bundle-import，
+列出导入后的 template_id 和状态。
+```
+
+**助手必须遵守的硬规则**
+- 语义判读按 [skills/template-distill/SKILL.md](skills/template-distill/SKILL.md) 执行；确定性步骤不要"发挥"。
+- `measured / id / image_sha256 / source_image / schema_version` 是受保护字段，patch 里出现会被拒绝；要改画布就重跑 `measure --force` 或用 `canvas.height_in` 对齐（与实测容差 3%）。
+- `ready` 必须同时通过校验和人工 review；`approve` 缺 review 会拒绝。`--force` 只在你明确要求时使用，并会写入评审记录。
+- 预览图必须给你看并与样本并排核对后，才能批准。
+- 期刊/教材样本图默认只入本地库，不要导出公开 bundle（版权）。
+
+**常见问题**
+- **预览失败/没有弹图**：v2.0.0 的 `run-distill.ps1` 有 `--out` 参数绑定问题，v2.0.1 已修复；升级到 V2.01。
+- **测量不到图幅**：样图太暗/太糊或没有明显亮带，换清晰的整图截图。
+- **校验报 3% 容差**：`canvas.height_in` 与实测不符；不要手改 measured，改 canvas 或重测。
+- **模板状态 `ready` 不能改**：复制一份 spec 或用新 id 重新导入，避免破坏已交付模板。
 
 ---
 
@@ -422,6 +599,7 @@ url = "http://127.0.0.1:6520/mcp"
 ```
 ├── main(默认分支)🏠          开发主线:AgentKit 2.0.1(MCP 2.0.1 + 守卫 + 蒸馏)
 ├── customer-v2.0.1 🎁        当前客户版离线包快照(与 Release v2.0.1 资产一致)
+├── customer-v2.0.0 🗄️        2.0.0 客户版历史快照(已恢复,配合 v2.0.0 Release)
 ├── customer-v1.1.4 🗄️        legacy 客户版(add-in 1.1.4),保留
 ├── installer/ 🛺             ArcGISProMCP.Install——NuGet 安装器工具(下载→校验→启动安装)
 ├── addin/ArcGISProMCP/ 🧩     C# 插件(125 个工具、GuardClient、模板命令)

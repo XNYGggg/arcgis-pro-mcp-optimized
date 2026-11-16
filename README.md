@@ -68,7 +68,7 @@ V2.01 (v2.0.1) is the repo's **current recommended version**, live-tested on Arc
   - Verify: the matching `.sha256` asset plus the bundled `SHA256SUMS.txt` (all 231 files covered).
   - The original `ArcGIS-Pro-MCP-v2.0.1.zip` stays available for reference; `ArcGIS-Pro-MCP-2.0.1.zip` is an installer-compatibility alias (byte-identical to `-r2`).
 - 🗄️ **Previous versions:** [v2.0.0](../../releases/tag/v2.0.0) (preview, preserved) · [v1.1.4](../../releases/tag/v1.1.4) (1.x legacy, preserved)
-- 👀 Browse source: [**`customer-v2.0.1`**](../../tree/customer-v2.0.1) (current package snapshot) · [**`main`**](../../tree/main) (development line) · [**`customer-v1.1.4`**](../../tree/customer-v1.1.4) (legacy)
+- 👀 Browse source: [**`customer-v2.0.1`**](../../tree/customer-v2.0.1) (current package snapshot) · [**`customer-v2.0.0`**](../../tree/customer-v2.0.0) (2.0.0 history, restored) · [**`main`**](../../tree/main) (development line) · [**`customer-v1.1.4`**](../../tree/customer-v1.1.4) (legacy)
 - 🗂️ Branch / tag / release map: [BRANCHES.md](BRANCHES.md)
 - 🛺 Prefer one command? Use the [NuGet installer](#-install-via-nuget-github-packages) below ⬇️
 
@@ -208,6 +208,185 @@ Use Streamable HTTP to `http://127.0.0.1:6520/mcp`; or the generic JSON above. (
 - 🐍 RunCode toolbox: `%LOCALAPPDATA%\ArcGIS Pro MCP\runcode\RunCode.pyt` — first run per Pro session raises the trust dialog; start the guard first.
 - 🔌 Python bridge: paste into Pro's Python window (`sys.path.insert(0, r"...\ArcGIS Pro MCP\plugin")`, then `mcp_bridge.start_server(port=6511)`); add `mcp_bridge.start_pump()` for `CURRENT`.
 - 🛡️ Dialog guard: `install\03-dialog-guard.cmd` (600 s), `-AlertOnly`, `-NotifyTest`.
+
+---
+
+## 🎨 Mapping & map production — prompt guide
+
+This section is about *how to talk to the assistant*. You never need to name a tool: state the four elements below and the assistant turns them into MCP calls.
+
+### Say these four things and it gets done in one pass
+
+| Element | What to state | Example |
+|---|---|---|
+| Data | Layer name, dataset path, current selection | "the `counties` layer in the current map" |
+| Operation | Classification field/method, buffer distance, statistics | "classify by `AREA` into 5 natural-break classes" |
+| Style | Colours, font sizes, legend/scale-bar/north-arrow placement, basemap | "pastel red to green, legend bottom-right" |
+| Output | Image/PDF/new feature class, resolution, save path | "A3 landscape PDF, 300 dpi, save to `D:\out\`" |
+
+**Good prompt vs bad prompt**
+- ❌ "Make my map prettier." — no target; the assistant can only guess.
+- ✅ "Symbolize `landuse` by `DLMC` unique values, colours from template `tpl-xxx`, legend bottom-right, then export an A3 landscape PDF to `D:\out\landuse.pdf` at 300 dpi."
+- ❌ "Make a map." — no extent, layout or output.
+- ✅ "Use the `study_area` layer extent at 1:10,000, make an A4 portrait PNG titled ‘Study Area Land Use’, with legend, scale bar and north arrow; send me a preview first."
+
+### Prompt cheat sheet by tool group
+
+| Module (tool group) | Say something like | The assistant uses |
+|---|---|---|
+| Session & project | "Run `diagnose` first, then save the project as `D:\proj\result.aprx`" | diagnose / save_project |
+| Layers | "Move `roads` into the `basemap` group, 40% transparency, visible only beyond 1:50,000; turn `POI` off" | move_layer / set_layer_transparency / set_layer_scale_range / set_layer_visibility |
+| Data & attributes | "Read the first 20 rows of `parcels` sorted by area; summarize `DLMC` area by class" | get_features / summarize_features |
+| Selection | "Select counties with `POP` > 500,000 and export them to `D:\out\counties_big.shp`; then select parcels inside `study_area`" | select_features / select_by_location / export_features |
+| Schema & datasets | "Add a DOUBLE field `AREA_HA` to `parcels`, calculate `!Shape_Area!/10000`; create a polygon feature class `result_2026` in EPSG:4547" | add_field / calculate_field / create_feature_class |
+| Geoprocessing | "Buffer roads by 500 m and dissolve; clip the land-use raster with `study_area` as mask" | run_geoprocessing_tool / run_batch |
+| Symbology | "Graduated colours by area, 5 natural breaks, pastel red to green; or unique values by `TYPE`" | set_layer_renderer |
+| Map view | "Zoom to `study_area` at 1:10,000 and send a 1600×900 PNG" | set_map_view / zoom_to_layer / export_map_view |
+| Layouts & export | "Create an A3 landscape layout, title …, legend with only 3 layers, scale bar and north arrow, export a 300 dpi PDF" | create_layout / add_layout_* / export_layout |
+| Raster | "Read the DEM bands, cell size and statistics; compute NDVI" | get_raster_info / raster_calculator / zonal_statistics |
+| Catalog & discovery | "Find shapefiles with `2025` in the name across the project and folder connections" | search_data / describe_dataset / list_folder |
+| Utility | "Do it in one go: hide basemap → zoom to counties → export PNG; prefix every layer name with arcpy" | run_batch / execute_arcpy_code |
+
+### Standard map-production prompt (copy & fill)
+
+```text
+Produce a map from <map name> in the current project:
+- Extent: <study-area layer/extent>, scale 1:<...>
+- Data: <layer 1>, <layer 2> (add fields and filters when needed)
+- Symbology: <graduated/unique/single symbol>, colours <ramp or hex>
+- Layout: <A3 landscape / A4 portrait>, title "<title>", legend <position>, scale bar <position>, north arrow <position>
+- Output: <PDF / PNG>, <300> dpi, save to <absolute path>
+- Process: self-check the layout, send me a preview, and export the final file only after I confirm.
+```
+
+### Batch export prompt
+
+```text
+For every map in `maps`, export a PDF with the same A3 landscape layout:
+title = map name, legend = visible layers only, scale bar and north arrow bottom-right,
+output to `D:\out\maps\` at 300 dpi. Export the first one for review before batching the rest.
+```
+
+### One-line fixes when something looks wrong
+
+- "The legend covers the map" → adjust the `legend` box or layout.
+- "The page ratio is wrong / too much whitespace" → adjust map frame and page ratio.
+- "The colours are too loud / not journal style" → give a colour ramp, hex codes or template ID.
+- "Don't export yet — show me a preview" → `export_map_view` or a layout preview first.
+
+**Effect:** stating data, operation, style and output up front usually gets a near-final map in one pass; later tweaks only need the difference ("move the legend right by 1 cm"), not the whole brief again.
+
+---
+
+## 🛡️ Guard module — prompt guide
+
+**What it solves:** the first time ArcGIS Pro runs a third-party `.pyt` / Python tool (such as RunCode.pyt) it raises the "third-party code library" trust dialog. Unattended work stalls there. The guard is summoned only before operations that may raise it, clicks "是(Y)", and exits as soon as the operation settles.
+
+**Two trigger modes**
+1. **Automatic (default in 2.x):** before `run_python_toolbox_tool` / `execute_arcpy_code`, the add-in arms the guard and settles it afterwards — usually no prompt needed from you.
+2. **Manual `guard_summon`:** for `.pyt` tools you run by hand in Pro, ENVI→Pro imports, or anything outside the assistant.
+
+**Prompt examples**
+
+| You say | What the assistant does |
+|---|---|
+| "I'm about to run RunCode.pyt manually in Pro. Summon the guard for 10 minutes; click 是 if the third-party trust dialog appears, and alert me topmost with sound if it can't" | `guard_summon` (timeout_s≈600) |
+| "Alert only this time — don't click" | `guard_summon` (alert_only) |
+| "Check whether the last guard session ended cleanly" | `guard_status` |
+| "Arm the guard before running RunCode" | automatic arm + settle |
+
+**Boundaries and parameters**
+- It only clicks the "third-party code library" trust dialog; overwrite, delete and every other confirmation are never touched.
+- When the button cannot be found, a topmost alert stays for at least 30 s and rings every 10 s.
+- `timeout_s` controls how long the guard lives; `guard_status` reports engine path/version and the 20 most recent sessions.
+- Trust is remembered per Pro process; after restarting Pro the dialog can appear again.
+- 1.1.4 has no `guard_summon`; use the bundled `install\03-dialog-guard.cmd` (600 s default) for the same guard.
+
+**Effect:** unattended RunCode / ENVI joint workflows no longer hang on a dialog; if auto-click fails, the topmost alert and sound still make sure it cannot fail silently.
+
+---
+
+## 🧪 Distill module — prompt guide
+
+"Distillation" here is **not model training**. It extracts the layout knowledge of a **sample figure** (a journal figure, textbook figure or exemplary map) — frame geometry, palette, font sizes, legend/scale-bar/north-arrow placement, known pitfalls — into a reusable JSON template spec that later map-production jobs can follow.
+
+**What you get:** a `template_id` plus a spec containing `canvas` (size/DPI), `map_frame`, `title / legend / scale_bar / north_arrow`, `palette`, `typography`, `regions[]`, `pitfalls[]`, `measured` (measurement evidence) and `review` (human sign-off). The library lives at `%LOCALAPPDATA%\ArcGIS Pro MCP\library` by default.
+
+**Effects**
+- Consistent layout across many figures from the same project or paper.
+- No repeated verbal briefs about legend position, title size or palette.
+- Auditable: every template carries measurement provenance, patch content, reviewer and date.
+- Fewer avoidable mistakes: `pitfalls[]` turns issues like "legend covers the map" into executable checks.
+
+**Workflow and prompts**
+
+| Step | What you say | Assistant calls | What you check |
+|---|---|---|---|
+| 1 Import | "Distill `D:\samples\fig3.png` into a template named ‘Study Area Overview’, tags: journal-style" | `template_import` | the returned `template_id` |
+| 2 Measure | "Measure it" | `template_measure` | `h_lines/v_lines`, `palette_top`, DPI |
+| 3 Semantics | the assistant reads the figure and writes the patch (frame, legend, fonts, regions, pitfalls) | `template_patch` | coordinates and font sizes in the patch |
+| 4 Validate | "Validate it" | `template_validate` | zero errors; warnings acceptable |
+| 5 Preview | "Show me the preview" | `template_preview` | wireframe side-by-side with the sample |
+| 6 Review / approve | "I confirm; reviewer Liu Haowen, note: layout checked" → "Approve" | `template_review` → `template_approve` | status becomes `ready` |
+| 7 Apply | "Use template `tpl-xxx` to produce the map for this project" | `template_apply` → mapping tools | output matches the template layout |
+
+**Copy-paste prompts**
+
+1. **Full single-figure distillation**
+
+```text
+Distill `D:\samples\fig3.png` into a layout template:
+- Name: Study Area Overview; tags: journal-style, A4 landscape
+- Run the full flow: import → measure → patch → validate → preview
+- Read the figure yourself for semantic fields (frame, legend, scale bar, north arrow, font sizes, palette, regions, pitfalls)
+- Report the key result of each step; show me the preview and wait for my OK before review + approve
+- Never hand-edit the measured values
+```
+
+2. **Batch intake (measure only first)**
+
+```text
+Scan every PNG under `D:\samples\`, import + measure each one, name = file name,
+tag them all `candidate`. Do not write semantic patches yet; give me a measurement
+summary table so I can pick which ones to refine.
+```
+
+3. **Produce a map with a template**
+
+```text
+Use template `tpl-20261116-172854-57ec` to produce a map in the current project:
+call template_apply first, then follow map_frame/palette/typography/pitfalls to build
+an A4 landscape layout titled "Study Area Land Use", and export a 300 dpi PDF to
+`D:\out\landuse.pdf`. Send me the self-check result and a preview for acceptance.
+```
+
+4. **Edit a ready template**
+
+```text
+Move template `tpl-xxx`'s legend to bottom-right (x=0.78, y=0.78, w=0.16, h=0.16)
+and set the title size to 22. Re-run validate and preview, show me the result; do not
+touch measured. After I confirm, review + approve again.
+```
+
+5. **Migrate / share a template**
+
+```text
+Export `tpl-xxx` as bundle.zip, then bundle-import it into the template library on
+another machine and list the new template_id and status.
+```
+
+**Hard rules the assistant must follow**
+- Semantic reading follows [skills/template-distill/SKILL.md](skills/template-distill/SKILL.md); deterministic steps are never "improvised".
+- `measured / id / image_sha256 / source_image / schema_version` are protected; a patch containing them is rejected. To change the canvas, re-run `measure --force` or align `canvas.height_in` within the 3% tolerance.
+- `ready` requires both validation and a human review; `approve` refuses without one. `--force` only on your explicit request and it is recorded in the review.
+- The preview must be shown to you and checked against the sample before approval.
+- Journal/textbook sample figures stay in the local library by default — do not export public bundles (copyright).
+
+**FAQ**
+- **Preview fails / no image:** the v2.0.0 `run-distill.ps1` had an `--out` binding bug; fixed in v2.0.1. Upgrade to V2.01.
+- **No figure band detected:** the sample is too dark/blurry or lacks a bright band; use a clean full-figure screenshot.
+- **3% canvas tolerance error:** `canvas.height_in` disagrees with measurement; fix the canvas or re-measure — never hand-edit `measured`.
+- **A `ready` template cannot be changed:** copy the spec or re-import under a new id instead of breaking a delivered template.
 
 ---
 
@@ -422,6 +601,7 @@ Everything the assistant can do, by name. Click to expand 👇
 ```
 ├── main (default) 🏠          development line: AgentKit 2.0.1 (MCP 2.0.1 + guard + distill)
 ├── customer-v2.0.1 🎁         current customer-package snapshot (matches the v2.0.1 release assets)
+├── customer-v2.0.0 🗄️         2.0.0 customer-package history (restored, matches the v2.0.0 release)
 ├── customer-v1.1.4 🗄️         legacy customer edition (add-in 1.1.4), preserved
 ├── installer/ 🛺              ArcGISProMCP.Install — NuGet tool: download → verify → run setup
 ├── addin/ArcGISProMCP/ 🧩     C# add-in (125 tools, GuardClient, template commands)
