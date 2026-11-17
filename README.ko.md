@@ -609,3 +609,29 @@ validate와 preview를 다시 실행해 보여 주세요; measured는 건드리�
 - 🏷️ 상표: "ArcGIS"는 Esri의 상표입니다; 이 프로젝트는 서드파티 도구이며 Esri와 제휴 관계가 없습니다.
 
 🆘 FAQ는 `docs\排障手册.md`(문제 해결 매뉴얼), 고급 사용법은 `docs\使用指南.md`(사용 가이드)에 있습니다. 즐거운 제도 되세요 🎨 (｀・ω・´)ゞ
+
+---
+
+<!-- LDU-THANKS -->
+
+<h2 align="center">🙏 감사의 말</h2>
+
+<p align="center">
+  본 프로젝트는 <strong>루둥대학(鲁东大学)</strong>의 지원을 받아 개발되었습니다. 진심으로 감사드립니다.
+</p>
+
+<p align="center">
+  <a href="https://www.ldu.edu.cn/"><img src="assets/ldu-emblem.png" width="104" alt="루둥대학 교표"></a>
+</p>
+
+<h3 align="center">루둥대학 · Ludong University</h3>
+
+> 루둥대학은 1930년에 설립된 산둥성 옌타이시 소재 산둥성 소속 종합대학으로, 응용형 인재 양성을 주도로 공학·농학·이학·인문학이 조화롭게 발전하고 있습니다. 26개 단과대학을 두고 있으며, 공학·화학·재료과학 등 6개 분야가 ESI 세계 순위 상위 1%에 진입했습니다. 교훈은 ‘후덕(厚德)·박학(博學)·일신(日新)·독행(篤行)’입니다.
+
+<p align="center">
+  📍 중국 산둥성 옌타이시 즈푸구 홍치중로 186호 (우편번호 264025)<br>
+  🌐 <a href="https://www.ldu.edu.cn/">공식 홈페이지</a> ·
+  <a href="https://jwc.ldu.edu.cn/">교무처</a> ·
+  <a href="https://lib.ldu.edu.cn/">도서관</a> ·
+  <a href="https://ehall.ldu.edu.cn/">학생 포털</a>
+</p>
