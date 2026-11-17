@@ -542,3 +542,29 @@ print(mcp_bridge.start_pump())
 - 🏷️ 商標：「ArcGIS」は Esri の商標です。本プロジェクトはサードパーティ製ツールであり、Esri とは関係ありません。
 
 🆘 FAQ は `docs\排障手册.md`（トラブルシューティング）、高度な使い方は `docs\使用指南.md`（使用ガイド）にあります。楽しいマッピングを 🎨 (｀・ω・´)ゞ
+
+---
+
+<!-- LDU-THANKS -->
+
+<h2 align="center">🙏 謝辞</h2>
+
+<p align="center">
+  本プロジェクトは <strong>魯東大学</strong> の支援を受けて開発されています。ここに心より感謝申し上げます。
+</p>
+
+<p align="center">
+  <a href="https://www.ldu.edu.cn/"><img src="assets/ldu-emblem.png" width="104" alt="魯東大学 校章"></a>
+</p>
+
+<h3 align="center">魯東大学 · Ludong University</h3>
+
+> 魯東大学は1930年に創立され、山東省煙台市に位置する山東省所属の総合大学です。応用型人材の育成を主導とし、工学・農学・理学・文学が調和して発展しています。26の学院を擁し、工学・化学・材料科学など6つの学問分野がESI世界ランキングの上位1%にランクインしています。校訓は「厚徳・博学・日新・篤行」です。
+
+<p align="center">
+  📍 中国山東省煙台市芝罘区紅旗中路186号（郵便番号 264025）<br>
+  🌐 <a href="https://www.ldu.edu.cn/">公式サイト</a> ·
+  <a href="https://jwc.ldu.edu.cn/">教務処</a> ·
+  <a href="https://lib.ldu.edu.cn/">図書館</a> ·
+  <a href="https://ehall.ldu.edu.cn/">学生ポータル</a>
+</p>
