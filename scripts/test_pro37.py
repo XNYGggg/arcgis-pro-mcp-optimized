@@ -22,7 +22,7 @@ async def run(output):
     async with streamablehttp_client("http://127.0.0.1:6520/mcp") as (read, write, _):
         async with ClientSession(read, write) as session:
             initialized = await session.initialize()
-            assert initialized.serverInfo.version == "2.0.1.0", initialized.serverInfo
+            assert initialized.serverInfo.version == "2.0.2.0", initialized.serverInfo
             evidence["server"] = initialized.serverInfo.model_dump()
             tools = await session.list_tools()
             assert len(tools.tools) == 125

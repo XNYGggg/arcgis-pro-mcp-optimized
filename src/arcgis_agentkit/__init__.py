@@ -8,5 +8,5 @@ Modules:
 See docs/design-2026-11-16.md for the design.
 """
 
-__version__ = "2.0.1"
+__version__ = "2.0.2"
 

@@ -152,7 +152,16 @@ namespace ArcGISProMCP.Commands
 
         private static object Describe(Params parameters)
         {
-            var path = ResolvePath(parameters.Require("path"));
+            return DescribeDataset(ResolvePath(parameters.Require("path")));
+        }
+
+        /// <summary>
+        /// Open one dataset and report its definition. Also used by the
+        /// create_* wrappers to verify that requested fields really exist
+        /// before they report success.
+        /// </summary>
+        internal static Dictionary<string, object> DescribeDataset(string path)
+        {
             var workspace = Path.GetDirectoryName(path);
             var name = Path.GetFileName(path);
 

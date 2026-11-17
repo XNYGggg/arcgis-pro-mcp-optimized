@@ -2,7 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using ArcGIS.Desktop.Core;
+using ArcGIS.Desktop.Framework.Threading.Tasks;
+using ArcGIS.Desktop.Mapping;
 using ArcGISProMCP.Bridge;
 
 namespace ArcGISProMCP.Commands
@@ -63,26 +67,41 @@ namespace ArcGISProMCP.Commands
 
             Wrap("create_feature_class", "schema",
                 "Create an empty feature class in a geodatabase or folder.",
-                "management.CreateFeatureclass", p => new Dictionary<string, object>
+                "management.CreateFeatureclass", p =>
                 {
-                    ["out_path"] = p.GetString("out_path")
-                                   ?? Project.Current?.DefaultGeodatabasePath,
-                    ["out_name"] = p.Require("name"),
-                    ["geometry_type"] = p.GetString("geometry_type", "POLYGON"),
-                    ["template"] = p.GetString("template"),
-                    ["has_m"] = p.GetString("has_m", "DISABLED"),
-                    ["has_z"] = p.GetString("has_z", "DISABLED"),
-                    ["spatial_reference"] = p.Has("epsg") ? p.GetInt("epsg").ToString() : null,
-                }, addToMapByDefault: true);
+                    // Validate fields before anything is created: an invalid
+                    // request must not leave a dataset behind.
+                    ParseFieldRequests(p);
+                    return new Dictionary<string, object>
+                    {
+                        ["out_path"] = p.GetString("out_path")
+                                       ?? Project.Current?.DefaultGeodatabasePath,
+                        ["out_name"] = p.Require("name"),
+                        ["geometry_type"] = p.GetString("geometry_type", "POLYGON"),
+                        ["template"] = p.GetString("template"),
+                        ["has_m"] = p.GetString("has_m", "DISABLED"),
+                        ["has_z"] = p.GetString("has_z", "DISABLED"),
+                        ["spatial_reference"] = p.Has("epsg")
+                            ? p.GetInt("epsg").ToString() : null,
+                    };
+                }, addToMapByDefault: true,
+                afterSuccess: (parameters, outputs) =>
+                    ApplyAndVerifyFieldsAsync(parameters, outputs.FirstOrDefault()));
 
             Wrap("create_table", "schema", "Create an empty standalone table.",
-                "management.CreateTable", p => new Dictionary<string, object>
+                "management.CreateTable", p =>
                 {
-                    ["out_path"] = p.GetString("out_path")
-                                   ?? Project.Current?.DefaultGeodatabasePath,
-                    ["out_name"] = p.Require("name"),
-                    ["template"] = p.GetString("template"),
-                }, addToMapByDefault: true);
+                    ParseFieldRequests(p);
+                    return new Dictionary<string, object>
+                    {
+                        ["out_path"] = p.GetString("out_path")
+                                       ?? Project.Current?.DefaultGeodatabasePath,
+                        ["out_name"] = p.Require("name"),
+                        ["template"] = p.GetString("template"),
+                    };
+                }, addToMapByDefault: true,
+                afterSuccess: (parameters, outputs) =>
+                    ApplyAndVerifyFieldsAsync(parameters, outputs.FirstOrDefault()));
 
             Wrap("create_file_geodatabase", "schema", "Create a file geodatabase.",
                 "management.CreateFileGDB", p => new Dictionary<string, object>
@@ -255,10 +274,290 @@ namespace ArcGISProMCP.Commands
         /// <summary>The layer name or dataset path a command acts on.</summary>
         private static string Target(Params parameters) => parameters.Require("layer_name");
 
+        // --- fields support for create_feature_class / create_table ----------
+        //
+        // CreateFeatureclass and CreateTable accept no fields parameter in
+        // arcpy, although the tool catalog documents one. The fields are
+        // therefore added here, one AddField per field, and read back before
+        // success is reported: a dataset with the wrong columns must never
+        // come back as a success (D1, live-test 2026-11-16).
+
+        private static readonly Dictionary<string, string[]> FieldTypeAliases =
+            new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
+            {
+                // Keys are the GP/CreateField type names callers pass; values
+                // are the names ArcGIS.Core Field.FieldType reports (Describe).
+                ["TEXT"] = new[] { "String", "Text" },
+                ["SHORT"] = new[] { "SmallInteger", "Short" },
+                ["LONG"] = new[] { "Integer", "Long" },
+                ["BIGINTEGER"] = new[] { "BigInteger", "BigInteger64" },
+                ["FLOAT"] = new[] { "Single", "Float" },
+                ["DOUBLE"] = new[] { "Double" },
+                ["DATE"] = new[] { "Date" },
+                ["GUID"] = new[] { "GUID" },
+                ["BLOB"] = new[] { "Blob" },
+            };
+
+        private sealed class FieldRequest
+        {
+            public string Name;
+            public string Type;
+            public string Precision;
+            public string Scale;
+            public string Length;
+            public string Alias;
+        }
+
+        private static List<FieldRequest> ParseFieldRequests(Params parameters)
+        {
+            var requests = new List<FieldRequest>();
+
+            foreach (var field in parameters.GetObjectList("fields"))
+            {
+                var name = field.Require("name").Trim();
+                if (!Regex.IsMatch(name, "^[A-Za-z_][A-Za-z0-9_]*$"))
+                    throw new ArgumentException(
+                        $"Invalid field name '{name}': use letters, digits and "
+                        + "underscores, starting with a letter or underscore.");
+
+                var type = field.GetString("type", "TEXT").Trim().ToUpperInvariant();
+                if (!FieldTypeAliases.ContainsKey(type))
+                    throw new ArgumentException(
+                        $"Unsupported field type '{type}' for '{name}'. Supported: "
+                        + string.Join(", ", FieldTypeAliases.Keys) + ".");
+
+                requests.Add(new FieldRequest
+                {
+                    Name = name,
+                    Type = type,
+                    Precision = field.GetString("precision"),
+                    Scale = field.GetString("scale"),
+                    Length = field.GetString("length"),
+                    Alias = field.GetString("alias"),
+                });
+            }
+
+            return requests;
+        }
+
+        private static async Task ApplyAndVerifyFieldsAsync(Params parameters,
+                                                            string datasetPath)
+        {
+            if (!parameters.Has("fields")) return;
+            var requests = ParseFieldRequests(parameters);
+            if (requests.Count == 0) return;
+
+            if (string.IsNullOrEmpty(datasetPath))
+            {
+                throw new InvalidOperationException(
+                    "fields: the tool created a dataset but returned no output path, "
+                    + "so the requested fields cannot be applied or verified.");
+            }
+
+            var added = new List<string>();
+            foreach (var request in requests)
+            {
+                var result = await GeoprocessingCommands.RunNamedAsync(
+                    "management.AddField",
+                    new Dictionary<string, object>
+                    {
+                        ["in_table"] = datasetPath,
+                        ["field_name"] = request.Name,
+                        ["field_type"] = request.Type,
+                        ["field_precision"] = request.Precision,
+                        ["field_scale"] = request.Scale,
+                        ["field_length"] = request.Length,
+                        ["field_alias"] = request.Alias,
+                        ["field_is_nullable"] = "NULLABLE",
+                        ["field_domain"] = null,
+                    },
+                    addToMap: false).ConfigureAwait(false);
+
+                if (result.IsFailed)
+                {
+                    var messages = result.ErrorMessages != null
+                                   && result.ErrorMessages.Any()
+                        ? string.Join("; ", result.ErrorMessages.Select(m => m.Text))
+                        : "the tool reported no error text";
+                    await DeleteHalfCreatedAsync(datasetPath).ConfigureAwait(false);
+                    throw new InvalidOperationException(
+                        $"fields: adding '{request.Name}' failed ({messages}). The "
+                        + "dataset created by this call was deleted so no "
+                        + "half-configured dataset is left behind. Fields added "
+                        + "before the failure: "
+                        + (added.Count == 0 ? "(none)" : string.Join(", ", added)) + ".");
+                }
+                added.Add(request.Name);
+            }
+
+            // Read back and verify -- never report success for a schema the
+            // caller did not ask for.
+            Dictionary<string, object> info;
+            try
+            {
+                info = await QueuedTask.Run(
+                    () => CatalogCommands.DescribeDataset(datasetPath))
+                    .ConfigureAwait(false);
+            }
+            catch (Exception exception)
+            {
+                await DeleteHalfCreatedAsync(datasetPath).ConfigureAwait(false);
+                throw new InvalidOperationException(
+                    "fields: the dataset was created but could not be read back "
+                    + $"for verification ({exception.Message}). It was deleted.");
+            }
+
+            var actual = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var actualLengths = new Dictionary<string, object>(
+                StringComparer.OrdinalIgnoreCase);
+            if (info != null && info.TryGetValue("fields", out var raw)
+                && raw is List<Dictionary<string, object>> fieldList)
+            {
+                foreach (var entry in fieldList)
+                {
+                    var fieldName = entry.TryGetValue("name", out var n) ? n?.ToString() : null;
+                    if (string.IsNullOrEmpty(fieldName)) continue;
+                    actual[fieldName] = entry.TryGetValue("type", out var t)
+                        ? t?.ToString() : null;
+                    actualLengths[fieldName] = entry.TryGetValue("length", out var l)
+                        ? l : null;
+                }
+            }
+
+            var problems = new List<string>();
+            foreach (var request in requests)
+            {
+                if (!actual.TryGetValue(request.Name, out var actualType))
+                {
+                    problems.Add($"'{request.Name}' is missing");
+                    continue;
+                }
+
+                var aliases = FieldTypeAliases[request.Type];
+                if (!aliases.Any(a => string.Equals(a, actualType,
+                                                    StringComparison.OrdinalIgnoreCase)))
+                {
+                    problems.Add($"'{request.Name}' is {actualType}, requested {request.Type}");
+                    continue;
+                }
+
+                if (string.Equals(request.Type, "TEXT", StringComparison.OrdinalIgnoreCase)
+                    && int.TryParse(request.Length, out var wantedLength))
+                {
+                    var actualLength = actualLengths.TryGetValue(request.Name, out var l)
+                        ? Convert.ToInt32(l ?? 0) : 0;
+                    if (actualLength != wantedLength)
+                        problems.Add($"'{request.Name}' length is {actualLength}, "
+                                     + $"requested {wantedLength}");
+                }
+            }
+
+            if (problems.Count > 0)
+            {
+                await DeleteHalfCreatedAsync(datasetPath).ConfigureAwait(false);
+                throw new InvalidOperationException(
+                    "fields: verification failed after creation: "
+                    + string.Join("; ", problems)
+                    + ". The dataset was deleted (fail-loud, no half-configured "
+                    + "dataset is kept).");
+            }
+        }
+
+        /// <summary>
+        /// Remove a dataset this call just created, plus any map layer that
+        /// was already registered for it. Best effort: the throw that follows
+        /// is the caller's signal, cleanup never masks it.
+        /// </summary>
+        private static async Task DeleteHalfCreatedAsync(string datasetPath)
+        {
+            try
+            {
+                await GeoprocessingCommands.RunNamedAsync(
+                    "management.Delete",
+                    new Dictionary<string, object> { ["in_data"] = datasetPath },
+                    addToMap: false).ConfigureAwait(false);
+            }
+            catch { }
+
+            // Once the dataset is gone its layer can no longer report a source
+            // path, so match by layer name as well (gdb datasets keep the file
+            // name; shapefiles drop the extension).
+            var fileName = Path.GetFileName(datasetPath);
+            var stem = Path.GetFileNameWithoutExtension(fileName);
+            bool NameMatches(string candidate) =>
+                !string.IsNullOrEmpty(candidate)
+                && (string.Equals(candidate, fileName, StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(candidate, stem, StringComparison.OrdinalIgnoreCase));
+
+            try
+            {
+                await QueuedTask.Run(() =>
+                {
+                    var map = MapView.Active?.Map;
+                    if (map == null) return;
+
+                    foreach (var layer in map.GetLayersAsFlattenedList().ToList())
+                    {
+                        var remove = false;
+                        try
+                        {
+                            if (layer is BasicFeatureLayer basic)
+                            {
+                                using (var table = basic.GetTable())
+                                {
+                                    var localPath = table?.GetPath()?.LocalPath;
+                                    if (!string.IsNullOrEmpty(localPath)
+                                        && string.Equals(Path.GetFullPath(localPath),
+                                                         Path.GetFullPath(datasetPath),
+                                                         StringComparison.OrdinalIgnoreCase))
+                                        remove = true;
+                                }
+                            }
+                        }
+                        catch
+                        {
+                            // Source already deleted: fall through to the name
+                            // match below.
+                        }
+                        if (!remove && NameMatches(layer.Name)) remove = true;
+                        if (remove)
+                        {
+                            try { map.RemoveLayer(layer); } catch { }
+                        }
+                    }
+
+                    var tablesToRemove = new List<StandaloneTable>();
+                    foreach (var table in map.GetStandaloneTablesAsFlattenedList().ToList())
+                    {
+                        var remove = false;
+                        try
+                        {
+                            using (var source = table.GetTable())
+                            {
+                                var localPath = source?.GetPath()?.LocalPath;
+                                if (!string.IsNullOrEmpty(localPath)
+                                    && string.Equals(Path.GetFullPath(localPath),
+                                                     Path.GetFullPath(datasetPath),
+                                                     StringComparison.OrdinalIgnoreCase))
+                                    remove = true;
+                            }
+                        }
+                        catch { }
+                        if (!remove && NameMatches(table.Name)) remove = true;
+                        if (remove) tablesToRemove.Add(table);
+                    }
+                    if (tablesToRemove.Count > 0)
+                        map.RemoveStandaloneTables(tablesToRemove);
+                }).ConfigureAwait(false);
+            }
+            catch { }
+        }
+
         private static void Wrap(string command, string group, string summary,
                                  string toolName,
                                  Func<Params, Dictionary<string, object>> buildValues,
-                                 bool addToMapByDefault = false)
+                                 bool addToMapByDefault = false,
+                                 Func<Params, List<string>, Task> afterSuccess = null)
         {
             CommandRouter.RegisterAsync(command, group, summary, async parameters =>
             {
@@ -279,11 +578,19 @@ namespace ArcGISProMCP.Commands
                     throw new InvalidOperationException($"{command} failed: {messages}");
                 }
 
+                var outputs = result.Values?
+                    .Select(value => value?.ToString())
+                    .Where(text => !string.IsNullOrEmpty(text))
+                    .ToList() ?? new List<string>();
+
+                if (afterSuccess != null)
+                    await afterSuccess(parameters, outputs).ConfigureAwait(false);
+
                 return new Dictionary<string, object>
                 {
                     ["command"] = command,
                     ["tool"] = toolName,
-                    ["outputs"] = result.Values?.ToList(),
+                    ["outputs"] = outputs,
                     ["elapsed_seconds"] = Math.Round((DateTime.Now - started).TotalSeconds, 2),
                     ["messages"] = result.Messages?.Select(m => m.Text).Take(20).ToList(),
                 };

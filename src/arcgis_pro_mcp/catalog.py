@@ -445,7 +445,9 @@ CATALOG: List[Tool] = [
 
     T("create_feature_class", "Schema",
       "Create an empty feature class, by default in the project's default "
-      "geodatabase, and add it to the map.",
+      "geodatabase, and add it to the map. Requested fields are added after "
+      "creation and read back for verification; if a field cannot be added or "
+      "verified, the half-created dataset is deleted and the call fails.",
       P("name", "str", REQUIRED, "Feature class name."),
       P("geometry_type", "str", "POLYGON",
         "POINT, MULTIPOINT, POLYLINE or POLYGON."),
@@ -454,18 +456,22 @@ CATALOG: List[Tool] = [
       P("template", "str", None, "Dataset to copy the schema from."),
       P("fields", "list[dict]", None,
         'Fields to create, e.g. [{"name": "NAME", "type": "TEXT", '
-        '"length": 50}].'),
+        '"length": 50}]. Types: TEXT, SHORT, LONG, BIGINTEGER, FLOAT, DOUBLE, '
+        'DATE, GUID, BLOB; optional precision/scale/alias.'),
       P("has_z", "str", "DISABLED", "ENABLED or DISABLED."),
       P("has_m", "str", "DISABLED", "ENABLED or DISABLED."),
       P("add_to_map", "bool", True, "Add the result to the map."),
       MAP_NAME),
 
     T("create_table", "Schema",
-      "Create an empty standalone table.",
+      "Create an empty standalone table. Requested fields are added after "
+      "creation and read back for verification; if a field cannot be added or "
+      "verified, the half-created dataset is deleted and the call fails.",
       P("name", "str", REQUIRED, "Table name."),
       P("out_path", "str", None, "Target geodatabase or folder."),
       P("template", "str", None, "Table to copy the schema from."),
-      P("fields", "list[dict]", None, "Fields to create."),
+      P("fields", "list[dict]", None,
+        "Fields to create (same shape and types as create_feature_class)."),
       P("add_to_map", "bool", True, "Add the result to the map."),
       MAP_NAME),
 

@@ -1,5 +1,28 @@
 # Changelog
 
+## 2.0.2 — 2026-11-16
+
+### Fix D1: create_feature_class / create_table silently dropped `fields`
+
+Live-test finding (docs/mcp-tool-live-test-2026-11-16.md, defect D1, rated P0 by
+the round-21 three-party review): both tools documented a `fields` parameter,
+but `management.CreateFeatureclass` / `management.CreateTable` have no such
+arcpy parameter, and the wrapper never implemented one — the dataset came back
+with only OBJECTID/Shape while the call reported success.
+
+- Requested fields are now added one `management.AddField` at a time after the
+  dataset is created (types TEXT / SHORT / LONG / BIGINTEGER / FLOAT / DOUBLE /
+  DATE / GUID / BLOB, with optional length / precision / scale / alias).
+- The schema is read back (`describe_dataset` internals on the MCT) before
+  success is reported: missing fields, wrong types or wrong TEXT lengths fail
+  the call.
+- Fail-loud with cleanup: if any AddField fails or verification mismatches, the
+  dataset created by the same call is deleted (`management.Delete`) and its map
+  layer/standalone table is removed, so no half-configured dataset is left
+  behind. The error names the stage and the fields added before the failure.
+- Invalid field names/types are rejected before anything is created.
+- Catalog descriptions updated; tool count stays 125; version bumped to 2.0.2.
+
 ## 2.0.1 — 2026-11-16
 
 ### V2.01 official release & repository overhaul (2026-11-16, later)
