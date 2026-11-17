@@ -602,3 +602,29 @@ Details, acceptance criteria and trade-offs: [docs/design-2026-11-16.md](docs/de
 - 👤 **Maintainer**: Law ([@XNYGggg](https://github.com/XNYGggg)).
 
 [🇨🇳 简体中文说明](README.zh-CN.md) · Made with ☕ + 🗺️ + 一点点强迫症
+
+---
+
+<!-- LDU-THANKS -->
+
+<h2 align="center">🙏 Acknowledgements</h2>
+
+<p align="center">
+  This project is supported by <strong>Ludong University</strong>. We sincerely thank the university for its support.
+</p>
+
+<p align="center">
+  <a href="https://www.ldu.edu.cn/"><img src="assets/ldu-emblem.png" width="104" alt="Ludong University emblem"></a>
+</p>
+
+<h3 align="center">Ludong University</h3>
+
+> Founded in 1930 and located in Yantai, Shandong, Ludong University is a provincial comprehensive university that focuses on applied talent cultivation and pursues coordinated development across engineering, agriculture, science and the humanities. The university has 26 colleges, and six disciplines — including Engineering, Chemistry and Materials Science — rank among the global top 1% in ESI. Its motto is “Great Virtue, Broad Learning, Daily Renewal, Earnest Practice” (厚德、博学、日新、笃行).
+
+<p align="center">
+  📍 No. 186 Hongqi Middle Road, Zhifu District, Yantai, Shandong 264025, China<br>
+  🌐 <a href="https://www.ldu.edu.cn/">Official Website</a> ·
+  <a href="https://jwc.ldu.edu.cn/">Academic Affairs Office</a> ·
+  <a href="https://lib.ldu.edu.cn/">Library</a> ·
+  <a href="https://ehall.ldu.edu.cn/">Student Portal</a>
+</p>
