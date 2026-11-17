@@ -1,3 +1,5 @@
+[![简体中文](https://img.shields.io/badge/Language-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-d1242f?style=flat-square)](README.md) [![日本語](https://img.shields.io/badge/Language-%E6%97%A5%E6%9C%AC%E8%AA%9E-bc002d?style=flat-square)](README.ja.md) [![한국어](https://img.shields.io/badge/Language-%ED%95%9C%EA%B5%AD%EC%96%B4-0047a0?style=flat-square)](README.ko.md)
+
 # 🗺️ ArcGIS Pro MCP 优化版 · 客户版 v2.0.1（V2.01）🎁
 
 > 📦 **当前推荐版本**：[**Release v2.0.1**](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/releases/tag/v2.0.1) → `ArcGIS-Pro-MCP-v2.0.1-r2.zip`（本包；文档修订版，二进制与初版资产完全一致）。历史版本 v2.0.0 与 v1.1.4 仍保留在 [Releases](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/releases)。
