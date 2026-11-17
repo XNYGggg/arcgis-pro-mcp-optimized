@@ -2,6 +2,10 @@
 
 > **📌 文档修订（2026-11-16 晚）**：系统要求更新为 **Windows 11 x64（仅 x64 / AMD64，不支持 ARM64）**；本包二进制与运行脚本零改动，仅文档（README / 本说明 / VERSION.json）与包内 `SHA256SUMS.txt` 更新。
 
+> **📚 完整版本变更**：见 [docs/CHANGELOG.md](docs/CHANGELOG.md) 的 `[1.1.4]` 条目（Keep a Changelog 格式）；本文件保留发布时的说明与三方评审记录。
+
+> **🔐 校验口径**：仓库根 `SHA256SUMS.txt` 对应 v1.1.4 发布包快照；仓库内后续文档修订（README/docs）不回写该清单，`install\01-check.cmd` 只校验 `install/addin.sha256`，自检不受影响。
+
 ## 三方会谈评审结论
 
 发布前由 Claude 主持，Codex 与 DeepSeek 参与评审（2026-11-16，议题：客户版发布前审查）。

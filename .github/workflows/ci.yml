@@ -1,0 +1,108 @@
+name: ci
+
+# GitHub Actions has no ArcGIS Pro, so it cannot build the add-in or produce a
+# release -- see source/BUILD.md. It can run everything that does not need Pro:
+# client registration, the MCP HTTP transport, the Python catalog/pump/mock
+# tests, and the installer script-integrity check. Those are the parts most
+# likely to break silently.
+#
+# The test steps below are adapted from source/.github/workflows/tests.yml
+# (upstream snapshot). They run with source/ as the working directory.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source-tests:
+    name: Source tests (no ArcGIS Pro required)
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: source
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install the Python dependencies
+        run: pip install "mcp>=1.6.0,<2" "pydantic>=2.0"
+
+      - name: Python syntax check
+        run: python -m compileall -q src arcgis_pro_plugin
+
+      - name: Adjust tool-count expectation (customer edition has 113 tools)
+        shell: powershell
+        run: |
+          # The customer edition adds get_queue_status (113 tools). The upstream
+          # snapshot's HTTP test still asserts 112. Patch the expectation in the
+          # CI workspace only; the committed source snapshot stays untouched.
+          $p = "tests\http-transport\Program.cs"
+          $c = [System.IO.File]::ReadAllText($p)
+          $c = $c.Replace('names.Length != 112', 'names.Length != 113').Replace('112 tools', '113 tools')
+          [System.IO.File]::WriteAllText($p, $c, (New-Object System.Text.UTF8Encoding($false)))
+          Write-Host "Patched tool-count expectation: 112 -> 113"
+
+      - name: Client registration
+        run: dotnet run --project tests\client-registration --nologo -v quiet
+
+      - name: MCP over HTTP (.NET 8)
+        run: dotnet run --project tests\http-transport -f net8.0 --nologo -v quiet
+
+      - name: MCP over HTTP (.NET 10)
+        run: dotnet run --project tests\http-transport -f net10.0 --nologo -v quiet
+
+      - name: Catalog matches the bridge
+        run: python tests\test_catalog_matches_bridge.py
+
+      - name: Main-thread pump
+        run: python tests\test_pump.py
+
+      - name: End to end against a mock bridge
+        run: python tests\test_end_to_end_mock.py
+
+      - name: Installer scripts parse and call nothing undefined
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File tests\installer\test-script-integrity.ps1
+
+  package-integrity:
+    name: Package integrity (no ArcGIS Pro required)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify add-in SHA256
+        shell: powershell
+        run: |
+          $want = (Get-Content install\addin.sha256 -Raw).Trim().ToLower()
+          $got = (Get-FileHash install\ArcGISProMCP.esriAddinX -Algorithm SHA256).Hash.ToLower()
+          if ($want -ne $got) { throw "addin.sha256 mismatch: want $want got $got" }
+          Write-Host "add-in SHA256 OK: $got"
+
+      - name: Verify VERSION.json consistency
+        shell: powershell
+        run: |
+          $v = Get-Content VERSION.json -Raw | ConvertFrom-Json
+          $manifestHash = (Get-Content install\addin.sha256 -Raw).Trim()
+          if ($v.version -notmatch '^\d+\.\d+\.\d+$') { throw "VERSION.json version is not semver: $($v.version)" }
+          if ($v.addin.sha256 -ne $manifestHash) { throw "VERSION.json addin.sha256 does not match install/addin.sha256" }
+          if (-not (Test-Path $v.addin.file)) { throw "add-in file missing: $($v.addin.file)" }
+          if (-not ($v.tools -is [int]) -or $v.tools -le 0) { throw "VERSION.json tools is invalid: $($v.tools)" }
+          Write-Host "VERSION.json OK: version=$($v.version), tools=$($v.tools)"
