@@ -542,3 +542,29 @@ print(mcp_bridge.start_pump())
 - 🏷️ 商标：“ArcGIS”为 Esri 商标；本项目为第三方工具，与 Esri 无隶属关系。
 
 🆘 常见问题见 `docs\排障手册.md`；进阶用法见 `docs\使用指南.md`。祝你出图愉快 🎨 (｀・ω・´)ゞ
+
+---
+
+<!-- LDU-THANKS -->
+
+<h2 align="center">🙏 致谢</h2>
+
+<p align="center">
+  本项目的研究与开发得到了 <strong>鲁东大学</strong> 的支持，谨此致以诚挚的感谢。
+</p>
+
+<p align="center">
+  <a href="https://www.ldu.edu.cn/"><img src="assets/ldu-emblem.png" width="104" alt="鲁东大学校徽"></a>
+</p>
+
+<h3 align="center">鲁东大学 · Ludong University</h3>
+
+> 鲁东大学始建于 1930 年，坐落于山东烟台，是一所以应用型人才培养为主导、工农理文多学科协调发展的省属综合性大学。学校现设 26 个学院，工程学、化学、材料科学等 6 个学科进入 ESI 全球排名前 1%，秉承「厚德、博学、日新、笃行」的校训。
+
+<p align="center">
+  📍 山东省烟台市芝罘区红旗中路 186 号（邮编 264025）<br>
+  🌐 <a href="https://www.ldu.edu.cn/">学校官网</a> ·
+  <a href="https://jwc.ldu.edu.cn/">教务处</a> ·
+  <a href="https://lib.ldu.edu.cn/">图书馆</a> ·
+  <a href="https://ehall.ldu.edu.cn/">网上办事大厅</a>
+</p>
