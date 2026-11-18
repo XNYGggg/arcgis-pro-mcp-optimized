@@ -15,6 +15,20 @@ This branch holds the in-progress ArcGIS Pro MCP 2.x line (2.0.2). The feature s
 
 ---
 
+## 🧩 3 モジュール早見表 / Three modules at a glance
+
+> 2.x の正式構成は「中核 MCP + オンデマンドの Guard / Distill」です。まず早見版を掲載し、完全なドキュメントは正式リリース時に追加します。 / 2.x settles on a core MCP plus on-demand Guard / Distill; full docs ship with the release.
+
+| モジュール / Module | 役割 / What it does | 使い方 / How to use | 例 / Example |
+|---|---|---|---|
+| 🧩 MCP | 125 個のネイティブツール + RunCode / Python ブリッジ / 125 native tools plus RunCode and the Python bridge | add-in を導入し、クライアントを `127.0.0.1:6520/mcp` に接続 / install the add-in, connect to `127.0.0.1:6520/mcp` | 「`counties` を `AREA` で 5 クラスに分け、A3 PDF を `D:\out\` に出力」 |
+| 🛡️ Guard | サードパーティ信頼ダイアログのみクリック / clicks only the third-party trust dialog | `guard_summon` で召喚、`guard_status` で撤収確認 / summon with `guard_summon`, verify with `guard_status` | 「RunCode の前にガードを召喚し、終了後に撤収を確認」 |
+| 🧪 Distill | サンプル図 → 再利用可能なレイアウトテンプレート / sample figure → reusable layout template | 10 個の `template_*`：import → measure → patch → validate → preview → review → approve → apply | 「`fig3.png` をテンプレートに蒸留し、プレビュー確認後に approve」 |
+
+**プロンプト 4 原則 / Four prompt rules**：モジュールを指名・対象を具体化・出力を確定・確認ポイントを設ける。 / Name the module, specify the objects, pin the output, and build in a checkpoint.
+
+---
+
 上流プロジェクト：[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)（作者 Pisut Nakmuenwai、AGPL-3.0-or-later）。帰属とライセンス：[NOTICE](NOTICE)、[LICENSE](LICENSE)。
 
 ---

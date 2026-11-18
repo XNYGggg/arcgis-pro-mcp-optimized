@@ -15,6 +15,20 @@ This branch holds the in-progress ArcGIS Pro MCP 2.x line (2.0.2). The feature s
 
 ---
 
+## 🧩 三模块速查 / Three modules at a glance
+
+> 2.x 的正式形态是「核心 MCP + 按需 Guard / Distill」。先给速查版，完整文档随正式发布补齐。 / 2.x settles on a core MCP plus on-demand Guard / Distill. This is the quick version; full docs ship with the release.
+
+| 模块 / Module | 作用 / What it does | 怎么用 / How to use | 提示词示例 / Example |
+|---|---|---|---|
+| 🧩 MCP | 125 个原生工具 + RunCode / Python 桥 / 125 native tools plus RunCode and the Python bridge | add-in 装好，客户端连 `127.0.0.1:6520/mcp` / install the add-in, connect to `127.0.0.1:6520/mcp` | 「把 `区县` 按 `AREA` 分 5 级，导出 A3 PDF 到 `D:\out\`」 |
+| 🛡️ Guard | 只点"第三方代码库"信任框 / clicks only the third-party trust dialog | 助手 `guard_summon` 召唤、`guard_status` 确认收队 / summon with `guard_summon`, verify with `guard_status` | 「跑 RunCode 前先召唤守卫，结束后确认已收队」 |
+| 🧪 Distill | 样图 → 可复用版式模板 / sample figure → reusable layout template | 10 个 `template_*`：import → measure → patch → validate → preview → review → approve → apply | 「把 `fig3.png` 蒸馏成模板，预览确认后再 approve」 |
+
+**提示词四条规则 / Four prompt rules**：点名模块、对象写具体、输出定死、留确认点。 / Name the module, specify the objects, pin the output, and build in a checkpoint.
+
+---
+
 上游项目：[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)，原作者 Pisut Nakmuenwai，AGPL-3.0-or-later 许可。署名与许可：[NOTICE](NOTICE)、[LICENSE](LICENSE)。
 
 ---

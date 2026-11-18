@@ -15,6 +15,20 @@ This branch holds the in-progress ArcGIS Pro MCP 2.x line (2.0.2). The feature s
 
 ---
 
+## 🧩 세 모듈 요약 / Three modules at a glance
+
+> 2.x의 정식 구성은 "핵심 MCP + 온디맨드 Guard / Distill"입니다. 우선 요약판을 싣고, 전체 문서는 정식 릴리스와 함께 제공합니다. / 2.x settles on a core MCP plus on-demand Guard / Distill; full docs ship with the release.
+
+| 모듈 / Module | 역할 / What it does | 사용 방법 / How to use | 예시 / Example |
+|---|---|---|---|
+| 🧩 MCP | 125개 기본 도구 + RunCode / Python 브리지 / 125 native tools plus RunCode and the Python bridge | add-in 설치 후 클라이언트를 `127.0.0.1:6520/mcp`에 연결 / install the add-in, connect to `127.0.0.1:6520/mcp` | "`counties`를 `AREA`로 5개 클래스로 나누고 A3 PDF를 `D:\out\`에 내보내 줘" |
+| 🛡️ Guard | 서드파티 신뢰 대화 상자만 클릭 / clicks only the third-party trust dialog | `guard_summon`으로 소환, `guard_status`로 해산 확인 / summon with `guard_summon`, verify with `guard_status` | "RunCode 전에 가드를 소환하고, 끝나면 해산 확인" |
+| 🧪 Distill | 샘플 도면 → 재사용 가능한 레이아웃 템플릿 / sample figure → reusable layout template | 10개 `template_*`: import → measure → patch → validate → preview → review → approve → apply | "`fig3.png`를 템플릿으로 증류하고, 미리보기 확인 후 approve" |
+
+**프롬프트 4원칙 / Four prompt rules**: 모듈 지정, 대상 구체화, 출력 확정, 확인 지점 마련. / Name the module, specify the objects, pin the output, and build in a checkpoint.
+
+---
+
 업스트림 프로젝트: [Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)(원저자 Pisut Nakmuenwai, AGPL-3.0-or-later). 저작자 표시와 라이선스: [NOTICE](NOTICE), [LICENSE](LICENSE).
 
 ---
