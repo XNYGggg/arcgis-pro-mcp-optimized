@@ -4,6 +4,30 @@ Notable changes, newest first. Versions are the add-in version in
 `addin/ArcGISProMCP/Config.daml`, which is what the ribbon, the installer and
 the MCP handshake all report.
 
+## 1.1.6 — 2026-11-18
+
+### Changed
+
+- **get_pump_status answers when the Python bridge is down.** A refused
+  connection now returns `running:false, bridge_listening:false` with a hint
+  instead of failing, so the one query whose job is to report bridge state is
+  readable precisely when the bridge is missing. Execution commands such as
+  execute_arcpy_code still fail hard.
+- **Bridge errors carry a code and a timestamp.** `last_error_code` /
+  `last_error_at` in diagnose and `[code=...]` in the message
+  (BRIDGE_NOT_LISTENING / BRIDGE_ERROR / BRIDGE_CLOSED / BRIDGE_TIMEOUT /
+  UNSUPPORTED); status reads get a 5 s bound.
+- **diagnose probes the bridge port** (300 ms) and reports
+  `bridge_listening`, so "is the bridge up" is answerable without it.
+- **Toolbox path errors suggest the intended path** ("Did you mean ...?") and
+  the positional-parameters error now shows a ready-to-use example.
+- **Tool schemas state the host difference**: disk toolboxes take positional
+  values on the native add-in; named parameters are Python-bridge only, and
+  bridge-backed tools say so in their descriptions.
+- **HTTP transport test no longer asserts an exact tool count** -- uniqueness
+  plus a required-tool subset instead; the exact count broke on every
+  addition.
+
 ## 1.1.1 — 2026-09-07
 
 ### Fixed

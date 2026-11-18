@@ -1,4 +1,30 @@
-# 发布说明 · 客户版 v1.1.4（2026-11-16）
+# 发布说明 · Customer 1.16（1.14 增强版，构建号 1.1.6，2026-11-18）
+
+> **🚀 发布定位**：本包是 **Customer 1.16（1.14 增强版）**，在 v1.1.4 之上合入 1.1.5 / 1.1.6 的修复与增强；**1.1.4 正式发布仍在准备中，敬请期待**。本分支不创建 GitHub Release / Gitee 发行版、不上传发行资产、不打 tag；安装包仅随仓库提供（`install/`）。可随时回滚到 v1.1.4。
+
+## 变更摘要（相对 v1.1.4）
+
+**1.1.5（F1–F10）**：环境注入贯通（`set_environment` 的 snapRaster 等真正传给 GP，支持每调用覆盖）；`describe_geoprocessing_tool` 返回枚举与默认值；`create_map` 默认无底图（`project_default` 恢复旧行为）；栅格/TIN 的缩放与符号读取；新增 `add_table`；`export_map_view` 新增 `fit:"auto"`；`set_raster_symbology` 支持显式配色/标签；`set_map_properties` 的 epsg 生效；新增 `restart_pro` 自重启命令。
+
+**1.1.6（V-1–V-7，工具链修复）**：toolbox 路径笔误给出 "Did you mean …" 提示、命名参数报错附带可用示例；`get_pump_status` 在 Python 桥未启动时**返回结构化状态**（`running:false, bridge_listening:false`）而不再以 Failed 呈现（执行类命令仍严格报错）；错误分级（`BRIDGE_NOT_LISTENING / BRIDGE_ERROR / BRIDGE_CLOSED / BRIDGE_TIMEOUT / UNSUPPORTED`）与 `last_error_code/at`，状态查询加 5 秒读超时；`diagnose` 主动探测桥端口（`bridge_listening/probe_ms`）；工具描述修正（原生端只收位置参数、桥依赖标注）；HTTP 传输测试断言改为"去重 + 必备子集"；桥 down 结果缓存 5 秒。
+
+## 验证（本机实机，2026-11-18）
+
+- 构建期：client-registration、installer、http-transport（net8.0 + net10.0）全部通过。
+- 实机：全量回归 26/26；专项 10/10；桥状态桩 4/4；真实 Python 桥三态（桥停 / 桥起泵停 / 桥泵全起）全部通过。
+- 规模：112 命令 / 115 工具；add-in SHA256 `96C7829E2A26E16C270722A84605F9945DA2348DFCF202C658A64EA9E012E625`（444,124 字节）。
+
+## 本包的定位与边界
+
+- 面向客户端的完整离线包（安装脚本、运行时、客户端接入、文档、源码快照与构建产物），与 v1.1.4 客户版同构。
+- 不创建 Release、不上传发行资产、不打 tag；默认分支保持 v1.1.4。
+- 作为 1.14 增强版使用；遇问题可回滚 1.1.4，并按 `docs/排障手册.md` 反馈。
+
+---
+
+## 历史：客户版 v1.1.4 发布说明（2026-11-16）
+
+> **📌 文档修订（2026-11-16 晚）**：系统要求更新为 **Windows 11 x64（仅 x64 / AMD64，不支持 ARM64）**；本包二进制与运行脚本零改动，仅文档（README / 本说明 / VERSION.json）与包内 `SHA256SUMS.txt` 更新。
 
 ## 三方会谈评审结论
 
@@ -18,7 +44,7 @@
 | 7 | 包根缺少 LICENSE/NOTICE（DeepSeek，AGPL §5） | 已在包根加入 `LICENSE` 与 `NOTICE`（含上游署名与本包修改声明） |
 | 8 | `source/dist/` 内上游 1.1.1 二进制可能被误用（DeepSeek） | 增加 `source/dist/README.md` 明确标注“非本客户版安装包” |
 | 9 | `pyproject.toml=1.1.1` 与交付物 1.1.4 冲突（Codex） | 源码快照内版本号对齐为 1.1.4，描述同步为 113 工具 |
-| 10 | README 系统要求不准确（Codex） | 明确 Windows 10/11 以 Pro 3.7 官方支持为准；补充 .NET Desktop Runtime 10 与 WebView2 由 Pro 受支持环境提供；补充 AGPL §13 网络条款说明 |
+| 10 | README 系统要求不准确（Codex） | 明确 Windows 11 x64（仅 x64，不支持 ARM64）以 Pro 3.7 官方支持为准；补充 .NET Desktop Runtime 10 与 WebView2 由 Pro 受支持环境提供；补充 AGPL §13 网络条款说明 |
 
 ## 有意保留（不视为缺陷）
 

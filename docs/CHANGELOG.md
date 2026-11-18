@@ -1,5 +1,11 @@
 # 更新日志
 
+## Customer 1.16（1.14 增强版，构建号 1.1.6，2026-11-18）
+
+- 相对 v1.1.4 累计合入 1.1.5 的 F1–F10（环境注入、describe 增强、create_map 无底图、栅格/TIN 支持、add_table、fit:auto、显式配色、epsg 生效、restart_pro）与 1.1.6 的 V-1–V-7（toolbox 路径纠错提示、get_pump_status 桥缺失时结构化返回、错误分级与读超时、diagnose 主动探测、工具描述修正、HTTP 断言加固、桥 down 缓存）。
+- 规模：112 命令 / 115 工具；add-in SHA256 `96C7829E…E625`。
+- 未创建 Release：不上传发行资产、不打 tag；默认分支保持 v1.1.4。
+
 ## v1.1.4（本客户版）
 
 - add-in 升级为 ArcGIS Pro 3.7 / .NET 10 构建，工具数 113。

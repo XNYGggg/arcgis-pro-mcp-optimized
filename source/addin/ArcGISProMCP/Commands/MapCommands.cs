@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using ArcGIS.Desktop.Framework;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
 using ArcGIS.Core.CIM;
+using ArcGIS.Core.Geometry;
 using ArcGIS.Desktop.Core;
 using ArcGIS.Desktop.Mapping;
 using ArcGISProMCP.Bridge;
@@ -23,23 +25,49 @@ namespace ArcGISProMCP.Commands
         public static readonly Dictionary<string, object> Environment =
             new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
+        /// <summary>
+        /// The environment keys this bridge forwards to tool runs, mapped to
+        /// the GP environment names. Anything set through set_environment but
+        /// missing here is still stored (and reported by get_environment under
+        /// _unsupported) but never reaches a tool.
+        /// </summary>
+        public static readonly Dictionary<string, string> GpEnvironmentNames =
+            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["workspace"] = "workspace",
+                ["outputCoordinateSystem"] = "outputCoordinateSystem",
+                ["extent"] = "extent",
+                ["mask"] = "mask",
+                ["cellSize"] = "cellSize",
+                ["snapRaster"] = "snapRaster",
+                ["overwriteOutput"] = "overwriteoutput",
+                ["parallelProcessingFactor"] = "parallelProcessingFactor",
+                ["scratchWorkspace"] = "scratchWorkspace",
+                ["geographicTransformations"] = "geographicTransformations",
+                ["resamplingMethod"] = "resamplingMethod",
+            };
+
         public static void Register()
         {
             // Saving is a UI-thread operation, not an MCT one, so it is
             // registered async and dispatched explicitly.
             CommandRouter.RegisterAsync("save_project", Group,
                 "Save the project, or save a copy elsewhere.", SaveProjectAsync);
-            CommandRouter.Register("create_map", Group,
-                "Create a new map or scene.", CreateMap);
+            CommandRouter.RegisterAsync("create_map", Group,
+                "Create a new map or scene. Created without a basemap unless one "
+                + "is named (basemap=\"project_default\" keeps the old default).",
+                CreateMapAsync);
             CommandRouter.Register("remove_map", Group,
                 "Delete a map from the project.", RemoveMap);
             CommandRouter.RegisterAsync("activate_map", Group,
                 "Open a map's view in the ArcGIS Pro UI.", ActivateMapAsync);
-            CommandRouter.Register("set_map_properties", Group,
-                "Rename a map.", SetMapProperties);
+            CommandRouter.RegisterAsync("set_map_properties", Group,
+                "Rename a map or change its coordinate system.",
+                SetMapPropertiesAsync);
             CommandRouter.Register("get_environment", Group,
-                "Read the geoprocessing environment used for tool runs.",
-                _ => new Dictionary<string, object>(Environment), runOnMct: false);
+                "Read the geoprocessing environment: settings, which keys are "
+                + "forwarded to tools (_forwarded) and which are not (_unsupported).",
+                GetEnvironment, runOnMct: false);
             CommandRouter.Register("set_environment", Group,
                 "Set geoprocessing environment values applied to later tool runs.",
                 SetEnvironment, runOnMct: false);
@@ -71,6 +99,27 @@ namespace ArcGISProMCP.Commands
         internal static Task SaveEditsOnUiThread() =>
             OnUiThread(() => Project.Current.SaveEditsAsync());
 
+        /// <summary>
+        /// Saves pending edits, then the project. False when either save
+        /// throws, so a restart can refuse to discard anything. The SDK's
+        /// save methods report failure by exception, not return value.
+        /// </summary>
+        internal static async Task<bool> SaveAllOnUiThread()
+        {
+            try
+            {
+                await OnUiThread(() => Project.Current.SaveEditsAsync())
+                    .ConfigureAwait(false);
+                await OnUiThread(() => Project.Current.SaveAsync())
+                    .ConfigureAwait(false);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         internal static Task DiscardEditsOnUiThread() =>
             OnUiThread(() => Project.Current.DiscardEditsAsync());
 
@@ -95,30 +144,64 @@ namespace ArcGISProMCP.Commands
             return new Dictionary<string, object> { ["saved"] = project.URI };
         }
 
-        private static object CreateMap(Params parameters)
+        private static async Task<object> CreateMapAsync(Params parameters)
         {
-            var name = parameters.Require("name");
+            var given = parameters.GetString("name");
+            var alias = parameters.GetString("map_name");
+            if (!string.IsNullOrWhiteSpace(given) && !string.IsNullOrWhiteSpace(alias)
+                && !string.Equals(given, alias, StringComparison.OrdinalIgnoreCase))
+                throw new ArgumentException(
+                    "name and map_name were both given and differ; pass one of them.");
+            var name = !string.IsNullOrWhiteSpace(given) ? given : alias;
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException(
+                    "name is required (map_name is accepted as an alias).");
+
             var type = (parameters.GetString("map_type", "MAP") ?? "MAP").ToUpperInvariant();
-            var map = MapFactory.Instance.CreateMap(
+            var basemapName = parameters.GetString("basemap", "none") ?? "none";
+
+            var map = await QueuedTask.Run(() => MapFactory.Instance.CreateMap(
                 name,
                 type == "SCENE" ? MapType.Scene : MapType.Map,
                 MapViewingMode.Map,
-                ParseBasemap(parameters.GetString("basemap")));
+                ParseBasemap(basemapName))).ConfigureAwait(false);
 
-            return new Dictionary<string, object>
+            var applied = new Dictionary<string, object>
             {
                 ["created"] = map.Name,
                 ["map_type"] = map.MapType.ToString(),
+                ["basemap"] = basemapName,
             };
+
+            if (parameters.Has("epsg"))
+            {
+                var wkid = parameters.GetInt("epsg");
+                await QueuedTask.Run(() => map.SetSpatialReference(
+                    SpatialReferenceBuilder.CreateSpatialReference(wkid)))
+                    .ConfigureAwait(false);
+                applied["epsg"] = wkid;
+            }
+
+            if (parameters.GetBool("activate"))
+            {
+                await OnUiThread(() => ProApp.Panes.CreateMapPaneAsync(map))
+                    .ConfigureAwait(false);
+                applied["activated"] = true;
+            }
+
+            return applied;
         }
 
         /// <summary>Pro takes a Basemap value, not the layer name arcpy accepts.</summary>
         private static Basemap ParseBasemap(string name)
         {
-            if (string.IsNullOrWhiteSpace(name)) return Basemap.ProjectDefault;
+            if (string.IsNullOrWhiteSpace(name)) return Basemap.None;
             switch (name.Replace(" ", string.Empty).ToUpperInvariant())
             {
                 // Names follow what ArcGIS Pro shows in its basemap gallery.
+                case "NONE": return Basemap.None;
+                case "PROJECTDEFAULT":
+                case "DEFAULT": return Basemap.ProjectDefault;
                 case "IMAGERY": return Basemap.Satellite;
                 case "IMAGERYHYBRID": return Basemap.Hybrid;
                 case "STREETS": return Basemap.Streets;
@@ -129,7 +212,6 @@ namespace ArcGISProMCP.Commands
                 case "OCEANS": return Basemap.Oceans;
                 case "OPENSTREETMAP": return Basemap.OpenStreetMap;
                 case "NATIONALGEOGRAPHIC": return Basemap.NationalGeographic;
-                case "NONE": return Basemap.None;
                 default: return Basemap.Topographic;
             }
         }
@@ -160,26 +242,54 @@ namespace ArcGISProMCP.Commands
             return new Dictionary<string, object> { ["activated"] = map.Name };
         }
 
-        private static object SetMapProperties(Params parameters)
+        private static async Task<object> SetMapPropertiesAsync(Params parameters)
         {
-            var map = MapHelpers.ResolveMap(parameters);
-            var changed = new Dictionary<string, object>();
-            if (parameters.Has("new_name"))
+            var wkid = parameters.Has("epsg") ? (int?)parameters.GetInt("epsg") : null;
+            var newName = parameters.GetString("new_name");
+
+            var changed = await QueuedTask.Run(() =>
             {
-                map.SetName(parameters.GetString("new_name"));
-                changed["name"] = map.Name;
-            }
-            if (parameters.Has("epsg"))
+                // A Map created on the async worker thread cannot be touched
+                // from the CIM thread, so resolve it inside the queued task.
+                var map = MapHelpers.ResolveMap(parameters);
+                var result = new Dictionary<string, object>();
+                if (!string.IsNullOrWhiteSpace(newName))
+                {
+                    map.SetName(newName);
+                    result["name"] = map.Name;
+                }
+                if (wkid.HasValue)
+                {
+                    var reference = SpatialReferenceBuilder.CreateSpatialReference(wkid.Value);
+                    if (reference == null)
+                        throw new ArgumentException(
+                            $"EPSG:{wkid.Value} is not a known coordinate system.");
+                    map.SetSpatialReference(reference);
+                    result["epsg"] = wkid.Value;
+
+                    var unchanged = map.GetLayersAsFlattenedList().OfType<Layer>()
+                        .Where(layer =>
+                        {
+                            var sr = layer.GetSpatialReference();
+                            return sr != null && sr.Wkid != wkid.Value;
+                        })
+                        .Select(layer => layer.Name)
+                        .ToList();
+                    if (unchanged.Count > 0) result["unchanged_layers"] = unchanged;
+                }
+                result["map"] = map.Name;
+                return result;
+            }).ConfigureAwait(false);
+
+            var reply = new Dictionary<string, object>
             {
-                changed["epsg_warning"] =
-                    "Changing a map's coordinate system is not exposed to add-ins; "
-                    + "use run_geoprocessing_tool or change it in the UI.";
-            }
-            return new Dictionary<string, object>
-            {
-                ["map"] = map.Name,
+                ["map"] = changed["map"],
                 ["changed"] = changed,
             };
+            if (wkid.HasValue)
+                reply["map_note"] = "Only the map's coordinate system changed; "
+                    + "layer data is not reprojected.";
+            return reply;
         }
 
         private static object SetEnvironment(Params parameters)
@@ -198,10 +308,12 @@ namespace ArcGISProMCP.Commands
                 }
                 object value = pair.Value.ValueKind switch
                 {
-                    System.Text.Json.JsonValueKind.String => pair.Value.GetString(),
-                    System.Text.Json.JsonValueKind.Number => pair.Value.GetDouble(),
-                    System.Text.Json.JsonValueKind.True => true,
-                    System.Text.Json.JsonValueKind.False => false,
+                    JsonValueKind.String => pair.Value.GetString(),
+                    JsonValueKind.Number => pair.Value.GetDouble(),
+                    JsonValueKind.True => true,
+                    JsonValueKind.False => false,
+                    JsonValueKind.Object => EnvironmentExtentText(pair.Value)
+                                            ?? pair.Value.GetRawText(),
                     _ => pair.Value.GetRawText(),
                 };
                 Environment[pair.Key] = value;
@@ -211,9 +323,50 @@ namespace ArcGISProMCP.Commands
             return new Dictionary<string, object>
             {
                 ["applied"] = applied,
-                ["note"] = "These are passed to each geoprocessing run; ArcGIS Pro has "
-                         + "no ambient environment for add-ins.",
+                ["forwarded"] = applied.Keys
+                    .Where(GpEnvironmentNames.ContainsKey)
+                    .Select(key => GpEnvironmentNames[key])
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .OrderBy(name => name).ToList(),
+                ["unsupported"] = applied.Keys
+                    .Where(key => !GpEnvironmentNames.ContainsKey(key))
+                    .OrderBy(name => name).ToList(),
+                ["note"] = "Forwarded keys reach each geoprocessing run; unsupported "
+                         + "keys are stored but ignored. A tool still decides whether "
+                         + "it honours an environment.",
             };
+        }
+
+        private static object GetEnvironment(Params parameters)
+        {
+            var result = new Dictionary<string, object>(Environment);
+            result["_forwarded"] = Environment.Keys
+                .Where(GpEnvironmentNames.ContainsKey)
+                .Select(key => GpEnvironmentNames[key])
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(name => name).ToList();
+            result["_unsupported"] = Environment.Keys
+                .Where(key => !GpEnvironmentNames.ContainsKey(key))
+                .OrderBy(name => name).ToList();
+            return result;
+        }
+
+        /// <summary>
+        /// An {xmin,ymin,xmax,ymax} object becomes the space-separated extent
+        /// string a geoprocessing environment expects.
+        /// </summary>
+        internal static string EnvironmentExtentText(JsonElement value)
+        {
+            if (value.TryGetProperty("xmin", out var xmin)
+                && value.TryGetProperty("ymin", out var ymin)
+                && value.TryGetProperty("xmax", out var xmax)
+                && value.TryGetProperty("ymax", out var ymax))
+            {
+                return string.Join(" ", new[] { xmin, ymin, xmax, ymax }
+                    .Select(v => v.GetDouble().ToString(
+                        "R", System.Globalization.CultureInfo.InvariantCulture)));
+            }
+            return null;
         }
 
         // --- bookmarks -------------------------------------------------------

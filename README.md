@@ -1,8 +1,10 @@
-# 🗺️ ArcGIS Pro MCP 优化版 · 客户版 v1.1.4 🎁
+# 🗺️ ArcGIS Pro MCP 优化版 · Customer 1.16（1.14 增强版）🚀
 
 用一句自然语言，让 AI 助手直接操作你正开着的 ArcGIS Pro 工程：加图层、改符号、查属性、跑地理处理、出图导出。数据不出本机，所有通信都走 `127.0.0.1` 🔒。
 
-> **📌 版本说明（2026-11-16）**：**1.0 版本（本页 v1.1.4）非常稳定，推荐日常使用**；**2.0 版本（v2.0.0）现在正在测试阶段**，尚未完成优化，暂不推荐用于正式工作。
+> **🚀 本分支是 Customer 1.16（1.14 增强版，构建号 1.1.6）**：在 1.14（v1.1.4）之上累计合入 1.1.5 的 F1–F10 与 1.1.6 的 V-1–V-7 增强。**1.1.4 的正式发布仍在准备中，敬请期待**；本分支**不提供 Release/发行版资产**，安装包在仓库 `install/` 目录，可随时回滚到 v1.1.4。
+
+> **📌 版本说明（2026-11-16）**：**1.0 版本（v1.1.4 正式包）非常稳定，推荐日常使用**；**2.0 版本为测试版本**，优化尚未完成，其 GitHub Release 资产与 tag 已移除，暂不提供下载。
 
 > **🙏 上游项目与原作者**：本客户版基于 **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**（原作者 **Pisut Nakmuenwai**，AGPL-3.0-or-later），在其基础上累计本地补丁至 **v1.1.4**。完整署名与修改声明见包根 `NOTICE` 与 `source/SOURCE-NOTICE.md`。
 
@@ -14,7 +16,7 @@
 
 | 项目 | 要求 |
 |---|---|
-| 🪟 操作系统 | Windows 10 / 11（64 位；以 ArcGIS Pro 3.7 官方支持的系统为准，Pro 3.7 推荐 Windows 11） |
+| 🪟 操作系统 | **Windows 11 x64**（64 位 Home / Pro / Enterprise，ArcGIS Pro 3.7 官方支持）。**架构：仅 x64（AMD64），不支持 ARM64** |
 | 🗺️ ArcGIS Pro | **3.7 或更高**（本 add-in 基于 3.7 / .NET 10 构建） |
 | 🔑 权限 | 普通用户即可，安装**不需要管理员** |
 | 📦 其他依赖 | 无（PowerShell 与 .NET 由 Windows / Pro 自带） |
@@ -125,7 +127,7 @@ url = "http://127.0.0.1:6520/mcp"
 
 ---
 
-## 🧰 全部 113 个 MCP 工具（12 组）
+## 🧰 全部 115 个 MCP 工具（12 组）
 
 助手能做的全部事情，按名字列在这里。点开看看 👇
 
@@ -313,7 +315,7 @@ url = "http://127.0.0.1:6520/mcp"
 
 | 路径 | 内容 | 说明 |
 |---|---|---|
-| `install\ArcGISProMCP.esriAddinX` | 🧩 add-in v1.1.4 | 113 个原生工具 + 全部 GP 工具；HTTP MCP 6520 / 旧 TCP 6510 |
+| `install\ArcGISProMCP.esriAddinX` | 🧩 add-in v1.1.6（Customer 1.16 / 1.14 增强版） | 115 个工具（112 个命令）+ 全部 GP 工具；HTTP MCP 6520 / 旧 TCP 6510 |
 | `install\runtime\stdio-bridge.ps1` | 🌉 stdio 桥 | 给只能启动本地进程的客户端（如 Claude Desktop）转接 6520；纯 PowerShell，无需 Python |
 | `install\runtime\runcode\RunCode.pyt` | 🐍 RunCode 工具箱 | 需要高频执行任意 arcpy 时使用；首次运行会弹一次信任框 |
 | `install\runtime\guard\` | 🛡️ 弹窗守护 | 自动点击“第三方代码库执行”信任框；失败时置顶提醒（≥30 秒、响铃） |
@@ -374,7 +376,7 @@ url = "http://127.0.0.1:6520/mcp"
 
 ## 📜 版本与许可
 
-- 🏷️ 版本：**1.1.4**（构建日期见 `VERSION.json`；工具数 113）
+- 🏷️ 版本：**Customer 1.16（1.14 增强版，构建号 1.1.6）**（构建日期见 `VERSION.json`；工具数 115）
 - 👤 维护者：**Law**（[@XNYGggg](https://github.com/XNYGggg)）
 - 🙏 上游项目与原作者：**[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**，作者 **Pisut Nakmuenwai**（AGPL-3.0-or-later）。本包在其基础上累计补丁至 1.1.4（修改点见 `docs\CHANGELOG.md` 与 `RELEASE-NOTES.md`）。
 - ⚖️ 许可证：**AGPL-3.0-or-later**（本包附带完整源码快照与上游 NOTICE）

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using ArcGIS.Core.Data;
 using System.IO;
+using System.Threading.Tasks;
 using ArcGIS.Desktop.Core;
+using ArcGIS.Desktop.Framework.Threading.Tasks;
 using ArcGIS.Desktop.Mapping;
 using ArcGISProMCP.Bridge;
 
@@ -25,6 +27,10 @@ namespace ArcGISProMCP.Commands
 
             CommandRouter.Register("add_layer", Group,
                 "Add data to a map from a path or service URL.", AddLayer);
+
+            CommandRouter.RegisterAsync("add_table", Group,
+                "Add a standalone table (geodatabase or folder) to a map.",
+                AddTableAsync);
 
             CommandRouter.Register("remove_layer", Group,
                 "Remove a layer from a map.", RemoveLayer);
@@ -354,13 +360,62 @@ namespace ArcGISProMCP.Commands
             };
         }
 
+        /// <summary>
+        /// A standalone table goes into a map through the standalone-table
+        /// factory -- the add_layer path only builds layers. Runs on the MCT
+        /// and reports a name clash instead of silently renaming.
+        /// </summary>
+        private static async Task<object> AddTableAsync(Params parameters)
+        {
+            var path = parameters.Require("path");
+            var requested = parameters.GetString("name", "") ?? "";
+
+            return await QueuedTask.Run(() =>
+            {
+                // The map must be resolved on the thread its objects are
+                // created on; resolving it before QueuedTask.Run throws
+                // CalledOnWrongThreadException inside the lambda.
+                var map = MapHelpers.ResolveMap(parameters);
+                // The factory would name the table after the dataset anyway,
+                // so check that name for a clash even when none was passed.
+                var wanted = !string.IsNullOrWhiteSpace(requested)
+                    ? requested
+                    : Path.GetFileNameWithoutExtension(path);
+                var clash = map.GetStandaloneTablesAsFlattenedList()
+                    .FirstOrDefault(table => string.Equals(
+                        table.Name, wanted, StringComparison.OrdinalIgnoreCase));
+                if (clash != null)
+                    throw new ArgumentException(
+                        $"Map '{map.Name}' already has a standalone table called "
+                        + $"'{wanted}'.");
+
+                var table = StandaloneTableFactory.Instance.CreateStandaloneTable(
+                    new Uri(path, UriKind.Absolute), map, 0, wanted);
+
+                return (object)new Dictionary<string, object>
+                {
+                    ["added"] = table.Name,
+                    ["map"] = map.Name,
+                    ["source"] = path,
+                };
+            }).ConfigureAwait(false);
+        }
+
         private static object ZoomToLayer(Params parameters)
         {
             var map = MapHelpers.ResolveMap(parameters);
-            var layer = MapHelpers.RequireFeatureLayer(map, parameters.Require("layer_name"));
+            var layer = MapHelpers.FindLayer(map, parameters.Require("layer_name"));
             var view = MapHelpers.RequireActiveView(map);
 
-            var extent = layer.QueryExtent();
+            var extent = MapHelpers.ExtentOf(layer);
+            var fallback = false;
+            if (extent == null)
+            {
+                // No extent from the layer itself (some TIN/group cases): fall
+                // back to the view so the call still answers, and say so.
+                extent = view.Extent;
+                fallback = true;
+            }
             if (extent == null || extent.IsEmpty)
                 throw new InvalidOperationException($"Layer '{layer.Name}' has no extent to zoom to.");
 
@@ -375,6 +430,7 @@ namespace ArcGISProMCP.Commands
                 ["zoomed_to"] = layer.Name,
                 ["extent"] = MapHelpers.Describe(extent),
                 ["scale"] = view.Camera?.Scale,
+                ["fallback_to_view"] = fallback,
             };
         }
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ArcGIS.Core.CIM;
@@ -229,7 +230,10 @@ namespace ArcGISProMCP.Commands
                         + "colorizer needs three bands; unique values needs an "
                         + "integer raster with an attribute table.");
 
-                layer.SetColorizer(layer.CreateColorizer(definition));
+                var colorizer = layer.CreateColorizer(definition);
+                foreach (var pair in ApplyValueSymbology(colorizer, parameters))
+                    applied[pair.Key] = pair.Value;
+                layer.SetColorizer(colorizer);
                 applied["colorizer"] = kind;
                 if (ramp != null) applied["color_ramp"] = parameters.GetString("color_ramp");
             }
@@ -245,6 +249,73 @@ namespace ArcGISProMCP.Commands
                     "Provide colorizer, color_ramp, stretch_type, break_count "
                     + "and/or transparency.");
             return applied;
+        }
+
+        /// <summary>
+        /// Explicit per-value colours and labels for a unique-value raster
+        /// colorizer. Keys are the raster's own values as strings ("1", "2", …);
+        /// colours are [r,g,b] or [r,g,b,a] with 0-100 alpha, matching the
+        /// other symbology commands. Values the raster does not have come back
+        /// under unmatched_values instead of vanishing.
+        /// </summary>
+        private static Dictionary<string, object> ApplyValueSymbology(
+            CIMRasterColorizer colorizer, Params parameters)
+        {
+            var result = new Dictionary<string, object>();
+            if (colorizer is not CIMRasterUniqueValueColorizer unique) return result;
+
+            var colors = parameters.GetObject("value_colors");
+            var labels = parameters.GetObject("value_labels");
+            if ((colors == null || colors.Count == 0)
+                && (labels == null || labels.Count == 0))
+                return result;
+
+            var matched = new List<string>();
+            foreach (var group in unique.Groups
+                     ?? Array.Empty<CIMRasterUniqueValueGroup>())
+            {
+                foreach (var item in group.Classes
+                         ?? Array.Empty<CIMRasterUniqueValueClass>())
+                {
+                    foreach (var raw in item.Values ?? Array.Empty<string>())
+                    {
+                        if (colors != null && colors.TryGetValue(raw, out var color))
+                        {
+                            item.Color = SymbologyCommands.ToColor(ReadColor(color));
+                            matched.Add(raw);
+                        }
+                        if (labels != null && labels.TryGetValue(raw, out var label)
+                            && label.ValueKind == JsonValueKind.String)
+                            item.Label = label.GetString();
+                    }
+                }
+            }
+
+            if (colors != null && colors.Count > 0)
+            {
+                result["value_colors_applied"] = matched.Distinct().ToList();
+                var unmatched = colors.Keys
+                    .Where(key => !matched.Contains(key, StringComparer.OrdinalIgnoreCase))
+                    .ToList();
+                if (unmatched.Count > 0) result["unmatched_values"] = unmatched;
+            }
+            return result;
+        }
+
+        private static int[] ReadColor(JsonElement element)
+        {
+            if (element.ValueKind != JsonValueKind.Array)
+                throw new ArgumentException(
+                    "value_colors entries are [r,g,b] or [r,g,b,a] arrays.");
+            var parts = element.EnumerateArray()
+                .Where(item => item.ValueKind == JsonValueKind.Number)
+                .Select(item => (int)Math.Round(item.GetDouble()))
+                .ToArray();
+            if (parts.Length < 3)
+                throw new ArgumentException("A colour needs at least r, g, b.");
+            return parts.Length >= 4
+                ? new[] { parts[0], parts[1], parts[2], parts[3] }
+                : new[] { parts[0], parts[1], parts[2], 100 };
         }
 
         private static RasterStretchType ParseStretch(string name)

@@ -1,21 +1,26 @@
 {
-  "name": "ArcGIS Pro MCP 优化版（客户版）",
-  "version": "1.1.4",
-  "built": "2026-11-16",
-  "tools": 113,
+  "name": "ArcGIS Pro MCP 优化版客户版 Customer 1.16（1.14 增强版，构建号 1.1.6）",
+  "version": "1.1.6",
+  "built": "2026-11-18",
+  "tools": 115,
+  "commands": 112,
   "requirements": {
-    "os": "Windows 10/11 x64",
+    "os": "Windows 11 x64 (AMD64); ARM64 not supported",
     "arcgis_pro": ">=3.7",
     "external_deps": "none (PowerShell/.NET provided by Windows and ArcGIS Pro)"
   },
   "addin": {
     "file": "install/ArcGISProMCP.esriAddinX",
-    "file_version": "1.1.4.0",
+    "file_version": "1.1.6.0",
     "desktop_version": "3.7",
-    "sha256": "7e6ca097c7af065a1bc951930d47489dd1b8bb77cf6156cf98a742b53d286ad4"
+    "sha256": "96c7829e2a26e16c270722a84605f9945da2348dfcf202c658a64ea9e012e625"
   },
   "license": "AGPL-3.0-or-later",
   "upstream": "https://github.com/Knight60/ArcGIS-Pro-MCP",
   "source": "source/",
-  "branch": "customer-v1.1.4"
+  "branch": "customer-1.16",
+  "release": {
+    "status": "enhanced",
+    "note": "1.14 增强版（构建号 1.1.6）；1.1.4 正式发布敬请期待；未创建 Release/发行版资产"
+  }
 }

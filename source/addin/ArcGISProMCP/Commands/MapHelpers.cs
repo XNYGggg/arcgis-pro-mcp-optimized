@@ -85,6 +85,37 @@ namespace ArcGISProMCP.Commands
             throw new ArgumentException($"Layer '{name}' holds no features.");
         }
 
+        /// <summary>
+        /// A layer's extent for zooming and framing: any layer type, group
+        /// layers by union of their contents, and null when nothing answers.
+        /// </summary>
+        public static Envelope ExtentOf(Layer layer, int depth = 0)
+        {
+            if (layer == null) return null;
+            try
+            {
+                var extent = layer.QueryExtent();
+                if (extent != null && !extent.IsEmpty) return extent;
+            }
+            catch
+            {
+                // Raster/TIN layers may not answer QueryExtent; fall through.
+            }
+
+            if (layer is GroupLayer group && depth < 10)
+            {
+                Envelope union = null;
+                foreach (var child in group.Layers)
+                {
+                    var extent = ExtentOf(child, depth + 1);
+                    if (extent == null) continue;
+                    union = union == null ? extent : union.Union(extent);
+                }
+                return union;
+            }
+            return null;
+        }
+
         // --- serialisation ---------------------------------------------------
 
         public static Dictionary<string, object> Describe(Layer layer, int? index = null)
