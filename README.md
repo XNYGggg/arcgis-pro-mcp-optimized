@@ -127,6 +127,64 @@ Connect over Streamable HTTP to `http://127.0.0.1:6520/mcp`, or use the generic 
 
 ---
 
+## 🧩 The three modules: what each does, how to use it, and how to ask
+
+This project follows a "one repo, three modules" design. Each module works on its own; in practice they take turns:
+
+| Module | What it does (one line) | When to use it | In this edition |
+|---|---|---|---|
+| 🧩 **MCP add-in** | The only road between the AI and Pro: 113 native tools plus two arcpy channels — RunCode and the Python bridge | Everyday work; batch scripts; interactive sessions that need `CURRENT` | ✅ Installed and ready |
+| 🛡️ **Dialog guard** | Clicks the "third-party code library" trust dialog for you; if it can't, raises a topmost alarm with beeps | The first RunCode.pyt run; unattended batches | ✅ Standalone script `03-dialog-guard.cmd` |
+| 🧪 **Template distillation** | Turns one sample figure into a reusable layout template so batches share one layout | Many maps with the same layout; reproducing paper or report figures | ❌ Not in 1.1.4 — see V2.01 (v2.0.1) |
+
+### 🧩 Module 1: MCP add-in (the core)
+
+- **What it does**: the only channel between the AI and Pro — adding layers, styling, geoprocessing, layout and export all go through it. Two arcpy channels: the **RunCode toolbox** for one-off or batch scripts, and the **Python bridge** for interactive sessions that keep variables across calls or need `CURRENT`.
+- **How to use it**:
+  1. After installation, open Pro and confirm the **MCP tab** shows **running** (`127.0.0.1:6520`);
+  2. RunCode: ask the assistant to call `run_python_toolbox_tool` with the path `%LOCALAPPDATA%\ArcGIS Pro MCP\runcode\RunCode.pyt`;
+  3. Python bridge (optional): Pro menu **Analysis → Python**, paste the bridge bootstrap (port 6511; add `start_pump()` for `CURRENT` — see "RunCode and the Python bridge" below).
+- **How to word the prompt**: state **object + operation + output**; for batches add "do one first and show me".
+  - ✅ "Graduate `county_boundaries` by `AREA` into 5 natural-break classes, light red to dark green, legend bottom-right, export an A3 landscape PDF to `D:\out\` at 300 dpi."
+  - ✅ "Use RunCode to write an idempotent script: turn on labels for every layer, field `NAME`, size 10; skip layers already labeled."
+  - ✅ "This arcpy needs `CURRENT`: fill the bridge bootstrap with my username and send it to me — I'll paste it into Pro myself."
+  - ❌ "Handle my data." — no object, operation, or output; the assistant can only keep asking.
+
+### 🛡️ Module 2: Dialog guard (only needed for RunCode)
+
+- **What it does**: the first time Pro runs a third-party `.pyt`, it shows a "third-party code library" trust dialog, and unattended tasks stall on it. The guard clicks only this kind of "Yes(Y)"; if it can't, it raises a topmost alarm (at least 30 s, beeping every 10 s). Overwrite and delete confirmations are **never touched**.
+- **How to use it** (details in "Using the dialog guard" below):
+  ```text
+  install\03-dialog-guard.cmd                    # 600 s by default
+  install\03-dialog-guard.cmd -DurationSeconds 120
+  install\03-dialog-guard.cmd -AlertOnly         # alert only, no clicking
+  ```
+  Trust is asked once per Pro process; after a Pro restart, guard once more.
+- **How to word the prompt**: put "start the guard" and "what you're about to run" in one sentence.
+  - ✅ "I'm about to run RunCode.pyt: start the dialog guard in the background for 600 seconds, click Yes on the trust dialog, and if you can't, raise the topmost alarm with beeps."
+  - ✅ "Alert only this time, no auto-click."
+  - ❌ "Dismiss all dialogs for me." — the guard handles trust dialogs only; every other confirmation is your call.
+
+### 🧪 Module 3: Template distillation (2.x feature)
+
+- **What it does**: distills one sample figure into a reusable layout template; later batch exports apply the template, so many maps share one reproducible layout.
+- **How to use it**: 1.1.4 **does not include** this module (no `template_*` tools). On **V2.01 (v2.0.1)**, call the 10 `template_*` tools in the order `import → measure → patch → validate → preview → review → approve → apply`; the template library lives in `%LOCALAPPDATA%\ArcGIS Pro MCP\library` and survives upgrades.
+- **How to word the prompt**: name the template, and pin the flow plus the confirmation point.
+  - ✅ "Distill `D:\samples\fig3.png` into a template named Study Area Overview: import → measure → patch → validate → preview; show me the preview first, then review + approve after I confirm."
+  - ✅ "Use the Study Area Overview template to export every map in `maps` as an A3 PDF, titled after the map, into `D:\out\maps\`."
+  - ❌ "Copy this figure." — no template name, flow, or confirmation point; the layout can't be reproduced.
+
+### 🧭 Prompt rules that apply to all three modules
+
+1. **Name the module**: everyday work needs no naming (MCP is the default); say "use **RunCode**" for scripts, "use the **Python bridge**" for persistent sessions, "start the **dialog guard**" before unattended runs, "use the **template**" for a consistent layout.
+2. **Be specific about objects**: write layer names, field names, and paths verbatim in backticks — not "that layer" or "the data from earlier".
+3. **Pin the output**: format (PNG / PDF / new feature class), size or resolution, and save path.
+4. **Build in a checkpoint**: for batch, overwrite, or delete operations, ask for "one first" or "explain the impact first".
+
+> For the full four-element formula and templates for mapping prompts, see "Mapping and map production (prompt guide)" below.
+
+---
+
 ## 🎨 Mapping and map production (prompt guide)
 
 This section explains "how to talk to the AI": you don't need to remember tool names — just cover the four elements below and the assistant will break it down into MCP tool calls.
