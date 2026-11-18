@@ -171,6 +171,45 @@ Use Streamable HTTP to `http://127.0.0.1:6520/mcp`; or the generic JSON above. (
 
 ---
 
+## 🧩 Three modules at a glance: what they do, how to use them, how to ask
+
+This project follows a "one repo, three modules" design: the core **MCP** does the work, while **Guard** and **Distill** show up on demand and leave as soon as they're done:
+
+| Module | What it does (one line) | How to use it (essentials) | Status |
+|---|---|---|---|
+| 🧩 **MCP** | 125 native tools plus two arcpy channels — RunCode and the Python bridge — letting the AI work on the Pro project in front of you | Install the add-in → MCP tab shows running (`127.0.0.1:6520`) → connect your client to `127.0.0.1:6520/mcp` | ✅ |
+| 🛡️ **Guard** | Summoned only before operations that may raise the "third-party code library" trust dialog; clicks "Yes(Y)", then disbands as soon as the operation ends | The assistant calls `guard_summon` to summon it and `guard_status` to check; RunCode calls arm/settle it automatically | ✅ |
+| 🧪 **Distill** | Sample figure → reusable layout template, so batches share one reproducible layout | The 10 `template_*` tools, in the order import → measure → patch → validate → preview → review → approve → apply; the template library lives in `%LOCALAPPDATA%\ArcGIS Pro MCP\library` | ✅ |
+
+### ✍️ How to word the prompt for each module
+
+**🧩 MCP — object + operation + output; for batches, do one first**
+- ✅ "Graduate `county_boundaries` by `AREA` into 5 natural-break classes, light red to dark green, legend bottom-right, export an A3 landscape PDF to `D:\out\` at 300 dpi."
+- ✅ "Use RunCode to write an idempotent script: prefix every layer name with `LYR_`; skip layers already prefixed."
+- ✅ "This arcpy needs `CURRENT`: fill in the Python bridge bootstrap and send it to me — I'll paste it myself."
+- ❌ "Handle my data." — no object, operation, or output; the assistant can only keep asking.
+
+**🛡️ Guard — say "summon the guard" and "what you're about to run" in one sentence**
+- ✅ "This RunCode job is a batch export: summon the guard with `guard_summon` first, then check `guard_status` after it finishes to confirm it has disbanded."
+- ✅ "The guard may only click third-party trust dialogs; leave overwrite and delete confirmations to me."
+- ❌ "Dismiss all dialogs for me." — the guard handles trust dialogs only; every other confirmation is your call.
+
+**🧪 Distill — name the template, pin the flow and the confirmation point**
+- ✅ "Distill `D:\samples\fig3.png` into a template named Study Area Overview: import → measure → patch → validate → preview; show me the preview first, then review + approve after I confirm."
+- ✅ "Use the Study Area Overview template to export every map in `maps` as an A3 PDF, titled after the map, into `D:\out\maps\`."
+- ❌ "Copy this figure." — no template name, flow, or confirmation point; the layout can't be reproduced.
+
+### 🧭 Rules that apply to all three modules
+
+1. **Name the module**: everyday work defaults to MCP; say "use RunCode" for scripts, "use the Python bridge" for persistent sessions, "summon the guard" before unattended runs, "use the template" for a consistent layout.
+2. **Be specific about objects**: write layer names, field names, and paths verbatim in backticks — not "that layer".
+3. **Pin the output**: format (PNG / PDF / new feature class), size or resolution, and save path.
+4. **Build in a checkpoint**: for batch, overwrite, or delete operations, ask for "one first" or "explain the impact first".
+
+> For the detailed flows, see "Guard module — prompt guide" and "Distill module — prompt guide" below; for the four-element formula of mapping prompts, see "Mapping & map production — prompt guide".
+
+---
+
 ## 🎨 Mapping & map production — prompt guide
 
 This section is about *how to talk to the assistant*. You never need to name a tool: state the four elements below and the assistant turns them into MCP calls.
