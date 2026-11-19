@@ -66,7 +66,7 @@
 - **2026-11-16（深夜，main 内容切换）**：按用户要求，`main` 分支内容由 2.0.1 开发线切换为 **v1.1.4 稳定版**（tree 与 `customer-v1.1.4` 一致，额外保留本 BRANCHES.md 供文档引用；2.0.1 历史提交仍在 main 的祖先链中，未丢失）；2.x 代码保留在 `customer-v2.0.1` / `customer-v2.0.0` 分支。
 - **2026-11-16（晚，1.1.4 README 双语与徽标）**：`customer-v1.1.4` 的 README 双语化（`README.md` 英文默认 + `README.zh-CN.md` 中文），顶部带 Language 切换并补全 Version / License / ArcGIS Pro / Platform / Release 徽标。
 - **2026-11-16（晚，默认分支）**：按用户要求，仓库默认分支（主干）由 `main` 切回 `customer-v1.1.4`，即默认展示稳定版 v1.1.4；`main` 随后于当晚切换为 v1.1.4 内容。GitHub 设置：`gh api -X PATCH repos/XNYGggg/arcgis-pro-mcp-optimized -f default_branch=customer-v1.1.4`。
-- **2026-11-16（晚，版本状态标注）**：将 v1.1.4 标记为**稳定版 · 推荐**；删除 Release `v2.0.1`、`v2.0.0` 及其标签（2.0 为测试版本，优化未完成、不推荐使用），2.0 代码仅保留在分支中；README（main 双语、customer-v1.1.4）与仓库简介同步标注。
+- **2026-11-16（晚，版本状态标注）**：将 v1.1.4 标记为**稳定版 · 推荐**；删除 Release `v2.0.1`、`v2.0.0` 及其标签（2.0 为测试版本，优化未完成、不推荐使用），2.0 代码仅保留在分支中；README（main 双语、customer-v1.1.4）与仓库简介同步标注（该推荐标记已于 2026-11-19 撤销）。
 - **2026-11-16（晚，README 强化）**：恢复 `customer-v2.0.0` 分支（原归档 SHA `e8ebda5`）；四个分支 README 均增补"出图制图 / 守卫 / 蒸馏"三模块的使用方法与提示词指南。
 - **2026-11-16**：V2.01 正式发布与仓库重整（后于当晚按用户决定移除 2.0 发布物）。
   - 默认分支由 `customer-v1.1.4` 改回 `main`；新建 `customer-v2.0.1` 包快照分支。

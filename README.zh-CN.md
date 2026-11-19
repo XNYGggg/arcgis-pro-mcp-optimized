@@ -56,6 +56,8 @@
 
 > 自检时若 ArcGIS Pro 没开，端口检查会显示警告——先打开 Pro 再跑一次即可 👌
 
+> **NuGet（GitHub Packages）备选安装**：从源 `https://nuget.pkg.github.com/XNYGggg/index.json` 执行 `dotnet tool install --global ArcGISProMCP.Install --version 1.1.13`（GitHub Packages 需带 `read:packages` 的凭据）。该工具会下载本版离线包、逐文件校验 SHA256SUMS 后执行安装。
+
 ---
 
 ## 🎛️ 配置方法 —— 接入你的 AI 客户端

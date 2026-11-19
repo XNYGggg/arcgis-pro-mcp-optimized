@@ -56,6 +56,8 @@ Verification on this machine (live, **ArcGIS Pro 3.7 only**): 1.1.7 regression 2
 
 > If Pro is not running during the check, the port test shows a warning — open Pro and run it again 👌
 
+> **NuGet (GitHub Packages) alternative**: `dotnet tool install --global ArcGISProMCP.Install --version 1.1.13` from source `https://nuget.pkg.github.com/XNYGggg/index.json` (GitHub Packages needs a credential with `read:packages`). The tool downloads this release's offline package, verifies SHA256SUMS and runs the installer.
+
 ---
 
 ## 🎛️ Configuration — connect your AI client

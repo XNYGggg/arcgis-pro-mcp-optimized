@@ -56,6 +56,8 @@
 
 > チェック時に Pro が起動していないとポート検査は警告になります——Pro を起動して再実行してください 👌
 
+> **NuGet（GitHub Packages）での代替インストール**：ソース `https://nuget.pkg.github.com/XNYGggg/index.json` から `dotnet tool install --global ArcGISProMCP.Install --version 1.1.13` を実行します（GitHub Packages には `read:packages` 権限の資格情報が必要）。ツールは本版のオフライン・パッケージを取得し、SHA256SUMS を逐次検証してからインストーラーを実行します。
+
 ---
 
 ## 🎛️ 設定 —— AI クライアントの接続

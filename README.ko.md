@@ -56,6 +56,8 @@
 
 > 검사 시 ArcGIS Pro가 꺼져 있으면 포트 검사가 경고로 나옵니다 — Pro를 켜고 다시 실행하세요 👌
 
+> **NuGet(GitHub Packages) 대체 설치**: 소스 `https://nuget.pkg.github.com/XNYGggg/index.json`에서 `dotnet tool install --global ArcGISProMCP.Install --version 1.1.13`를 실행합니다(GitHub Packages에는 `read:packages` 권한 자격 증명 필요). 도구가 본 버전 오프라인 패키지를 내려받아 SHA256SUMS를 파일별로 검증한 뒤 설치 프로그램을 실행합니다.
+
 ---
 
 ## 🎛️ 설정 — AI 클라이언트 연결
