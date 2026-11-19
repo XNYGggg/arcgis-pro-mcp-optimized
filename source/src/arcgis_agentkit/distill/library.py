@@ -68,6 +68,34 @@ def valid_template_id(template_id: str) -> bool:
 _valid_template_id = valid_template_id
 
 
+def _pid_alive(pid: int) -> bool:
+    """Best-effort liveness check used before stealing a stale lock file."""
+    if pid <= 0:
+        return False
+    if os.name == "nt":
+        import ctypes
+
+        process_query_limited_information = 0x1000
+        still_active = 259
+        kernel32 = ctypes.windll.kernel32
+        handle = kernel32.OpenProcess(
+            process_query_limited_information, False, pid)
+        if not handle:
+            return False
+        try:
+            exit_code = ctypes.c_ulong()
+            if not kernel32.GetExitCodeProcess(handle, ctypes.byref(exit_code)):
+                return False
+            return exit_code.value == still_active
+        finally:
+            kernel32.CloseHandle(handle)
+    try:
+        os.kill(pid, 0)
+        return True
+    except OSError:
+        return False
+
+
 class TemplateLibrary:
     def __init__(self, root: str | Path | None = None,
                  config: dict[str, Any] | None = None) -> None:
@@ -114,8 +142,18 @@ class TemplateLibrary:
             except FileExistsError:
                 try:
                     if time.time() - lock.stat().st_mtime > 10:
-                        lock.unlink(missing_ok=True)
-                        continue
+                        # Only steal a stale lock whose owner is gone: a live
+                        # import may legitimately hold the lock past 10 s, and
+                        # stealing from it reintroduces the race the lock exists
+                        # to prevent.
+                        try:
+                            owner = int(lock.read_text(
+                                encoding="ascii", errors="ignore").strip() or 0)
+                        except OSError:
+                            owner = 0
+                        if not _pid_alive(owner):
+                            lock.unlink(missing_ok=True)
+                            continue
                 except OSError:
                     pass
                 time.sleep(0.05)
@@ -166,6 +204,20 @@ class TemplateLibrary:
                 if path.stem.lower() == lowered:
                     return path.stem
         return template_id
+
+    def _id_taken(self, template_id: str,
+                  entries: list[dict[str, Any]]) -> bool:
+        """An id is taken if a spec OR an index entry uses it.
+
+        An interrupted delete can leave the entry behind without the spec; a
+        new import must not claim that id, or the pending cleanup would later
+        delete the wrong template.
+        """
+        lowered = template_id.lower()
+        if self.spec_path(template_id).exists():
+            return True
+        return any(str(entry.get("id", "")).lower() == lowered
+                   for entry in entries)
 
     def _apply_upsert(self, data: dict[str, Any], spec: dict[str, Any]) -> None:
         entries = [entry for entry in data["templates"]
@@ -229,7 +281,8 @@ class TemplateLibrary:
         # spec write and the index commit must not interleave with a delete,
         # which decides image liveness from the same records under this lock.
         with self._lock():
-            for entry in self.index().get("templates", []):
+            entries = self.index().get("templates", [])
+            for entry in entries:
                 if entry.get("image_sha256") == digest:
                     existing = self.get(entry["id"])
                     return {"spec": existing, "skipped": True,
@@ -240,12 +293,12 @@ class TemplateLibrary:
                 raise ValueError(
                     f"invalid template id: {template_id!r} (letters, digits, "
                     "'.', '_' and '-' only; it becomes a file name)")
-            if self.spec_path(template_id).exists():
+            if self._id_taken(template_id, entries):
                 # Truncate before suffixing: the result must still satisfy the
                 # same 80-character rule, or the template could never be deleted.
                 base = template_id[:75]
                 template_id = f"{base}-{secrets.token_hex(2)}"
-                while self.spec_path(template_id).exists():
+                while self._id_taken(template_id, entries):
                     template_id = f"{base}-{secrets.token_hex(2)}"
 
             extension = image_path.suffix.lower() or ".png"
@@ -479,11 +532,12 @@ class TemplateLibrary:
                 declared = str(spec.get("id") or "")
                 template_id = (declared if valid_template_id(declared)
                                else _slug(declared or bundle_path.stem))
+                entries = self.index().get("templates", [])
                 target_id = template_id
-                if self.spec_path(target_id).exists():
+                if self._id_taken(target_id, entries):
                     base = target_id[:75]
                     target_id = f"{base}-{secrets.token_hex(2)}"
-                    while self.spec_path(target_id).exists():
+                    while self._id_taken(target_id, entries):
                         target_id = f"{base}-{secrets.token_hex(2)}"
                 spec["id"] = target_id
                 digest = spec.get("image_sha256")

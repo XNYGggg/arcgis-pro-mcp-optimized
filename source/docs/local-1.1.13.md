@@ -12,7 +12,7 @@
 | 1 | **Python 库**：`TemplateLibrary.delete(template_id, force=False)`——加锁执行；删除 spec + index 条目 + 作业单 + 无引用的去重图片；图片被其他模板引用（index 条目与 specs 目录双重扫描）时保留并回报引用者；删除不存在 id 抛 `FileNotFoundError`（CLI → `not_found`/exit 3）；`ready` 模板无 force 抛 `ValueError`（库侧兜底） | source/src/arcgis_agentkit/distill/library.py |
 | 2 | **CLI**：`arcgis-distill delete <id> [--force]`；`--json` 信封；`ready` 无 force → `ready_template`/exit 5；`inbox` 不受影响 | source/src/arcgis_agentkit/distill/cli.py |
 | 3 | **MCP 面**：catalog Template 组新增 `template_delete`（destructive=True）；`tools.json` 重新生成（125→126 工具）；C# 薄封装 `template_delete`（TemplateCommands.cs 注册 + 处理器） | source/src/arcgis_pro_mcp/catalog.py、source/addin/ArcGISProMCP/Commands/TemplateCommands.cs、Resources/tools.json |
-| 4 | **测试**：`tests/test_distill.py` 新增 7 用例（无共享图片删除、共享图片保留、未知 id `not_found` + 重复删除、ready 需 force、路径型 id 拒绝、孤儿索引清理、超长 id 撞名后可删除）→ 14/14；`test_catalog_matches_bridge.py` 的 CSHARP_ONLY 增补 `template_delete`（4/4） | source/tests/** |
+| 4 | **测试**：`tests/test_distill.py` 新增 8 用例（无共享图片删除、共享图片保留、未知 id `not_found` + 重复删除、ready 需 force、路径型 id 拒绝、孤儿索引清理、超长 id 撞名后可删除、中断删除后 id 仍保留）→ 15/15；`test_catalog_matches_bridge.py` 的 CSHARP_ONLY 增补 `template_delete`（4/4） | source/tests/** |
 | 5 | **文档**：`docs/distill.md` 与 `skills/template-distill/SKILL.md` 增加删除一节；四语 README 工具表/能力对照/版本行与 1.1.13 历史行；`docs/使用指南.md`、`docs/CHANGELOG.md`、`source/CHANGELOG.md`、`RELEASE-NOTES.md` 同步 | 见仓库 |
 | 6 | **版本**：Config.daml / csproj / pyproject / `arcgis_agentkit`（MODULE_VERSION、`__version__`）统一 1.1.13；VERSION.json 126 工具 / 123 命令；install.ps1 / check.ps1 版本口径同步 | 见仓库 |
 | 7 | **运行时同步**：`install/runtime/distill/arcgis_agentkit` 由 source 重新复制，逐文件一致（12 文件） | install/runtime/distill/arcgis_agentkit/** |
@@ -34,7 +34,7 @@
 
 ## 单元测试
 
-- `tests/test_distill.py`：**14/14**（原 7 + 新 7）。
+- `tests/test_distill.py`：**15/15**（原 7 + 新 8）。
 - `tests/test_catalog_matches_bridge.py`：**4/4**（tools.json ↔ catalog 126 工具全等价；template_* 记为 C# 原生实现，CSHARP_ONLY 含 `template_delete`）。
 
 ## 打包与校验

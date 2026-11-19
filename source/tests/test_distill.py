@@ -225,6 +225,31 @@ def test_delete_clears_orphan_index_entry(pipeline):
     assert library.list() == []
 
 
+def test_import_does_not_reuse_id_reserved_by_orphan_entry(pipeline, tmp_path):
+    _tmp, library, template_id = pipeline
+    # An interrupted delete leaves the index entry without the spec; the id
+    # must stay reserved until the cleanup finishes.
+    library.spec_path(template_id).unlink()
+    image = Image.open(tmp_path / "sample.png").convert("RGB")
+    image.putpixel((2, 2), (0, 0, 255))
+    image.save(tmp_path / "sample4.png")
+
+    assert main(["import", str(tmp_path / "sample4.png"), "--name", "Reuse",
+                 "--id", template_id, "--json"]) == 0
+    ids = [entry["id"] for entry in library.list()]
+    assert template_id in ids, "the orphan entry keeps its id"
+    assert any(entry_id != template_id for entry_id in ids), \
+        "the new import must take a suffixed id"
+
+    # Finishing the orphan cleanup must not touch the new template.
+    assert main(["delete", template_id, "--json"]) == 0
+    assert any(entry["id"] != template_id for entry in library.list())
+    remaining = [entry["id"] for entry in library.list()
+                 if entry["id"] != "demo-figure"]
+    for tid in remaining:
+        assert main(["delete", tid, "--json"]) == 0
+
+
 def test_reimported_long_id_stays_deletable(pipeline, tmp_path):
     _tmp, library, template_id = pipeline
     long_id = "a" * 80
