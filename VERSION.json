@@ -22,6 +22,6 @@
   "branch": "customer-v1.1.13",
   "release": {
     "status": "enhanced",
-    "note": "1.14 增强版（构建号 1.1.13），在 1.1.12 基础上为模板库新增 template_delete（删除 spec/index 条目/作业单/无引用去重图片，ready 模板需 --force）；正式版：经测试稳定，推荐下载；已发布 GitHub Release v1.1.13（tag v1.1.13，main 分支内容同此版本），接替并删除 v1.1.11；v1.1.4 与已下线的 v1.1.11 均为历史版本（不再推荐或支持）"
+    "note": "1.14 增强版（构建号 1.1.13），在 1.1.12 基础上为模板库新增 template_delete（删除 spec/index 条目/作业单/无引用去重图片，ready 模板需 --force）；正式版：经测试稳定，推荐下载；已发布 GitHub Release v1.1.13（tag v1.1.13，main 分支内容同此版本），接替并删除 v1.1.11；v1.1.4 与已下线的 v1.1.11 均为历史版本（仅留档）"
   }
 }
