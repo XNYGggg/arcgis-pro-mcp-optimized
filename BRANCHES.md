@@ -31,7 +31,7 @@
 
 | Release | 状态 | 资产 | 说明 |
 |---|---|---|---|
-| **v1.1.13** | ✅ **Latest · 正式版 · 经测试稳定，推荐下载** | `ArcGIS-Pro-MCP-1.1.13.zip` + 兼容别名 `ArcGIS-Pro-MCP-v1.1.13.zip` + `ArcGIS-Pro-MCP-1.1.13.zip.sha256` | 1.x 正式版（123 命令 / 126 工具，含模板蒸馏与模板删除）；系统要求 **Windows 11 x64（仅 x64 / AMD64，不支持 ARM64）、ArcGIS Pro 3.7**；SHA256 `437DA080EE78486D4F058A19AEE2278360D5617E1003B61FBFFE3B2227616533`（2,758,763 B）；包内 SHA256SUMS 232/232 通过；发布说明与评审记录见 `RELEASE-NOTES.md` |
+| **v1.1.13** | ✅ **Latest · 正式版 · 经测试稳定，推荐下载** | `ArcGIS-Pro-MCP-1.1.13.zip` + 兼容别名 `ArcGIS-Pro-MCP-v1.1.13.zip` + `ArcGIS-Pro-MCP-1.1.13.zip.sha256` | 1.x 正式版（123 命令 / 126 工具，含模板蒸馏与模板删除）；系统要求 **Windows 11 x64（仅 x64 / AMD64，不支持 ARM64）、ArcGIS Pro 3.7**；SHA256 `BDEB0C99566633D2A632E845963423C6131F87F24617355357FF07488AA14E0D`（2,759,403 B）；包内 SHA256SUMS 232/232 通过；发布说明与评审记录见 `RELEASE-NOTES.md` |
 | v1.1.4 | 🗄️ 历史版本（仅留档） | `ArcGIS-Pro-MCP-v1.1.4.zip` + 兼容别名 `ArcGIS-Pro-MCP-1.1.4.zip` | 1.x 历史版本（113 工具），资产仍可下载但**不提供支持**；2026-11-16 深夜曾重发（文档修订，二进制零改动），SHA256 `d475f47c…c914` |
 | ~~v1.1.11~~ | ❌ **已删除（2026-11-19）** | 资产不可再下载 | 被 v1.1.13 接替；Release、资产与 tag 一并移除（分支快照保留供历史查阅） |
 | ~~v2.0.1~~ | ❌ 已删除（2026-11-16） | 资产不可再下载 | 测试版本（优化未完成）；r2 / 兼容别名 / 初版资产随 Release 一并移除 |
@@ -57,8 +57,9 @@
 
 ## 变更记录
 
+- **2026-11-19（v1.1.13 资产重发）**：包内 README×4 / RELEASE-NOTES / VERSION.json 移除针对 v1.1.4 / v1.1.11 的推荐字样（仅留档），离线包重发（2,759,403 B，SHA256 `BDEB0C99…4E0D`，由 commit `9220b66` 归档；add-in 与运行时二进制未变）；GitHub 与 Gitee 资产已同步替换。
 - **2026-11-19（NuGet 通道恢复）**：`installer/` 与 `.github/workflows/publish-nuget.yml` 恢复到 `main`（v1.1.11 换树时曾丢失），默认标签与工具版本改为 `v1.1.13`；`ArcGISProMCP.Install` 1.1.13 已推送至 GitHub Packages。
-- **2026-11-19（v1.1.13 正式发布，接替 v1.1.11）**：`customer-v1.1.13` 标注为正式版并发起 Release（tag `v1.1.13` @ `6162865`，Latest）；Release 提供 `ArcGIS-Pro-MCP-1.1.13.zip`（SHA256 `437DA080EE78486D4F058A19AEE2278360D5617E1003B61FBFFE3B2227616533`）；`main` 内容同步为 v1.1.13 + 本表；**v1.1.11 下线**——其 Release、资产与 tag 删除，`customer-v1.1.11` 转为已下线历史快照；v1.1.4 转为历史版本（仅留档、不提供回滚指引）。本版相对 v1.1.11 新增 1.1.12 模板蒸馏（10 个 `template_*` 工具 + `arcgis-distill`）与 1.1.13 模板删除（`template_delete`），工具数 115→126。
+- **2026-11-19（v1.1.13 正式发布，接替 v1.1.11）**：`customer-v1.1.13` 标注为正式版并发起 Release（tag `v1.1.13` @ `6162865`，Latest）；Release 提供 `ArcGIS-Pro-MCP-1.1.13.zip`（SHA256 `BDEB0C99566633D2A632E845963423C6131F87F24617355357FF07488AA14E0D`）（资产于 2026-11-19 因文档口径修订重发，二进制未变，由 commit `9220b66` 归档）；`main` 内容同步为 v1.1.13 + 本表；**v1.1.11 下线**——其 Release、资产与 tag 删除，`customer-v1.1.11` 转为已下线历史快照；v1.1.4 转为历史版本（仅留档、不提供回滚指引）。本版相对 v1.1.11 新增 1.1.12 模板蒸馏（10 个 `template_*` 工具 + `arcgis-distill`）与 1.1.13 模板删除（`template_delete`），工具数 115→126。
 - **2026-11-19（v1.1.11 正式发布）**：`customer-v1.1.11` 标注为正式版并发起 Release（tag `v1.1.11` @ `4340ec8`，Latest）；GitHub Release 与 Gitee 发行版提供 `ArcGIS-Pro-MCP-1.1.11.zip`（SHA256 `444553c7…fb5a`）；`main` 内容同步为 v1.1.11 + 本表；v1.1.4 当时转为上一稳定版（现为历史版本）。
 - **2026-11-17（工程化加固）**：明确分支职责——`main` 为稳定维护线（只收安全/关键修复）、`customer-v1.1.4` 为已发布稳定版快照、`v2.0.2-dev` 为不对外开发线；补录 `v2.0.2-dev` 分支；按三方评审结论不新建 `v1.1.x-lts` 分支、不公开 beta/rc、不承诺 LTS 支持期限。
 - **2026-11-16（深夜，平台说明与 v1.1.4 资产重发）**：全部分支与发布包的系统要求统一为 **Windows 11 x64（仅 x64 / AMD64，不支持 ARM64）**，删除全部旧系统支持表述（README 双语、RELEASE-NOTES、VERSION.json、包内文档；仅保留 Windows 11，不含 10 及更早版本）；v1.1.4 Release 资产按用户要求重发——仅文档更新、add-in 与运行时二进制零改动，包内 SHA256SUMS 重算 171/171 通过，新 SHA256 `d475f47c3300929d07764efe5ed9e358285fbdb193932bdb40394e43e819c914`（1,712,641 B）；此为「Release 资产只增不改」约定的用户批准例外。
