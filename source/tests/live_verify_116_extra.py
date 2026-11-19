@@ -54,10 +54,12 @@ class Mcp:
             return text
 
 
-RUNCODE = (r"E:\ai工具\claude code_app\project_total\01_project_arcgispro"
-           r"\.claude\arcgis_mcp_runtime\RunCode.pyt")
-TYPO_RUNCODE = (r"E:\ai工具\claude code app\project_total\01_project_arcgispro"
-                 r"\.claude\arcgis_mcp_runtime\RunCode.pyt")
+_DEFAULT_RUNCODE = os.path.join(
+    os.environ.get("LOCALAPPDATA") or os.path.expanduser("~"),
+    "ArcGIS Pro MCP", "runcode", "RunCode.pyt")
+RUNCODE = os.environ.get("MCP_RUNCODE_PYT") or _DEFAULT_RUNCODE
+# The lookup is meant to miss; any path one segment away will do.
+TYPO_RUNCODE = RUNCODE.replace("code_app", "code app")
 
 
 def main():

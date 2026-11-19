@@ -6,14 +6,14 @@
   "commands": 112,
   "requirements": {
     "os": "Windows 11 x64 (AMD64); ARM64 not supported",
-    "arcgis_pro": ">=3.7",
+    "arcgis_pro": "3.7 (built and live-verified on 3.7; later versions untested)",
     "external_deps": "none (PowerShell/.NET provided by Windows and ArcGIS Pro)"
   },
   "addin": {
     "file": "install/ArcGISProMCP.esriAddinX",
     "file_version": "1.1.11.0",
     "desktop_version": "3.7",
-    "sha256": "a728b7ed63b07391a83d49d14e88735d0926e7f2f0b1e4d3e755452d6593f06e"
+    "sha256": "10bad933d0f4fc102da3e36eed588d24ace15aec433a9e3ba61940fcd9f78e85"
   },
   "license": "AGPL-3.0-or-later",
   "upstream": "https://github.com/Knight60/ArcGIS-Pro-MCP",

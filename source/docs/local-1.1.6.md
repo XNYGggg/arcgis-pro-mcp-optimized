@@ -46,7 +46,7 @@
 
 ## 回滚
 
-- 恢复 `C:\Users\123\Documents\ArcGIS\AddIns\ArcGISPro\ArcGISProMCP.esriAddinX` 为 `.bak-20261118-182059`（或 `release\v1.1.6-artifacts\installed-before-upgrade.esriAddinX`），回写 installed.json（version=1.1.5、addin_sha256=DDF544F9…），重启 Pro。
+- 恢复 `%USERPROFILE%\Documents\ArcGIS\AddIns\ArcGISPro\ArcGISProMCP.esriAddinX` 为 `.bak-20261118-182059`（或 `release\v1.1.6-artifacts\installed-before-upgrade.esriAddinX`），回写 installed.json（version=1.1.5、addin_sha256=DDF544F9…），重启 Pro。
 - 源码回滚：删除 `release\v1.1.6-src`；`release\v1.1.5-src` 未改动。
 
 ## 构建记录

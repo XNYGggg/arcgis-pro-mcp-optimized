@@ -55,7 +55,7 @@ dotnet build addin\ArcGISProMCP\ArcGISProMCP.csproj -c Release -p:DeployAddIn=tr
 ## 回滚
 
 - 1.1.4 安装包：`release/downloads/v1.1.4-20261117/`（zip SHA256 `d475f47c…c914`），重跑 `install.ps1` 即回到 1.1.4；
-- 或恢复 `C:\Users\123\Documents\ArcGIS\AddIns\ArcGISPro` 下的 1.1.4 esriAddinX（包内 `install/ArcGISProMCP.esriAddinX`，SHA256 `7e6ca097…86ad4`）并回写 installed.json。
+- 或恢复 `%USERPROFILE%\Documents\ArcGIS\AddIns\ArcGISPro` 下的 1.1.4 esriAddinX（包内 `install/ArcGISProMCP.esriAddinX`，SHA256 `7e6ca097…86ad4`）并回写 installed.json。
 - 源码回滚：删除本目录，1.1.4 快照仍在 `release/customer-v1.1.4/source`（未改动）。
 
 ## 回归记录

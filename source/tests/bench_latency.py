@@ -4,14 +4,16 @@ Measures wall time over MCP HTTP plus the add-in's own elapsed_seconds, so a
 guard warm-up or GP launch cost shows up separately from transport overhead.
 """
 import json
+import os
 import statistics
 import urllib.request
 
-URL = "http://127.0.0.1:6520/mcp"
-RUNCODE = (r"E:\ai工具\claude code_app\project_total\01_project_arcgispro"
-           r"\.claude\arcgis_mcp_runtime\RunCode.pyt")
-SCRIPT = (r"E:\ai工具\claude code_app\project_total\01_project_arcgispro"
-          r"\release\v1.1.6-src\tests\bench_tiny.py")
+URL = os.environ.get("MCP_TEST_URL", "http://127.0.0.1:6520/mcp")
+RUNCODE = os.environ.get("MCP_RUNCODE_PYT") or os.path.join(
+    os.environ.get("LOCALAPPDATA") or os.path.expanduser("~"),
+    "ArcGIS Pro MCP", "runcode", "RunCode.pyt")
+SCRIPT = os.environ.get("MCP_BENCH_SCRIPT") or os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "bench_tiny.py")
 seq = 0
 
 

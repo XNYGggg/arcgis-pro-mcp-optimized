@@ -567,12 +567,15 @@ namespace ArcGISProMCP.Commands
                         : "the tool reported no error text";
                     var cleanup = await DeleteHalfCreatedAsync(datasetPath).ConfigureAwait(false);
                     throw new InvalidOperationException(
-                        $"fields: adding '{request.Name}' failed ({messages}). The "
-                        + "dataset created by this call was deleted so no "
-                        + "half-configured dataset is left behind. Fields added "
-                        + "before the failure: "
+                        $"fields: adding '{request.Name}' failed ({messages}). "
+                        + (cleanup.DatasetDeleted
+                            ? "The dataset created by this call was deleted so no "
+                              + "half-configured dataset is left behind. "
+                            : "The dataset created by this call could not be deleted "
+                              + "and may still exist. ")
+                        + "Fields added before the failure: "
                         + (added.Count == 0 ? "(none)" : string.Join(", ", added)) + "."
-                        + CleanupSuffix(cleanup));
+                        + CleanupSuffix(cleanup.Problems));
                 }
                 added.Add(request.Name);
             }
@@ -591,8 +594,11 @@ namespace ArcGISProMCP.Commands
                 var cleanup = await DeleteHalfCreatedAsync(datasetPath).ConfigureAwait(false);
                 throw new InvalidOperationException(
                     "fields: the dataset was created but could not be read back "
-                    + $"for verification ({exception.Message}). It was deleted."
-                    + CleanupSuffix(cleanup));
+                    + $"for verification ({exception.Message}). "
+                    + (cleanup.DatasetDeleted
+                        ? "It was deleted."
+                        : "Deleting it failed — it may still exist.")
+                    + CleanupSuffix(cleanup.Problems));
             }
 
             var actual = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -646,31 +652,43 @@ namespace ArcGISProMCP.Commands
                 throw new InvalidOperationException(
                     "fields: verification failed after creation: "
                     + string.Join("; ", problems)
-                    + ". The dataset was deleted (fail-loud, no half-configured "
-                    + "dataset is kept)." + CleanupSuffix(cleanup));
+                    + (cleanup.DatasetDeleted
+                        ? ". The dataset was deleted (fail-loud, no half-configured "
+                          + "dataset is kept)."
+                        : ". Deleting the dataset failed — it may still exist.")
+                    + CleanupSuffix(cleanup.Problems));
             }
+        }
+
+        private sealed class CleanupResult
+        {
+            public bool DatasetDeleted;
+            public readonly List<string> Problems = new List<string>();
         }
 
         /// <summary>
         /// Remove a dataset this call just created, plus the map layers and
         /// standalone tables that referenced it. Map objects are resolved by
-        /// their data source before the dataset is deleted, so cleanup works
-        /// on object identity and never guesses by name; any failed step is
-        /// returned so the throw that follows can report it instead of the
-        /// failure happening silently.
+        /// their data source before the dataset is deleted and removed from
+        /// the very map they were captured on, so cleanup works on object
+        /// identity and never guesses by name; every failed step is returned
+        /// so the throw that follows can report it instead of the failure
+        /// happening silently.
         /// </summary>
-        private static async Task<List<string>> DeleteHalfCreatedAsync(string datasetPath)
+        private static async Task<CleanupResult> DeleteHalfCreatedAsync(string datasetPath)
         {
-            var problems = new List<string>();
+            var cleanup = new CleanupResult();
             var layers = new List<Layer>();
             var tables = new List<StandaloneTable>();
+            Map map = null;
 
-            // Capture referencing map objects while the dataset still exists.
+            // Capture the owning map and the referencing objects while the
+            // dataset still exists.
             try
             {
                 await QueuedTask.Run(() =>
                 {
-                    var map = MapView.Active?.Map;
+                    map = MapView.Active?.Map;
                     if (map == null) return;
                     foreach (var layer in map.GetLayersAsFlattenedList().ToList())
                     {
@@ -683,7 +701,12 @@ namespace ArcGISProMCP.Commands
                                     layers.Add(layer);
                             }
                         }
-                        catch { }
+                        catch (Exception exception)
+                        {
+                            cleanup.Problems.Add(
+                                $"reading the data source of layer '{layer.Name}' failed: "
+                                + exception.Message);
+                        }
                     }
                     foreach (var table in map.GetStandaloneTablesAsFlattenedList().ToList())
                     {
@@ -695,13 +718,18 @@ namespace ArcGISProMCP.Commands
                                     tables.Add(table);
                             }
                         }
-                        catch { }
+                        catch (Exception exception)
+                        {
+                            cleanup.Problems.Add(
+                                $"reading the data source of table '{table.Name}' failed: "
+                                + exception.Message);
+                        }
                     }
                 }).ConfigureAwait(false);
             }
             catch (Exception exception)
             {
-                problems.Add("inspecting the map failed: " + exception.Message);
+                cleanup.Problems.Add("inspecting the map failed: " + exception.Message);
             }
 
             // Delete the dataset itself.
@@ -716,26 +744,30 @@ namespace ArcGISProMCP.Commands
                     var text = result.ErrorMessages != null && result.ErrorMessages.Any()
                         ? string.Join("; ", result.ErrorMessages.Select(m => m.Text))
                         : "the tool reported no error text";
-                    problems.Add("deleting the dataset failed: " + text);
+                    cleanup.Problems.Add("deleting the dataset failed: " + text);
+                }
+                else
+                {
+                    cleanup.DatasetDeleted = true;
                 }
             }
             catch (Exception exception)
             {
-                problems.Add("deleting the dataset failed: " + exception.Message);
+                cleanup.Problems.Add("deleting the dataset failed: " + exception.Message);
             }
 
-            // Remove exactly the captured objects, by identity.
+            // Remove exactly the captured objects, from the map they were
+            // captured on -- the active view may have changed by now.
             if (layers.Count > 0 || tables.Count > 0)
             {
                 try
                 {
                     await QueuedTask.Run(() =>
                     {
-                        var map = MapView.Active?.Map;
                         if (map == null)
                         {
-                            problems.Add("no active map view; the created layers "
-                                         + "could not be removed");
+                            cleanup.Problems.Add("no map was captured; the created "
+                                                 + "layers could not be removed");
                             return;
                         }
                         foreach (var layer in layers)
@@ -743,8 +775,8 @@ namespace ArcGISProMCP.Commands
                             try { map.RemoveLayer(layer); }
                             catch (Exception exception)
                             {
-                                problems.Add($"removing layer '{layer.Name}' failed: "
-                                             + exception.Message);
+                                cleanup.Problems.Add($"removing layer '{layer.Name}' failed: "
+                                                     + exception.Message);
                             }
                         }
                         if (tables.Count > 0)
@@ -752,19 +784,19 @@ namespace ArcGISProMCP.Commands
                             try { map.RemoveStandaloneTables(tables); }
                             catch (Exception exception)
                             {
-                                problems.Add("removing standalone tables failed: "
-                                             + exception.Message);
+                                cleanup.Problems.Add("removing standalone tables failed: "
+                                                     + exception.Message);
                             }
                         }
                     }).ConfigureAwait(false);
                 }
                 catch (Exception exception)
                 {
-                    problems.Add("removing map objects failed: " + exception.Message);
+                    cleanup.Problems.Add("removing map objects failed: " + exception.Message);
                 }
             }
 
-            return problems;
+            return cleanup;
         }
 
         private static bool PathEquals(string localPath, string datasetPath)

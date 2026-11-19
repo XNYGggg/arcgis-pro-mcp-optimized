@@ -105,12 +105,19 @@ the restart; every step is timestamped in
 
 Deploy with `scripts\install_addin.ps1` (or `dotnet build -p:DeployAddIn=true`),
 then record the installed build with the one parameterised script — do not
-write a new one-off script per version. It runs inside Pro through
-RunCode.pyt, which passes positional arguments only:
+write a new one-off script per version.
+
+From a normal shell, pass the values on the command line:
 
 ```
 update_installed.py <version> <expected_sha256> [note]
 ```
+
+RunCode.pyt executes the file with `__name__ == "__mcprun__"` and passes no
+argv, so inside Pro either set `MCP_UPDATE_ARGS` to
+`"<version> <expected_sha256> [note]"`, or use a two-line wrapper that sets
+`sys.argv` and `runpy`-runs `update_installed.py`; the script handles both
+entry names.
 
 It refuses to record unless the installed add-in's SHA-256 matches. Set
 `MCP_ADDIN_PATH`, `MCP_INSTALLED_JSON` or `MCP_PACKAGE_ROOT` to point it at
