@@ -3,7 +3,7 @@ name: template-distill
 description: Distill a sample map figure into a reusable layout template spec (import → measure → patch → validate → preview → review → approve → apply).
 ---
 
-# Template Distill · 语义蒸馏作业指导（客户版 1.1.12，模块移植自 2.x）
+# Template Distill · 语义蒸馏作业指导（客户版 1.1.x，模块移植自 2.x；1.1.13 起含删除）
 
 把一张样本成图变成可复用的版式模板。确定性步骤（测量/校验/预览/入库）全部由
 `arcgis-distill` 完成；你只负责**看图写语义字段**。全程一次性命令，无守护进程。
@@ -109,3 +109,16 @@ arcgis-distill bundle-import <name>.zip
 ```
 
 公开分享前确认样本图版权；期刊/教材图不要导出公开 bundle。
+
+## 7. 删除模板（清理）
+
+```text
+arcgis-distill delete <id> --json            # imported/measured/analyzed/validated
+arcgis-distill delete <id> --force --json    # ready（已批准）模板必须先征得用户同意
+```
+
+- 删除内容：spec、index 条目、作业单，以及**不再被其他模板引用**的去重样本图；
+  图片仍被引用时保留，返回的 `removed.image_kept_for` 列出引用者 id。
+- `ready` 模板需 `--force`，且仅当用户明确要求清理时执行（否则退出码 5 拒绝）。
+- 删除不存在的 id 返回 `not_found`（退出码 3）；重复删除安全、不会损坏索引。
+- `inbox` 中的待处理图片不受 delete 影响。

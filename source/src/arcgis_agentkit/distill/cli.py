@@ -5,6 +5,10 @@ One-shot pipeline, no daemon:
     import -> measure -> patch (semantic fields) -> validate -> preview
     -> review -> approve (ready) -> apply
 
+``delete`` removes a template again (spec, index entry, job sheet and its
+sample image when nothing else references it); it is housekeeping, not a
+pipeline step, and an approved ``ready`` template needs ``--force``.
+
 Deterministic steps carry no LLM. The semantic step is described in
 ``skills/template-distill/SKILL.md`` and submitted through ``patch``, which
 merges and validates before writing anything.
@@ -392,6 +396,30 @@ def _apply(args, as_json: bool) -> int:
     return EXIT_OK
 
 
+def _delete(args, as_json: bool) -> int:
+    library = _library(args)
+    spec = _load_spec(library, args.template_id)
+    if spec.get("status") == "ready" and not args.force:
+        return fail(f"template '{args.template_id}' is ready; deleting an approved "
+                    "template needs --force", "ready_template",
+                    exit_code=EXIT_VALIDATION, as_json=as_json)
+    result = library.delete(args.template_id, force=args.force)
+    removed = result["removed"]
+    if removed["image"]:
+        image_note = f"image removed: {removed['image']}"
+    elif removed["image_kept_for"]:
+        image_note = "image kept (shared by: " + ", ".join(removed["image_kept_for"]) + ")"
+    else:
+        image_note = "no image on record"
+    payload = ok(template_id=result["template_id"], deleted=True,
+                 was_status=result["status"], removed=removed,
+                 library=str(library.root))
+    emit(payload, as_json,
+         human=f"deleted {result['template_id']} (was {result['status']}); "
+               f"{image_note}")
+    return EXIT_OK
+
+
 def _inbox(args, as_json: bool) -> int:
     from .measure import measure_image
 
@@ -504,6 +532,13 @@ def _build_parser() -> argparse.ArgumentParser:
     inbox.add_argument("--process-new", action="store_true")
     inbox.add_argument("--width-in", type=float, default=6.7)
     inbox.set_defaults(func=_inbox)
+
+    delete = sub.add_parser(
+        "delete", help="delete a template and its unshared sample image")
+    delete.add_argument("template_id")
+    delete.add_argument("--force", action="store_true",
+                        help="also delete an approved (ready) template")
+    delete.set_defaults(func=_delete)
 
     return parser
 

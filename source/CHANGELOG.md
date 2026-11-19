@@ -4,6 +4,31 @@ Notable changes, newest first. Versions are the add-in version in
 `addin/ArcGISProMCP/Config.daml`, which is what the ribbon, the installer and
 the MCP handshake all report.
 
+## 1.1.13 — 2026-11-19
+
+### Added
+
+- **`template_delete`** — the template library can delete a template again. The
+  tool wraps a new `arcgis-distill delete <id> [--force]` command that removes
+  the spec, the index entry, the job sheet and the deduplicated sample image
+  when no other template still references it; a shared image is kept and
+  reported (`removed.image_kept_for`). Deleting an unknown id reports
+  `not_found` (exit 3) and a repeated delete is safe; an approved (`ready`)
+  template needs `--force` (exit 5 otherwise); `inbox` is untouched. This
+  closes the acceptance-cleanup gap where clearing a verification template
+  meant hand-editing the index.
+- `tests/test_distill.py` covers deletion (unshared image removed, shared
+  image kept, `not_found` for unknown ids, the ready gate); the `Template`
+  group in `catalog.py`, `Resources/tools.json` and the README tool tables
+  now list eleven `template_*` tools (**126 tools / 123 commands**).
+
+### Changed
+
+- `docs/distill.md` and `skills/template-distill/SKILL.md` gained the delete
+  section; the four-language READMEs, `docs/使用指南.md`, `RELEASE-NOTES.md` and
+  `VERSION.json` were bumped to 1.1.13 (Config.daml / csproj / pyproject /
+  `arcgis_agentkit` module version included).
+
 ## 1.1.12 — 2026-11-19
 
 ### Added

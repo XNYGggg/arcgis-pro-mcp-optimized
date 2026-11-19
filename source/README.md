@@ -217,7 +217,7 @@ connected, and the last error.
 
 <!-- TOOLS:START -->
 
-**125 tools.** Anything not listed is still reachable through `run_geoprocessing_tool` or `execute_arcpy_code`.
+**126 tools.** Anything not listed is still reachable through `run_geoprocessing_tool` or `execute_arcpy_code`.
 
 ### Session and project (16)
 
@@ -394,7 +394,7 @@ connected, and the last error.
 | `stop_pump` | Remove the main-thread dispatcher |
 | `run_batch` | Run several commands in one round trip -- much faster for multi-step workflows |
 
-### Template distillation (10)
+### Template distillation (11)
 
 | Tool | What it does |
 |---|---|
@@ -408,6 +408,7 @@ connected, and the last error.
 | `template_approve` | Approve a reviewed, validated template so it becomes ready to apply |
 | `template_preview` 🖼️ | Render the template as a wireframe PNG next to the sample figure and return the image so it can be checked visually |
 | `template_apply` | Write a ready template into a mapping context JSON file (layout, palette, typography) for the assistant to follow while composing a map |
+| `template_delete` ⚠️ | Delete a distilled template from the local library: its spec, index entry, job sheet and its sample image when no other template references it |
 
 ⚠️ = changes or deletes real data &nbsp;&nbsp; 🖼️ = returns an image the AI can look at
 

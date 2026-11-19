@@ -1,9 +1,9 @@
 {
-  "name": "ArcGIS Pro MCP 优化版客户版 Customer 1.1.12（1.14 增强版 + 模板蒸馏，构建号 1.1.12）",
-  "version": "1.1.12",
+  "name": "ArcGIS Pro MCP 优化版客户版 Customer 1.1.13（1.14 增强版 + 模板蒸馏 + 模板删除，构建号 1.1.13）",
+  "version": "1.1.13",
   "built": "2026-11-19",
-  "tools": 125,
-  "commands": 122,
+  "tools": 126,
+  "commands": 123,
   "requirements": {
     "os": "Windows 11 x64 (AMD64); ARM64 not supported",
     "arcgis_pro": "3.7 (built and live-verified on 3.7; later versions untested)",
@@ -11,17 +11,17 @@
   },
   "addin": {
     "file": "install/ArcGISProMCP.esriAddinX",
-    "file_version": "1.1.12.0",
+    "file_version": "1.1.13.0",
     "desktop_version": "3.7",
-    "sha256": "a20e263b041e78a1f5631b1dd4efc1b7946c05a28038751dc20c38f0ab55c6c7",
-    "size": 476195
+    "sha256": "4b90bb43f0bad77de817f19f0c342603ce9b2603c36e285066cf623b643d7419",
+    "size": 476408
   },
   "license": "AGPL-3.0-or-later",
   "upstream": "https://github.com/Knight60/ArcGIS-Pro-MCP",
   "source": "source/",
-  "branch": "customer-v1.1.11-distill",
+  "branch": "customer-v1.1.13-delete",
   "release": {
     "status": "enhanced",
-    "note": "1.14 增强版（构建号 1.1.12），在 1.1.11 基础上合入 2.x 模板蒸馏模块（10 个 template_* 工具 + arcgis-distill CLI + 模板库）；v1.1.4 为已发布稳定版（推荐）；本分支未创建 Release/发行版资产"
+    "note": "1.14 增强版（构建号 1.1.13），在 1.1.12 基础上为模板库新增 template_delete（删除 spec/index 条目/作业单/无引用去重图片，ready 模板需 --force）；v1.1.4 为已发布稳定版（推荐）；本分支未创建 Release/发行版资产"
   }
 }

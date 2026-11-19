@@ -252,6 +252,105 @@ class TemplateLibrary:
             raise ValueError("source_image escapes the library root") from exc
         return candidate
 
+    # -- deletion ----------------------------------------------------------
+
+    def delete(self, template_id: str, force: bool = False) -> dict[str, Any]:
+        """Delete a template: spec, index entry, job sheet and unshared image.
+
+        A second delete of the same id reports ``not_found`` and changes
+        nothing (the CLI maps that to exit code 3). An approved (``ready``)
+        template is the product of a review someone signed off on, so it needs
+        ``force`` - the same gate ``approve`` uses in reverse.
+        """
+        with self._lock():
+            data = self.index()
+            entries = data.get("templates", [])
+            entry = next((item for item in entries if item.get("id") == template_id), None)
+            path = self.spec_path(template_id)
+            if entry is None and not path.is_file():
+                raise FileNotFoundError(
+                    f"template '{template_id}' not found in {self.root}")
+            spec: dict[str, Any] = {}
+            if path.is_file():
+                try:
+                    spec = json.loads(path.read_text(encoding="utf-8-sig"))
+                except (OSError, ValueError):
+                    spec = {}
+            status = spec.get("status") or (entry or {}).get("status") or "unknown"
+            if status == "ready" and not force:
+                raise ValueError(
+                    f"template '{template_id}' is ready; deleting an approved "
+                    "template needs force")
+
+            image_relative = spec.get("source_image") or (entry or {}).get("image")
+            image_digest = spec.get("image_sha256") or (entry or {}).get("image_sha256")
+
+            data["templates"] = [item for item in entries
+                                 if item.get("id") != template_id]
+            self._write_index(data)
+            removed_spec = False
+            if path.is_file():
+                path.unlink()
+                removed_spec = True
+
+            # The image is stored once per sha256 and may be shared by templates
+            # that arrived through bundle-import, so it is removed only when no
+            # remaining spec references the same file or digest.
+            image_referenced_by: list[str] = []
+            image_removed = False
+            if image_relative:
+                for other in data["templates"]:
+                    if other.get("image") == image_relative or (
+                            image_digest and other.get("image_sha256") == image_digest):
+                        image_referenced_by.append(other.get("id"))
+                if not image_referenced_by:
+                    for other_path in self.specs.glob("*.json"):
+                        if other_path.stem == template_id:
+                            continue
+                        try:
+                            other_spec = json.loads(
+                                other_path.read_text(encoding="utf-8-sig"))
+                        except (OSError, ValueError):
+                            # An unreadable spec may reference the image; keep it.
+                            image_referenced_by.append(other_path.stem)
+                            continue
+                        if other_spec.get("source_image") == image_relative or (
+                                image_digest
+                                and other_spec.get("image_sha256") == image_digest):
+                            image_referenced_by.append(
+                                other_spec.get("id") or other_path.stem)
+                if not image_referenced_by:
+                    candidate = (self.root / str(image_relative)).resolve()
+                    try:
+                        candidate.relative_to(self.root.resolve())
+                        inside_images = candidate.parent == self.images.resolve()
+                    except ValueError:
+                        inside_images = False
+                    if inside_images and candidate.is_file():
+                        candidate.unlink()
+                        image_removed = True
+
+            job_path = self.jobs / f"{template_id}.json"
+            job_removed = False
+            if job_path.is_file():
+                try:
+                    job_path.unlink()
+                    job_removed = True
+                except OSError:
+                    pass
+
+            return {
+                "template_id": template_id,
+                "status": status,
+                "removed": {
+                    "index_entry": entry is not None,
+                    "spec": removed_spec,
+                    "image": image_relative if image_removed else None,
+                    "image_kept_for": sorted(item for item in image_referenced_by if item),
+                    "job": job_removed,
+                },
+            }
+
     # -- job sheets --------------------------------------------------------
 
     def job(self, template_id: str) -> dict[str, Any]:

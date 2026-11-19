@@ -1,7 +1,7 @@
 [project]
 name = "arcgis-pro-mcp"
-version = "1.1.12"
-description = "MCP server that lets AI assistants drive a live ArcGIS Pro session: 125 tools plus full arcpy access and template distillation"
+version = "1.1.13"
+description = "MCP server that lets AI assistants drive a live ArcGIS Pro session: 126 tools plus full arcpy access and template distillation"
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [{ name = "Pisut Nakmuenwai" }]

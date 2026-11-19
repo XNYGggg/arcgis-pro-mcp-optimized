@@ -147,3 +147,61 @@ def test_forced_approve_records_a_complete_review(pipeline):
     assert spec["status"] == "ready"
     review = spec.get("review") or {}
     assert review.get("by") and review.get("date")
+
+
+def test_delete_removes_template_and_unshared_image(pipeline):
+    _tmp, library, template_id = pipeline
+    image = library.image_path(library.get(template_id))
+    assert image.is_file()
+    job = library.jobs / f"{template_id}.json"
+    assert job.is_file()
+
+    assert main(["delete", template_id, "--json"]) == 0
+
+    assert library.list() == []
+    assert not library.spec_path(template_id).exists()
+    assert not image.exists()
+    assert not job.exists()
+
+
+def test_delete_keeps_image_shared_by_another_template(pipeline, tmp_path):
+    _tmp, library, template_id = pipeline
+    bundle = tmp_path / "bundle.zip"
+    assert main(["export", template_id, "--out", str(bundle), "--json"]) == 0
+    # bundle-import reuses the stored image file, so two specs now share it.
+    assert main(["bundle-import", str(bundle), "--json"]) == 0
+    assert len(library.list()) == 2
+    image = library.image_path(library.get(template_id))
+    assert image.is_file()
+
+    assert main(["delete", template_id, "--json"]) == 0
+    assert image.is_file(), "the image is still referenced by the other template"
+
+    remaining = library.list()[0]["id"]
+    assert main(["delete", remaining, "--json"]) == 0
+    assert not image.exists(), "last reference gone -> image is removed"
+
+
+def test_delete_unknown_id_is_not_found(pipeline, capsys):
+    _tmp, library, template_id = pipeline
+    assert main(["delete", "no-such-template", "--json"]) == 3
+    envelope = json.loads(capsys.readouterr().out.strip().splitlines()[-1])
+    assert envelope["ok"] is False
+    assert envelope["code"] == "not_found"
+
+    assert main(["delete", template_id, "--json"]) == 0
+    # Idempotent: a second delete reports not_found and changes nothing.
+    assert main(["delete", template_id, "--json"]) == 3
+    assert library.list() == []
+
+
+def test_delete_ready_template_requires_force(pipeline):
+    _tmp, library, template_id = pipeline
+    assert main(["approve", template_id, "--force", "--json"]) == 0
+    assert library.get(template_id)["status"] == "ready"
+
+    assert main(["delete", template_id, "--json"]) == 5
+    assert library.get(template_id)["status"] == "ready"
+
+    assert main(["delete", template_id, "--force", "--json"]) == 0
+    assert library.list() == []

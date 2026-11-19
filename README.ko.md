@@ -1,14 +1,14 @@
-[![English](https://img.shields.io/badge/Language-English-1f6feb?style=flat-square)](README.md) [![简体中文](https://img.shields.io/badge/Language-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-d1242f?style=flat-square)](README.zh-CN.md) [![日本語](https://img.shields.io/badge/Language-%E6%97%A5%E6%9C%AC%E8%AA%9E-bc002d?style=flat-square)](README.ja.md) [![한국어](https://img.shields.io/badge/Language-%ED%95%9C%EA%B5%AD%EC%96%B4-0047a0?style=flat-square)](README.ko.md) [![Version](https://img.shields.io/badge/Version-Customer%201.1.12-2ea44f?style=flat-square)](VERSION.json) [![Changelog](https://img.shields.io/badge/Docs-Changelog-6f42c1?style=flat-square)](docs/CHANGELOG.md) [![License: AGPL v3+](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue?style=flat-square)](LICENSE) [![ArcGIS Pro](https://img.shields.io/badge/ArcGIS%20Pro-3.7-00a1e0?style=flat-square)](https://www.esri.com/en-us/arcgis/products/arcgis-pro/overview) [![Platform](https://img.shields.io/badge/Platform-Windows%2011%20x64-lightgrey?style=flat-square)]()
+[![English](https://img.shields.io/badge/Language-English-1f6feb?style=flat-square)](README.md) [![简体中文](https://img.shields.io/badge/Language-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-d1242f?style=flat-square)](README.zh-CN.md) [![日本語](https://img.shields.io/badge/Language-%E6%97%A5%E6%9C%AC%E8%AA%9E-bc002d?style=flat-square)](README.ja.md) [![한국어](https://img.shields.io/badge/Language-%ED%95%9C%EA%B5%AD%EC%96%B4-0047a0?style=flat-square)](README.ko.md) [![Version](https://img.shields.io/badge/Version-Customer%201.1.13-2ea44f?style=flat-square)](VERSION.json) [![Changelog](https://img.shields.io/badge/Docs-Changelog-6f42c1?style=flat-square)](docs/CHANGELOG.md) [![License: AGPL v3+](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue?style=flat-square)](LICENSE) [![ArcGIS Pro](https://img.shields.io/badge/ArcGIS%20Pro-3.7-00a1e0?style=flat-square)](https://www.esri.com/en-us/arcgis/products/arcgis-pro/overview) [![Platform](https://img.shields.io/badge/Platform-Windows%2011%20x64-lightgrey?style=flat-square)]()
 
-# 🗺️ ArcGIS Pro MCP (Optimized) · Customer 1.1.12 (1.14 개선판 + 템플릿 증류) 🚀
+# 🗺️ ArcGIS Pro MCP (Optimized) · Customer 1.1.13 (1.14 개선판 + 템플릿 증류) 🚀
 
 자연어 한 문장으로 AI 어시스턴트가 이미 열어 둔 ArcGIS Pro 프로젝트를 직접 조작합니다: 레이어 추가, 심볼 변경, 속성 조회, 지오프로세싱 실행, 지도 내보내기. 데이터는 이 컴퓨터를 떠나지 않으며 모든 통신은 `127.0.0.1`을 통해서만 이루어집니다 🔒.
 
-> **🚀 이 브랜치는 Customer 1.1.12(1.14 개선판 + 템플릿 증류, 빌드 번호 1.1.12)입니다**: **v1.1.4** 위에 1.14 이후의 수정 — 1.1.5(F1–F10), 1.1.6(V-1–V-7), 2026-11-18 실기 전체 테스트에서 확인된 P0–P2 결함 수정(1.1.7–1.1.9), 1.1.10의 재시작 자가 치유, 1.1.11의 정리 수정, 1.1.12에서 2.x로부터 통합한 템플릿 증류 모듈 — 을 쌓았습니다. **v1.1.4는 이미 안정판으로 정식 릴리스되었습니다(권장)**; 이 브랜치는 **자체 Release 자산을 제공하지 않습니다** — 설치 패키지는 `install/`에 포함되어 있으며 언제든 v1.1.4로 롤백할 수 있습니다.
+> **🚀 이 브랜치는 Customer 1.1.13(1.14 개선판 + 템플릿 증류, 빌드 번호 1.1.13)입니다**: **v1.1.4** 위에 1.14 이후의 수정 — 1.1.5(F1–F10), 1.1.6(V-1–V-7), 2026-11-18 실기 전체 테스트에서 확인된 P0–P2 결함 수정(1.1.7–1.1.9), 1.1.10의 재시작 자가 치유, 1.1.11의 정리 수정, 1.1.12에서 2.x로부터 통합한 템플릿 증류 모듈, 1.1.13의 템플릿 삭제(template_delete) — 을 쌓았습니다. **v1.1.4는 이미 안정판으로 정식 릴리스되었습니다(권장)**; 이 브랜치는 **자체 Release 자산을 제공하지 않습니다** — 설치 패키지는 `install/`에 포함되어 있으며 언제든 v1.1.4로 롤백할 수 있습니다.
 
 > **📌 버전 안내(2026-11-16 갱신)**: **1.0 계열(v1.1.4 정식 고객판)은 매우 안정적이며 일상 사용에 권장됩니다**; **2.0 계열은 테스트 버전**으로 최적화가 미완료이며 GitHub Release 자산과 태그가 제거되어 **다운로드할 수 없습니다**. 2.0 코드는 `customer-v2.0.1` / `customer-v2.0.0` 브랜치에만 남아 있습니다.
 
-> **🙏 업스트림 프로젝트와 원저자**: 본 고객판은 **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**(원저자 **Pisut Nakmuenwai**, AGPL-3.0-or-later)를 기반으로 **v1.1.12**까지 로컬 패치를 누적한 것입니다. 전체 저작자 표시와 수정 고지는 `NOTICE` 및 `source/SOURCE-NOTICE.md`에 있습니다.
+> **🙏 업스트림 프로젝트와 원저자**: 본 고객판은 **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**(원저자 **Pisut Nakmuenwai**, AGPL-3.0-or-later)를 기반으로 **v1.1.13**까지 로컬 패치를 누적한 것입니다. 전체 저작자 표시와 수정 고지는 `NOTICE` 및 `source/SOURCE-NOTICE.md`에 있습니다.
 
 이 패키지는 실행에 필요한 **모든 구성 요소**를 함께 담고 있어 완전 오프라인으로 동작합니다. **Python 설치 불필요, pip 불필요, 인터넷 불필요**이며 ArcGIS Pro 자체 외에는 어떤 의존성도 없습니다. 배터리까지 들어 있습니다 🔋
 
@@ -16,7 +16,7 @@
 
 ## 🆚 1.14(v1.1.4) 대비 업그레이드 내용
 
-아래는 모두 v1.1.4 고객 패키지 이후 반영된 변경입니다. 도구 수 113 → **125**(1.1.5에서 `add_table`과 `restart_pro` 추가, 1.1.12에서 2.x 템플릿 증류 모듈 통합: `template_*` 도구 10개 추가); add-in 바이너리 해시 `A20E263B…C6C7`(476,195 바이트).
+아래는 모두 v1.1.4 고객 패키지 이후 반영된 변경입니다. 도구 수 113 → **126**(1.1.5에서 `add_table`과 `restart_pro` 추가, 1.1.12에서 2.x 템플릿 증류 모듈 통합으로 `template_*` 도구 10개 추가, 1.1.13에서 `template_delete` 추가); add-in 바이너리 해시 ``4B90BB43…3D7419``(476,408 바이트).
 
 | 빌드 | 유형 | 주요 내용 |
 |---|---|---|
@@ -28,10 +28,11 @@
 | **1.1.10** | 재시작 자가 치유 | `restart_pro` 타임아웃 자가 치유 — 저장 대화상자 탐지를 자식 프로세스로 바꾸고 15초 하드 타임아웃(초과 시 포기하고 로그); 버튼 매칭이 현지화된 `是(Y) / 否(N) / 取消(C)` 지원; `restart.log`는 UTF-8로 단계 하트비트 기록; TCP 연결 5초 타임아웃; Pro를 강제 종료하지 않는 원칙 유지. 재시작 예약 플래그는 10분 후 만료되어 어시스턴트가 죽어도 새 요청을 영구히 거부하지 않음. 배포는 `scripts/update_installed.py`(위치 인자, 해시 불일치 시 거부)로 단일화 |
 | **1.1.11** | 정리 수정 | `create_feature_class` / `create_table` 실패 시 정리가 데이터셋 삭제 전에 데이터 소스로 맵 레이어/독립 테이블을 해석하고 객체 동일성으로 제거 — 이름만 같은 무관한 레이어는 오삭제하지 않음. 정리 실패는 도구 오류에 보고(예외를 삼키지 않음). `scripts/update_installed.py`의 이 컴퓨터 경로 하드코딩 제거; 빌드가 소스 경로를 DLL/PDB에서 매핑 제거 |
 | **1.1.12** | 템플릿 증류 | 2.x 템플릿 증류 모듈 통합: `template_*` 도구 10개 + `arcgis-distill` CLI(Pro 내장 Python 사용, 추가 의존성 없음) + 로컬 템플릿 라이브러리(`%LOCALAPPDATA%\ArcGIS Pro MCP\library`, 업그레이드 시 유지); `skills/template-distill`과 `docs/distill.md` 추가; 도구 수 115→125, 명령 112→122 |
+| **1.1.13** | 템플릿 삭제 | 템플릿 라이브러리에 `template_delete` 추가 — 템플릿의 spec, 색인 항목, 작업 시트, 중복 제거된 샘플 이미지(다른 템플릿이 참조하면 유지)를 삭제; approved(ready) 템플릿은 `force` 필요; 도구 수 125→126, 명령 122→123 |
 
 이 컴퓨터 실기 검증(**ArcGIS Pro 3.7 전용**): 1.1.7 회귀 21/21 PASS; 1.1.8 연속 두 라운드 0 실패; 1.1.9 P2 10/10 및 P1 재실행 0 실패; 1.1.10 핸드셰이크 `1.1.10.0`; 1.1.11 핸드셰이크 `1.1.11.0`, ping `command_count=112`, D1 필드 회귀는 현재 테스트 프로젝트에 적용되는 모든 어서션 PASS(4개 레거시 어서션은 퇴역 프로젝트의 레이어 이름 참조), `get_features` 페이징/요약/정밀도 실기 재확인. 다른 Pro 버전은 미검증.
 
-1.1.12(템플릿 증류 이식): 빌드 전 과정 통과(client-registration / installer / HTTP net8.0+net10.0), `tests/test_distill.py` 7/7, `tests/test_catalog_matches_bridge.py` 4/4 통과. 전문가급 지도 도판 50장 일괄 증류 테스트(증류 가능한 49장 전부 성공, 표지 1장은 정상 거부)와 3자 리뷰 기록은 `release/distill-verify-20261119/`에 있습니다. 실기(Pro 3.7, 실제 터미널): 설치 후 핸드셰이크 `1.1.12.0`, `ping` 명령 수 **122**; MCP 경유 `template_*` 전체 흐름(import→measure→patch→validate→preview→review→approve→apply) **11/11 통과**, 공식 자체 점검 21 통과 / 0 실패. 자세한 내용은 `docs/CHANGELOG.md`와 `RELEASE-NOTES.md`.
+1.1.13(템플릿 삭제): 빌드 전 과정 통과(client-registration / installer / HTTP net8.0+net10.0), `tests/test_distill.py` 11/11(신규 삭제 4개: 공유되지 않은 이미지 삭제, 공유 이미지 유지, 미지의 id not_found, ready는 force 필요), `tests/test_catalog_matches_bridge.py` 4/4 통과. `tools.json`과 `catalog.py`는 126개 도구 / 123개 명령에서 완전 동일. 1.1.12 실기 인수 기록(핸드셰이크, 125개 도구, `template_*` 전체 흐름 11/11, 공식 자체 점검 21 통과 / 0 실패)은 `docs/CHANGELOG.md`에 있습니다.
 
 ---
 
@@ -157,7 +158,7 @@ Streamable HTTP로 `http://127.0.0.1:6520/mcp`에 연결하거나 위의 범용 
 
 | 모듈 | 한 줄 역할 | 사용 시점 | 본 버전 상태 |
 |---|---|---|---|
-| 🧩 **MCP 애드인** | AI와 Pro를 잇는 유일한 간선: 125개 MCP 도구 + RunCode / Python 브리지 두 arcpy 경로 | 일상의 모든 작업, 배치 스크립트, `CURRENT`가 필요한 대화형 세션 | ✅ 설치 즉시 사용 |
+| 🧩 **MCP 애드인** | AI와 Pro를 잇는 유일한 간선: 126개 MCP 도구 + RunCode / Python 브리지 두 arcpy 경로 | 일상의 모든 작업, 배치 스크립트, `CURRENT`가 필요한 대화형 세션 | ✅ 설치 즉시 사용 |
 | 🛡️ **다이얼로그 가드** | "서드파티 코드 라이브러리" 신뢰 대화상자를 자동 클릭, 못 누르면 최상위 링 알림 | 첫 RunCode.pyt 실행, 무인 배치 | ✅ 독립 스크립트 `03-dialog-guard.cmd` |
 | 🧪 **템플릿 증류** | 샘플 도면을 재사용 가능한 레이아웃 템플릿으로 증류해 배치 출력 양식 통일 | 여러 지도에 같은 양식, 논문/보고서 그림 재현 | ✅ 1.1.12부터 포함(2.x 이식) |
 
@@ -192,7 +193,7 @@ Streamable HTTP로 `http://127.0.0.1:6520/mcp`에 연결하거나 위의 범용 
 ### 🧪 모듈 3: 템플릿 증류(1.1.12부터 포함, 2.x에서 이식)
 
 - **역할**: 샘플 완성 도면을 재사용 가능한 레이아웃 템플릿으로 증류; 이후 배치 출력은 템플릿을 적용해 양식이 통일·재현됩니다.
-- **사용 방법**: 본 버전에 **포함됨**(1.1.12부터, 2.x 이식). 어시스턴트에게 "이 그림을 템플릿으로 증류해 줘"라고 하면 `import → measure → patch → validate → preview → review → approve → apply` 흐름으로 10개 `template_*` 도구를 실행합니다. 결정적 단계는 `arcgis-distill`이 수행하고, 의미 필드는 어시스턴트가 `skills/template-distill/SKILL.md`에 따라 작성합니다. 템플릿 라이브러리는 `%LOCALAPPDATA%\ArcGIS Pro MCP\library`이며 업그레이드 시 유지됩니다.
+- **사용 방법**: 본 버전에 **포함됨**(1.1.12부터, 2.x 이식). 어시스턴트에게 "이 그림을 템플릿으로 증류해 줘"라고 하면 `import → measure → patch → validate → preview → review → approve → apply` 흐름으로 11개 `template_*` 도구를 실행합니다. 결정적 단계는 `arcgis-distill`이 수행하고, 의미 필드는 어시스턴트가 `skills/template-distill/SKILL.md`에 따라 작성합니다. 템플릿 라이브러리는 `%LOCALAPPDATA%\ArcGIS Pro MCP\library`이며 업그레이드 시 유지됩니다.
 - **프롬프트 작성법**: 템플릿에 이름을 붙이고 흐름과 확인 지점을 적기.
   - ✅ "`D:\samples\fig3.png`를 '연구구역 개관도' 템플릿으로 증류: import → measure → patch → validate → preview, 미리보기를 먼저 나에게 확인시켜 주고, 확인 후 review + approve."
   - ✅ "'연구구역 개관도' 템플릿으로 `maps`의 각 지도를 A3 PDF로 출력, 제목은 지도 이름, 출력은 `D:\out\maps\`."
@@ -351,30 +352,30 @@ print(mcp_bridge.start_pump())
 
 ## 🧪 증류 모듈에 대하여(1.1.12부터 포함)
 
-본 브랜치는 **1.1.12**부터 템플릿 증류를 **포함**합니다(2.x에서 전면 이식): 10개 `template_*` 도구 + `arcgis-distill` CLI + 로컬 템플릿 라이브러리. 2.x 고유의 `guard_summon` / `guard_status`는 여전히 본 라인에 없으며, 다이얼로그 가드는 독립 스크립트 `03-dialog-guard.cmd`를 그대로 사용합니다.
+본 브랜치는 **1.1.12**부터 템플릿 증류를 **포함**합니다(2.x에서 전면 이식, 1.1.13에서 `template_delete` 추가): 11개 `template_*` 도구 + `arcgis-distill` CLI + 로컬 템플릿 라이브러리. 2.x 고유의 `guard_summon` / `guard_status`는 여전히 본 라인에 없으며, 다이얼로그 가드는 독립 스크립트 `03-dialog-guard.cmd`를 그대로 사용합니다.
 
-- 10개 `template_*` 도구: import / measure / patch / validate / preview / review / approve / apply / list / get;
+- 11개 `template_*` 도구: import / measure / patch / validate / preview / review / approve / apply / list / get / delete;
 - 템플릿 라이브러리는 `%LOCALAPPDATA%\ArcGIS Pro MCP\library`(업그레이드 시 유지);
 - 결정적 단계(measure / validate / preview / import)는 Pro 내장 Python의 `arcgis-distill`이 수행(추가 의존성 없음); 의미 필드는 어시스턴트가 `skills/template-distill/SKILL.md`에 따라 작성하며 도구 자체는 API 키가 필요 없습니다;
 - 대표 사용법: "`D:\samples\fig3.png`를 '연구구역 개관도' 템플릿으로 증류; import → measure → patch → validate → preview 흐름으로, 미리보기 확인 후 review + approve."
 
-1.1.12와 2.x 기능 비교:
+1.1.13과 2.x 기능 비교:
 
-| 기능 | 1.1.12(본 브랜치) | 2.x |
+| 기능 | 1.1.13(본 브랜치) | 2.x |
 |---|---|---|
-| 네이티브 MCP 도구 | 125개(13그룹) | 125개(14그룹, guard 2개 포함) |
+| 네이티브 MCP 도구 | 126개(13그룹) | 125개(14그룹, guard 2개 포함) |
 | RunCode / Python 브리지 | ✅ | ✅ |
 | 다이얼로그 가드 | 독립 스크립트 `03-dialog-guard.cmd` | `guard_summon` / `guard_status` + RunCode 자동 arm/settle |
-| 템플릿 증류 | ✅ 10개 `template_*` 도구 + schema v1.1 | ✅ 동일 |
+| 템플릿 증류 | ✅ 11개 `template_*` 도구 + schema v1.1 | ✅ 동일 |
 
 ---
 
-## 🧰 전체 125개 MCP 도구(13그룹)
+## 🧰 전체 126개 MCP 도구(13그룹)
 
 어시스턴트가 할 수 있는 일의 전부를 이름으로 나열합니다. 클릭해서 펼치기 👇
 
 <details>
-<summary><b>📜 전체 도구 목록 — 세션 16 · 레이어 20 · 데이터 11 · 선택 6 · 필드/데이터셋 11 · 지오프로세싱 7 · 심볼 6 · 뷰 7 · 레이아웃 16 · 래스터 5 · 카탈로그 6 · 유틸리티 4 · 템플릿 증류 10</b></summary>
+<summary><b>📜 전체 도구 목록 — 세션 16 · 레이어 20 · 데이터 11 · 선택 6 · 필드/데이터셋 11 · 지오프로세싱 7 · 심볼 6 · 뷰 7 · 레이아웃 16 · 래스터 5 · 카탈로그 6 · 유틸리티 4 · 템플릿 증류 11</b></summary>
 
 ### 세션과 프로젝트(16)
 
@@ -551,7 +552,7 @@ print(mcp_bridge.start_pump())
 | `stop_pump` | 메인 스레드 디스패처 제거; 라이브 프로젝트 명령은 재설치 전까지 동작하지 않음. |
 | `run_batch` | 여러 명령을 한 번의 왕복으로 실행 — 다단계 워크플로가 훨씬 빠름; 이미지 결과는 기본적으로 path/bytes/sha로 축약되고 각 단계의 밀리초도 반환. |
 
-### 템플릿 증류(10)
+### 템플릿 증류(11)
 
 | 도구 | 용도 |
 |---|---|
@@ -565,6 +566,7 @@ print(mcp_bridge.start_pump())
 | `template_approve` | 리뷰·검증을 마친 템플릿을 ready로 승인; 검증 오류나 리뷰 누락 시 거부(force는 덮어쓰고 기록). |
 | `template_preview` | 템플릿 와이어프레임 PNG를 샘플 도면과 나란히 렌더링해 육안 확인에 제공. |
 | `template_apply` | ready 템플릿을 제작 컨텍스트 JSON(레이아웃/팔레트/타이포그래피)으로 기록, 어시스턴트가 이를 따라 출도. |
+| `template_delete` | 라이브러리에서 템플릿 삭제 — spec, 색인 항목, 작업 시트, 다른 템플릿이 참조하지 않는 샘플 이미지; approved(ready) 템플릿은 force 필요. |
 </details>
 
 ---
@@ -573,7 +575,7 @@ print(mcp_bridge.start_pump())
 
 | 경로 | 내용 | 설명 |
 |---|---|---|
-| `install\ArcGISProMCP.esriAddinX` | 🧩 add-in v1.1.12 | 125개 MCP 도구 + 모든 GP 도구; HTTP MCP 6520 / 구형 TCP 6510 |
+| `install\ArcGISProMCP.esriAddinX` | 🧩 add-in v1.1.13 | 126개 MCP 도구 + 모든 GP 도구; HTTP MCP 6520 / 구형 TCP 6510 |
 | `install\runtime\distill\` | 🧪 템플릿 증류 | `arcgis-distill` CLI + `arcgis_agentkit` 패키지(Pro 내장 Python 실행); 템플릿 라이브러리는 `%LOCALAPPDATA%\ArcGIS Pro MCP\library`(업그레이드 시 유지) |
 | `install\runtime\stdio-bridge.ps1` | 🌉 stdio 브리지 | 로컬 프로세스만 실행할 수 있는 클라이언트(Claude Desktop 등)를 6520에 연결; 순수 PowerShell, Python 불필요 |
 | `install\runtime\runcode\RunCode.pyt` | 🐍 RunCode 도구상자 | 임의 arcpy를 자주 실행할 때 사용; 첫 실행 시 신뢰 확인 1회 |
@@ -635,7 +637,7 @@ print(mcp_bridge.start_pump())
 
 ## 📜 버전과 라이선스
 
-- 🏷️ 버전: **1.1.12**(Customer 1.1.12 · 1.14 개선판 + 템플릿 증류; 빌드 날짜는 `VERSION.json`, 도구 수 125)
+- 🏷️ 버전: **1.1.13**(Customer 1.1.13 · 1.14 개선판 + 템플릿 증류; 빌드 날짜는 `VERSION.json`, 도구 수 126)
 - 👤 관리자: **Law**([@XNYGggg](https://github.com/XNYGggg))
 - 🙏 업스트림 프로젝트와 원저자: **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**, 저자 **Pisut Nakmuenwai**(AGPL-3.0-or-later). 본 패키지는 1.1.12까지 로컬 패치를 누적했습니다(변경점은 `docs\CHANGELOG.md`와 `RELEASE-NOTES.md`).
 - ⚖️ 라이선스: **AGPL-3.0-or-later**(전체 소스 스냅샷과 업스트림 NOTICE 포함)

@@ -1,4 +1,32 @@
-# 发布说明 · Customer 1.1.12（1.14 增强版 + 模板蒸馏，构建号 1.1.12，2026-11-19）
+# 发布说明 · Customer 1.1.13（1.14 增强版 + 模板蒸馏 + 模板删除，构建号 1.1.13，2026-11-19）
+
+> **🚀 发布定位**：本包是 **Customer 1.1.13**，在 Customer 1.1.12 的基础上为模板库补齐**删除命令**（`template_delete` / `arcgis-distill delete`）——验收清理模板不再需要手工改 index/文件；其余能力与 1.1.12 完全一致（含 1.1.12 模板蒸馏与 1.1.5–1.1.11 全部修复）。**v1.1.4 是已发布的稳定版（推荐日常使用）**，本分支是其增强构建；不创建 GitHub Release / Gitee 发行版、不上传发行资产、不打 tag；安装包仅随仓库提供（`install/`）。可随时回滚到 v1.1.12 或 v1.1.4。
+
+## 变更摘要（相对 1.1.12）
+
+**1.1.13（模板删除）**：
+
+- 新增 MCP 工具 `template_delete`（catalog 第 126 个工具，Template 组第 11 个）：C# 薄封装 `arcgis-distill delete <id> [--force]`，与 CLI 单一实现不漂移。
+- `delete` 删除模板的 spec、index 条目、作业单，以及**不再被其他模板引用**的去重样本图（共享图片保留，返回 `removed.image_kept_for`）。
+- 安全语义：删除不存在的 id 报 `not_found`（退出码 3），重复删除安全；`ready`（已批准）模板需 `--force`（否则退出码 5）；`inbox` 不受影响。
+- 测试：`tests/test_distill.py` 11/11（新增 4 个删除用例：无共享图片删除、共享图片保留、未知 id not_found、ready 需 force）；`tests/test_catalog_matches_bridge.py` 4/4（CSHARP_ONLY 增补 template_delete）。
+- 文档与版本：`docs/distill.md`、`skills/template-distill/SKILL.md` 增加删除一节；四语 README 工具表/能力对照/版本同步；`docs/使用指南.md`、`VERSION.json`（126 工具 / 123 命令）、Config.daml / csproj / pyproject 统一 1.1.13；`source/docs/local-1.1.13.md` 记录本轮。
+
+## 验证（2026-11-19）
+
+- 构建：`scripts/build.ps1` 全过；add-in 476,408 字节 SHA256 `4B90BB43…3D7419`；自安装包 659,248 字节 SHA256 `B1E4922F…3A07F`。
+- 单元测试：`tests/test_distill.py` 11/11；`tests/test_catalog_matches_bridge.py` 4/4；`tools.json` ↔ `catalog.py` 126 工具全等价。
+- 打包校验：SHA256SUMS 重新生成并全量校验通过；`install/runtime/distill` 与 `source/src/arcgis_agentkit` 逐文件一致。
+- **规模**：123 命令 / 126 工具。仅验证 ArcGIS Pro 3.7；add-in 未签名（首次加载需信任）。
+
+## 回滚
+
+- add-in 回退到 1.1.12：SHA256 `A20E263B041E78A1F5631B1DD4EFC1B7946C05A28038751DC20C38F0AB55C6C7`（476,195 字节）——即基线提交 `7a20f9e`（分支 `customer-v1.1.11-distill`）中的 `install/ArcGISProMCP.esriAddinX`；
+- 运行时回退：用基线提交中的 `install/runtime/distill` 覆盖 `%LOCALAPPDATA%\ArcGIS Pro MCP\distill`；`arcgis_agentkit` 1.1.13 与 1.1.12 的库格式一致（schema v1.1 未变），删除命令不影响旧库。
+
+---
+
+## 历史发布 · Customer 1.1.12（1.14 增强版 + 模板蒸馏，构建号 1.1.12，2026-11-19）
 
 > **🚀 发布定位**：本包是 **Customer 1.1.12**，在 Customer 1.1.11 的基础上**整体并入 2.x（v2.0.2）的模板蒸馏模块**——1.1.x 客户线首次具备 10 个 `template_*` 工具与 `arcgis-distill` 命令行；其余能力与 1.1.11 完全一致（含 1.1.5–1.1.11 全部修复）。**v1.1.4 是已发布的稳定版（推荐日常使用）**，本分支是其增强构建；不创建 GitHub Release / Gitee 发行版、不上传发行资产、不打 tag；安装包仅随仓库提供（`install/`）。可随时回滚到 v1.1.11 或 v1.1.4。
 

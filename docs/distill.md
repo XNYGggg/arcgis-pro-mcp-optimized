@@ -1,4 +1,4 @@
-# Distill · 按需模板蒸馏（客户版 1.1.12，模块移植自 2.0.2）
+# Distill · 按需模板蒸馏（客户版 1.1.x；1.1.12 移植自 2.0.2，1.1.13 起含 delete）
 
 把一张样本成图蒸馏成可复用的版式 spec：`import → measure → patch → validate →
 preview → review → approve → apply`。一次作业、无守护进程、以输入 sha256 幂等；
@@ -39,10 +39,14 @@ arcgis-distill export <id> [--out bundle.zip]
 arcgis-distill bundle-import <bundle.zip>
 arcgis-distill apply <id> [--out context.json]
 arcgis-distill inbox [--process-new] [--width-in 6.7]
+arcgis-distill delete <id> [--force]
 ```
 
 全部支持 `--json`；退出码 0 成功 / 2 参数 / 3 环境 / 4 运行失败 / 5 校验失败。
 `approve` 在存在校验错误或缺 review 时拒绝（`--force` 可覆盖并写入 review）。
+`delete` 移除模板的 spec、索引条目、作业单与不再被其他模板引用的去重图片；
+删除不存在的 id 报 `not_found`（退出码 3，重复删除同样安全），`ready`（已批准）
+模板需 `--force`（否则退出码 5）；`inbox` 不受影响。
 
 ## 3. 库与 schema v1.1
 
@@ -82,6 +86,6 @@ library/
 
 `template_list / template_get / template_import / template_measure / template_patch /
 template_validate / template_review / template_approve / template_preview /
-template_apply`。它们都是 add-in 对 `arcgis-distill` CLI 的薄封装；客户版用
+template_apply / template_delete`。它们都是 add-in 对 `arcgis-distill` CLI 的薄封装；客户版用
 Pro 自带 Python 运行 `runtime/distill/run-distill.ps1`，无需另装 Python 或 pip。
 `template_preview` 直接返回 PNG 图像内容。

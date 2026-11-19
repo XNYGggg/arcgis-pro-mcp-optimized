@@ -37,7 +37,7 @@ $addinsDir  = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'ArcGIS\Ad
 $runtimeDst = Join-Path $env:LOCALAPPDATA 'ArcGIS Pro MCP'
 $stamp      = Get-Date -Format 'yyyyMMdd-HHmmss'
 
-Write-Host 'ArcGIS Pro MCP 优化版 · 客户版 Customer 1.1.12（1.14 增强版 + 模板蒸馏）' -ForegroundColor White
+Write-Host 'ArcGIS Pro MCP 优化版 · 客户版 Customer 1.1.13（1.14 增强版 + 模板蒸馏）' -ForegroundColor White
 Write-Host '组件：add-in + stdio 桥 + RunCode + 弹窗守护 + Python 桥 + 模板蒸馏（arcgis-distill）'
 
 if ($Rest -and $Rest.Count -gt 0) {
@@ -303,7 +303,7 @@ Ok ('运行时目录：' + $runtimeDst)
 
 $marker = [ordered]@{
     package       = 'ArcGIS Pro MCP 优化版（客户版）'
-    version       = '1.1.12'
+    version       = '1.1.13'
     installed_at  = (Get-Date).ToString('s')
     addin_sha256  = $srcHash
     package_root  = $pkgRoot

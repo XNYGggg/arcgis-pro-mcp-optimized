@@ -1078,6 +1078,14 @@ CATALOG: List[Tool] = [
       "palette, typography) for the assistant to follow while composing a map.",
       P("template_id", "str", REQUIRED, "Template id."),
       P("out", "str", None, "Optional context path.")),
+
+    T("template_delete", "Template",
+      "Delete a distilled template from the local library: its spec, index "
+      "entry, job sheet and its sample image when no other template references "
+      "it. Approved (ready) templates need force.",
+      P("template_id", "str", REQUIRED, "Template id."),
+      P("force", "bool", False, "Also delete an approved (ready) template."),
+      destructive=True),
 ]
 
 BY_NAME = {tool.name: tool for tool in CATALOG}

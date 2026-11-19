@@ -24,6 +24,7 @@ CSHARP_ONLY = {"restart_pro"} | {
     "template_list", "template_get", "template_import", "template_measure",
     "template_patch", "template_validate", "template_review",
     "template_approve", "template_preview", "template_apply",
+    "template_delete",
 }
 
 

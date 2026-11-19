@@ -57,6 +57,11 @@ namespace ArcGISProMCP.Commands
             CommandRouter.Register("template_apply", Group,
                 "Write a ready template into a mapping context file for the assistant.",
                 Apply, runOnMct: false, lane: ExecutionLane.Inline);
+            CommandRouter.Register("template_delete", Group,
+                "Delete a distilled template from the local library: its spec, "
+                + "index entry, job sheet and its sample image when no other "
+                + "template references it. Approved (ready) templates need force.",
+                Delete, runOnMct: false, lane: ExecutionLane.Inline);
         }
 
         // --- handlers --------------------------------------------------------
@@ -219,6 +224,13 @@ namespace ArcGISProMCP.Commands
                 args.Add("--out");
                 args.Add(outPath);
             }
+            return RunJson(args);
+        }
+
+        private static object Delete(Params parameters)
+        {
+            var args = new List<string> { "delete", parameters.Require("template_id") };
+            if (parameters.GetBool("force")) args.Add("--force");
             return RunJson(args);
         }
 

@@ -8,5 +8,5 @@ This package ships with the Customer 1.1.x line; the 2.x dialog guard is
 deliberately not included (1.1.x keeps its standalone dialog-guard script).
 """
 
-__version__ = "1.1.12"
+__version__ = "1.1.13"
 
