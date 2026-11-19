@@ -1,5 +1,16 @@
 # 更新日志
 
+## Customer 1.1.11（1.14 增强版，构建号 1.1.11，2026-11-19）
+
+- 相对 v1.1.4 累计合入 1.1.5 的 F1–F10、1.1.6 的 V-1–V-7，以及 2026-11-18 实机全量测试确认的 P0–P2 缺陷修复：
+  - 1.1.7（P0）：`create_feature_class` / `create_table` 的 `fields` 真正生效（AddField + describe 回读校验、失败清理）；`run_batch` 图片默认剥离为 path/bytes/sha；`get_features` 分页与几何摘要/精度；`preview_layout` 支持 `output_path`。
+  - 1.1.8（P1）：独立表/数据集路径的增改删；`sample_raster_values` 原生像素采样（无副作用表）；`create_map` SCENE 修复；`add_join` 连接注册表修复；布局元素左下角坐标与回读校验；`run_batch` 每步耗时；GP 入图等待重试。
+  - 1.1.9（P2）：图层命令接受数据集路径；`repair_layer_source` 支持栅格；`search_data` 去重；`check_extension` 语义修正；GP 输出过滤；栅格图层名提示。
+  - 1.1.10：`restart_pro` 超时自愈（15 秒硬超时、本地化按钮、UTF-8 心跳日志、5 秒 TCP 超时）；重启调度标志 10 分钟过期；部署脚本归一。
+  - 1.1.11（发布前评审修正）：失败清理改为按对象身份（删除前按数据源解析图层/独立表，同名异源不再误删）；清理失败随错误报告；`update_installed.py` 去本机路径；构建 PathMap 剔除 DLL/PDB 源码路径。
+- 规模：112 命令 / 115 工具；add-in SHA256 `A728B7ED…F06E`（468,175 字节）。
+- 未创建 Release：不上传发行资产、不打 tag；默认分支保持 v1.1.4。
+
 ## Customer 1.16（1.14 增强版，构建号 1.1.6，2026-11-18）
 
 - 相对 v1.1.4 累计合入 1.1.5 的 F1–F10（环境注入、describe 增强、create_map 无底图、栅格/TIN 支持、add_table、fit:auto、显式配色、epsg 生效、restart_pro）与 1.1.6 的 V-1–V-7（toolbox 路径纠错提示、get_pump_status 桥缺失时结构化返回、错误分级与读超时、diagnose 主动探测、工具描述修正、HTTP 断言加固、桥 down 缓存）。

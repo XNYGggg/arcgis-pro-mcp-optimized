@@ -6,14 +6,22 @@ it detached: the MCP reply goes out first, then this script closes ArcGIS
 Pro (answering "Don't Save" -- the add-in saved before asking), reopens the
 project and waits until the command bridge answers again.
 
-Runs hidden under Windows PowerShell 5.1. Log: %LOCALAPPDATA%\ArcGIS-MCP\restart.log
+Every wait is bounded and every step leaves a timestamped line in
+%LOCALAPPDATA%\ArcGIS-MCP\restart.log (UTF-8): the UI-automation probe that
+answers the save prompt runs in a child PowerShell process and is abandoned
+after $UiTimeoutSeconds, so a busy ArcGIS Pro can slow this helper down but
+never wedge it. It never kills Pro: a forced kill would leave the project's
+locks behind.
+
+Runs hidden under Windows PowerShell 5.1.
 #>
 param(
     [string]$Project = "",
     [int]$ProPid = 0,
     [int]$DelaySeconds = 3,
     [int]$CloseTimeoutSeconds = 240,
-    [int]$BridgeTimeoutSeconds = 240
+    [int]$BridgeTimeoutSeconds = 240,
+    [int]$UiTimeoutSeconds = 15
 )
 
 $ErrorActionPreference = "Stop"
@@ -23,7 +31,7 @@ $logPath = Join-Path $logRoot "restart.log"
 
 function Write-Log([string]$message) {
     $line = "{0:s} {1}" -f (Get-Date), $message
-    Add-Content -LiteralPath $logPath -Value $line
+    Add-Content -LiteralPath $logPath -Value $line -Encoding UTF8
 }
 
 function Get-Pro {
@@ -37,8 +45,25 @@ function Test-Bridge($port = 6510) {
     return $null -ne (Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue)
 }
 
+# A plain TcpClient constructor can sit on the OS connect timeout; wait on the
+# connect explicitly so one command cannot stall the helper.
+function Open-Client($port = 6510, $connectTimeoutMs = 5000) {
+    $client = New-Object System.Net.Sockets.TcpClient
+    try {
+        $iar = $client.BeginConnect("127.0.0.1", $port, $null, $null)
+        if (-not $iar.AsyncWaitHandle.WaitOne($connectTimeoutMs)) {
+            throw "connect to 127.0.0.1:$port timed out"
+        }
+        $client.EndConnect($iar)
+        return $client
+    } catch {
+        $client.Close()
+        throw
+    }
+}
+
 function Send-Command($command, $timeoutMs = 120000) {
-    $client = New-Object System.Net.Sockets.TcpClient("127.0.0.1", 6510)
+    $client = Open-Client 6510
     try {
         $stream = $client.GetStream()
         $payload = [Text.Encoding]::UTF8.GetBytes(
@@ -58,61 +83,75 @@ function Send-Command($command, $timeoutMs = 120000) {
 # three-button shape (Save/Don't Save/Cancel, Chinese labels via the escapes
 # below) is answered; any other dialog is logged and left alone, so a "No"
 # button in an unrelated box can never be clicked.
-function Answer-SavePrompt($process) {
-    try {
-        Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes -ErrorAction Stop
-    } catch {
-        return $false
-    }
+#
+# Every UI-automation call can block indefinitely while Pro is busy, so the
+# whole probe runs in a child PowerShell process: after $UiTimeoutSeconds the
+# job is stopped and the main script carries on. Buttons are matched with an
+# optional "(N)" / "(&N)" suffix in either parenthesis width -- localized
+# prompts use "否(N)" and "取消(C)", which an "(&N)-only" pattern misses.
+function Invoke-SavePromptProbe([int]$processId) {
+    $job = Start-Job -ArgumentList $processId -ScriptBlock {
+        param($processId)
+        try {
+            Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes -ErrorAction Stop
+            $root = [System.Windows.Automation.AutomationElement]::RootElement
+            $byPid = New-Object System.Windows.Automation.PropertyCondition(
+                [System.Windows.Automation.AutomationElement]::ProcessIdProperty, $processId)
+            $window = $root.FindFirst([System.Windows.Automation.TreeScope]::Children, $byPid)
+            if (-not $window) { return "none" }
 
-    $root = [System.Windows.Automation.AutomationElement]::RootElement
-    $byPid = New-Object System.Windows.Automation.PropertyCondition(
-        [System.Windows.Automation.AutomationElement]::ProcessIdProperty, $process.Id)
-    $window = $root.FindFirst([System.Windows.Automation.TreeScope]::Children, $byPid)
-    if (-not $window) { return $false }
+            $isButton = New-Object System.Windows.Automation.PropertyCondition(
+                [System.Windows.Automation.AutomationElement]::ControlTypeProperty,
+                [System.Windows.Automation.ControlType]::Button)
+            $buttons = $window.FindAll([System.Windows.Automation.TreeScope]::Descendants, $isButton)
 
-    $isButton = New-Object System.Windows.Automation.PropertyCondition(
-        [System.Windows.Automation.AutomationElement]::ControlTypeProperty,
-        [System.Windows.Automation.ControlType]::Button)
+            $suffix = '(\s*[（(](&?[A-Za-z])[）)])?$'
+            $names = @()
+            $noButton = $null
+            foreach ($button in $buttons) {
+                if ($button.Current.IsOffscreen -or -not $button.Current.IsEnabled) { continue }
+                $name = $button.Current.Name
+                if ($name) { $names += $name }
+                if (-not $noButton -and
+                    $name -match ('^(Don''t Save|Do not save|No|\u4e0d\u4fdd\u5b58|\u5426)' + $suffix)) {
+                    $noButton = $button
+                }
+            }
 
-    try {
-        $buttons = $window.FindAll([System.Windows.Automation.TreeScope]::Descendants, $isButton)
-    } catch {
-        return $false
-    }
+            $hasSave = @($names | Where-Object {
+                $_ -match ('^(Yes|Save|\u662f|\u4fdd\u5b58)' + $suffix) }).Count -gt 0
+            $hasDiscard = @($names | Where-Object {
+                $_ -match ('^(Don''t Save|Do not save|No|\u4e0d\u4fdd\u5b58|\u5426)' + $suffix) }).Count -gt 0
+            $hasCancel = @($names | Where-Object {
+                $_ -match ('^(Cancel|\u53d6\u6d88)' + $suffix) }).Count -gt 0
 
-    $suffix = "(\s*\(&[A-Za-z]\))?$"
-    $names = @()
-    $noButton = $null
-    foreach ($button in $buttons) {
-        if ($button.Current.IsOffscreen -or -not $button.Current.IsEnabled) { continue }
-        $name = $button.Current.Name
-        $names += $name
-        if (-not $noButton -and
-            $name -match ("^(Don't Save|Do not save|No|\u4e0d\u4fdd\u5b58|\u5426)" + $suffix)) {
-            $noButton = $button
+            if ($noButton -and $hasSave -and $hasDiscard -and $hasCancel) {
+                $pattern = $noButton.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern)
+                $pattern.Invoke()
+                return "clicked:" + $noButton.Current.Name
+            }
+            if ($names.Count -gt 0) {
+                return "unexpected:" + ($names -join ",")
+            }
+            return "none"
+        } catch {
+            return "error:" + $_.Exception.Message
         }
     }
 
-    $hasSave = @($names | Where-Object {
-        $_ -match ("^(Yes|Save|\u662f|\u4fdd\u5b58)" + $suffix) }).Count -gt 0
-    $hasDiscard = @($names | Where-Object {
-        $_ -match ("^(Don't Save|Do not save|No|\u4e0d\u4fdd\u5b58|\u5426)" + $suffix) }).Count -gt 0
-    $hasCancel = @($names | Where-Object {
-        $_ -match ("^(Cancel|\u53d6\u6d88)" + $suffix) }).Count -gt 0
-
-    if (-not ($hasSave -and $hasDiscard -and $hasCancel) -or -not $noButton) {
-        if ($names.Count -gt 0) {
-            Write-Log ("unexpected dialog buttons: " + ($names -join ", ") +
-                " -- not clicking")
-        }
-        return $false
+    $finished = Wait-Job $job -Timeout $UiTimeoutSeconds
+    if (-not $finished) {
+        Stop-Job $job -ErrorAction SilentlyContinue
+        Remove-Job $job -Force -ErrorAction SilentlyContinue
+        return "timeout"
     }
-
-    $pattern = $noButton.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern)
-    $pattern.Invoke()
-    Write-Log "answered the save prompt: $($noButton.Current.Name)"
-    return $true
+    try {
+        $result = Receive-Job $job -ErrorAction SilentlyContinue | Select-Object -First 1
+    } finally {
+        Remove-Job $job -Force -ErrorAction SilentlyContinue
+    }
+    if ($null -eq $result) { return "none" }
+    return [string]$result
 }
 
 Write-Log "restart requested: project='$Project' pid=$ProPid delay=$DelaySeconds"
@@ -124,19 +163,52 @@ if ($pro) {
     $null = $pro.CloseMainWindow()
 
     $waited = 0
-    $answered = $false
+    $promptState = "pending"
+    $uiaDisabled = $false
+    $lastUnexpected = ""
     while ($waited -lt $CloseTimeoutSeconds) {
         $running = Get-Process -Id $pro.Id -ErrorAction SilentlyContinue
         if (-not $running) { break }
         Start-Sleep -Seconds 2
         $waited += 2
-        if (-not $answered -and $waited % 6 -eq 0) {
-            $answered = Answer-SavePrompt $running
+
+        if (-not $uiaDisabled -and $promptState -ne "clicked" -and $waited % 6 -eq 0) {
+            $probe = Invoke-SavePromptProbe $running.Id
+            switch -Wildcard ($probe) {
+                "clicked:*" {
+                    $promptState = "clicked"
+                    Write-Log ("answered the save prompt: " + $probe.Substring(8))
+                }
+                "timeout" {
+                    $uiaDisabled = $true
+                    Write-Log ("save-prompt probe still blocked after ${UiTimeoutSeconds}s; not retrying")
+                }
+                "error:*" {
+                    Write-Log ("save-prompt probe error: " + $probe.Substring(6))
+                }
+                "unexpected:*" {
+                    $signature = $probe.Substring(11)
+                    if ($signature -ne $lastUnexpected) {
+                        $lastUnexpected = $signature
+                        Write-Log ("unexpected dialog buttons: " + $signature + " -- not clicking")
+                    }
+                }
+            }
+        }
+
+        if ($waited % 10 -eq 0) {
+            $title = ""
+            $responding = "n/a"
+            try { $title = $running.MainWindowTitle } catch { }
+            try { $responding = $running.Responding } catch { }
+            Write-Log ("closing: waited=${waited}s responding=$responding title='$title'")
         }
     }
 
     if (Get-Process -Id $pro.Id -ErrorAction SilentlyContinue) {
-        Write-Log "ArcGIS Pro did not close within ${CloseTimeoutSeconds}s; giving up"
+        $title = ""
+        try { $title = (Get-Process -Id $pro.Id).MainWindowTitle } catch { }
+        Write-Log ("ArcGIS Pro did not close within ${CloseTimeoutSeconds}s (window: '$title'); giving up")
         exit 2
     }
     Write-Log "closed after ${waited}s"
@@ -183,7 +255,7 @@ while ($waited -lt $BridgeTimeoutSeconds) {
                 if ($count -ge 112 -and ($ProPid -le 0 -or $newPid -ne $ProPid)) {
                     $ok = "{0:s} ok project='{1}' pid={2} commands={3}" -f `
                         (Get-Date), $Project, $newPid, $count
-                    Add-Content -LiteralPath (Join-Path $logRoot "restart.ok") -Value $ok
+                    Add-Content -LiteralPath (Join-Path $logRoot "restart.ok") -Value $ok -Encoding UTF8
                     Write-Log "project open and verified after ${waited}s (commands=$count pid=$newPid)"
                     exit 0
                 }
@@ -192,6 +264,9 @@ while ($waited -lt $BridgeTimeoutSeconds) {
             }
         } catch {
         }
+    }
+    if ($waited % 30 -eq 0) {
+        Write-Log "waiting for the bridge: ${waited}s listening=$listening"
     }
 }
 

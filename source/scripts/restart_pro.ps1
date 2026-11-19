@@ -16,6 +16,10 @@
     It never kills the process. A forced kill would leave the project's locks
     behind; the prompt is answered rather than bypassed.
 
+    The save-prompt probe runs in a child PowerShell process and is abandoned
+    after -UiTimeoutSeconds, so a busy ArcGIS Pro can slow the script down but
+    never wedge it.
+
 .PARAMETER Project
     The .aprx to reopen. Defaults to whichever project Pro currently has open.
 
@@ -31,7 +35,8 @@ param(
     [string]$Project,
     [switch]$Save,
     [int]$TimeoutSeconds = 180,
-    [int]$CloseTimeoutSeconds = 240
+    [int]$CloseTimeoutSeconds = 240,
+    [int]$UiTimeoutSeconds = 15
 )
 
 $ErrorActionPreference = "Stop"
@@ -82,43 +87,73 @@ function Send-Command($command, $timeoutMs = 120000) {
 
 # Pro's "save changes?" prompt is a WPF dialog inside the main window, not a
 # separate top-level window, so it is found by walking the automation tree.
-function Answer-SavePrompt($process) {
+# The walk runs in a child PowerShell process: UI-automation calls block while
+# Pro is busy, and waiting on a job gives that a hard deadline. Buttons match
+# an optional "(N)" / "(&N)" suffix in either parenthesis width -- localized
+# prompts use "否(N)" and "取消(C)", which an "(&N)-only" pattern misses.
+function Invoke-SavePromptProbe([int]$processId) {
+    $job = Start-Job -ArgumentList $processId -ScriptBlock {
+        param($processId)
+        try {
+            Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes -ErrorAction Stop
+            $root = [System.Windows.Automation.AutomationElement]::RootElement
+            $byPid = New-Object System.Windows.Automation.PropertyCondition(
+                [System.Windows.Automation.AutomationElement]::ProcessIdProperty, $processId)
+            $window = $root.FindFirst([System.Windows.Automation.TreeScope]::Children, $byPid)
+            if (-not $window) { return "none" }
+
+            $isButton = New-Object System.Windows.Automation.PropertyCondition(
+                [System.Windows.Automation.AutomationElement]::ControlTypeProperty,
+                [System.Windows.Automation.ControlType]::Button)
+            $buttons = $window.FindAll([System.Windows.Automation.TreeScope]::Descendants, $isButton)
+
+            $suffix = '(\s*[（(](&?[A-Za-z])[）)])?$'
+            $names = @()
+            $noButton = $null
+            foreach ($button in $buttons) {
+                if ($button.Current.IsOffscreen -or -not $button.Current.IsEnabled) { continue }
+                $name = $button.Current.Name
+                if ($name) { $names += $name }
+                if (-not $noButton -and
+                    $name -match ('^(Don''t Save|Do not save|No|不保存|否)' + $suffix)) {
+                    $noButton = $button
+                }
+            }
+
+            $hasSave = @($names | Where-Object {
+                $_ -match ('^(Yes|Save|是|保存)' + $suffix) }).Count -gt 0
+            $hasDiscard = @($names | Where-Object {
+                $_ -match ('^(Don''t Save|Do not save|No|不保存|否)' + $suffix) }).Count -gt 0
+            $hasCancel = @($names | Where-Object {
+                $_ -match ('^(Cancel|取消)' + $suffix) }).Count -gt 0
+
+            if ($noButton -and $hasSave -and $hasDiscard -and $hasCancel) {
+                $pattern = $noButton.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern)
+                $pattern.Invoke()
+                return "clicked:" + $noButton.Current.Name
+            }
+            if ($names.Count -gt 0) {
+                return "unexpected:" + ($names -join ",")
+            }
+            return "none"
+        } catch {
+            return "error:" + $_.Exception.Message
+        }
+    }
+
+    $finished = Wait-Job $job -Timeout $UiTimeoutSeconds
+    if (-not $finished) {
+        Stop-Job $job -ErrorAction SilentlyContinue
+        Remove-Job $job -Force -ErrorAction SilentlyContinue
+        return "timeout"
+    }
     try {
-        Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes -ErrorAction Stop
-    } catch {
-        return $false
+        $result = Receive-Job $job -ErrorAction SilentlyContinue | Select-Object -First 1
+    } finally {
+        Remove-Job $job -Force -ErrorAction SilentlyContinue
     }
-
-    $root = [System.Windows.Automation.AutomationElement]::RootElement
-    $byPid = New-Object System.Windows.Automation.PropertyCondition(
-        [System.Windows.Automation.AutomationElement]::ProcessIdProperty, $process.Id)
-    $window = $root.FindFirst([System.Windows.Automation.TreeScope]::Children, $byPid)
-    if (-not $window) { return $false }
-
-    $isButton = New-Object System.Windows.Automation.PropertyCondition(
-        [System.Windows.Automation.AutomationElement]::ControlTypeProperty,
-        [System.Windows.Automation.ControlType]::Button)
-
-    try {
-        $buttons = $window.FindAll([System.Windows.Automation.TreeScope]::Descendants, $isButton)
-    } catch {
-        # The tree walk times out while Pro is busy. Not a prompt; try later.
-        return $false
-    }
-
-    foreach ($button in $buttons) {
-        # Only a live prompt has an enabled, on-screen discard button. The
-        # ribbon's own Save buttons are disabled while no dialog is up.
-        if ($button.Current.Name -notmatch "^(Don't Save|Do not save|No)$") { continue }
-        if ($button.Current.IsOffscreen -or -not $button.Current.IsEnabled) { continue }
-
-        $pattern = $button.GetCurrentPattern(
-            [System.Windows.Automation.InvokePattern]::Pattern)
-        $pattern.Invoke()
-        Write-Host "  answered the save prompt: $($button.Current.Name)"
-        return $true
-    }
-    return $false
+    if ($null -eq $result) { return "none" }
+    return [string]$result
 }
 
 $pro = Get-Pro
@@ -150,15 +185,32 @@ if ($pro) {
     # it reports progress in the window title -- worth reading before deciding
     # something has gone wrong.
     $waited = 0
-    $answered = $false
+    $promptState = "pending"
+    $uiaDisabled = $false
     while ($waited -lt $CloseTimeoutSeconds) {
         $running = Get-Pro
         if (-not $running) { break }
         Start-Sleep -Seconds 2
         $waited += 2
 
-        if (-not $Save -and -not $answered -and $waited % 6 -eq 0) {
-            $answered = Answer-SavePrompt $running
+        if (-not $Save -and $promptState -ne "clicked" -and -not $uiaDisabled -and $waited % 6 -eq 0) {
+            $probe = Invoke-SavePromptProbe $running.Id
+            switch -Wildcard ($probe) {
+                "clicked:*" {
+                    $promptState = "clicked"
+                    Write-Host ("  answered the save prompt: " + $probe.Substring(8))
+                }
+                "timeout" {
+                    $uiaDisabled = $true
+                    Write-Host "  save-prompt probe still blocked; answer it by hand if Pro is waiting."
+                }
+                "error:*" {
+                    Write-Host ("  save-prompt probe error: " + $probe.Substring(6))
+                }
+                "unexpected:*" {
+                    Write-Host ("  unexpected dialog buttons: " + $probe.Substring(11) + " -- not clicking")
+                }
+            }
         }
         if ($waited % 30 -eq 0) {
             Write-Host ("  {0}s: '{1}', responding={2}" -f `

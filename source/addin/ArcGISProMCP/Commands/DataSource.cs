@@ -56,6 +56,9 @@ namespace ArcGISProMCP.Commands
 
         public void Dispose() => _table?.Dispose();
 
+        /// <summary>The raw table, for callers that write rows (D2, 2026-11-18).</summary>
+        public Table Table => _table;
+
         // --- resolution -------------------------------------------------------
 
         /// <summary>
@@ -67,21 +70,30 @@ namespace ArcGISProMCP.Commands
             var name = parameters.Require(key);
             var map = TryResolveMap(parameters);
 
-            if (map != null)
+            if (map != null && !name.Contains("\\") && !name.Contains("/"))
             {
-                var layer = map.GetLayersAsFlattenedList().OfType<BasicFeatureLayer>()
-                    .FirstOrDefault(l => string.Equals(l.Name, name,
-                                                       StringComparison.OrdinalIgnoreCase));
-                if (layer != null)
-                    return new DataSource(layer, RequireTable(layer.GetTable(), name))
-                    { Name = layer.Name };
+                // Pro attaches a tool's output to the map a moment after the
+                // tool returns. A write that targets the new table straight
+                // away used to miss it; look again briefly (final
+                // consistency, not a poll loop for a name that never comes).
+                for (var attempt = 0; attempt < 20; attempt++)
+                {
+                    var layer = map.GetLayersAsFlattenedList().OfType<BasicFeatureLayer>()
+                        .FirstOrDefault(l => string.Equals(l.Name, name,
+                                                           StringComparison.OrdinalIgnoreCase));
+                    if (layer != null)
+                        return new DataSource(layer, RequireTable(layer.GetTable(), name))
+                        { Name = layer.Name };
 
-                var standalone = map.GetStandaloneTablesAsFlattenedList()
-                    .FirstOrDefault(t => string.Equals(t.Name, name,
-                                                       StringComparison.OrdinalIgnoreCase));
-                if (standalone != null)
-                    return new DataSource(null, RequireTable(standalone.GetTable(), name))
-                    { Name = standalone.Name };
+                    var standalone = map.GetStandaloneTablesAsFlattenedList()
+                        .FirstOrDefault(t => string.Equals(t.Name, name,
+                                                           StringComparison.OrdinalIgnoreCase));
+                    if (standalone != null)
+                        return new DataSource(null, RequireTable(standalone.GetTable(), name))
+                        { Name = standalone.Name };
+
+                    if (attempt < 19) System.Threading.Thread.Sleep(50);
+                }
             }
 
             var opened = TryOpenPath(name);
@@ -90,9 +102,21 @@ namespace ArcGISProMCP.Commands
             var available = map == null ? "(no map)" : string.Join(", ",
                 map.GetLayersAsFlattenedList().Select(l => l.Name)
                    .Concat(map.GetStandaloneTablesAsFlattenedList().Select(t => t.Name)));
+            var rasterHint = "";
+            try
+            {
+                if (map != null && map.GetLayersAsFlattenedList()
+                        .OfType<BasicRasterLayer>()
+                        .Any(l => string.Equals(l.Name, name,
+                                                StringComparison.OrdinalIgnoreCase)))
+                    rasterHint = " '" + name + "' is a raster layer -- read it with "
+                               + "get_raster_info / sample_raster_values, not a table read.";
+            }
+            catch { }
             throw new ArgumentException(
                 $"No layer, table or dataset called '{name}'. Layers and tables in the "
-                + $"map: {available}. A full path also works, including memory\\name.");
+                + $"map: {available}. A full path also works, including memory\\name."
+                + rasterHint);
         }
 
         /// <summary>

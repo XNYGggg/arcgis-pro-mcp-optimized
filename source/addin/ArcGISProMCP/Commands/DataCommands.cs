@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using ArcGIS.Core.Data;
+using ArcGIS.Core.Geometry;
 using ArcGIS.Desktop.Mapping;
 using ArcGISProMCP.Bridge;
 
@@ -142,9 +146,22 @@ namespace ArcGISProMCP.Commands
             var limit = Math.Min(parameters.GetInt("limit", 50), MaxRows);
             var offset = Math.Max(parameters.GetInt("offset"), 0);
             var includeGeometry = parameters.GetBool("include_geometry");
+            var geometrySummary = parameters.GetBool("geometry_summary");
+            var geometryPrecision = parameters.Has("geometry_precision")
+                ? parameters.GetInt("geometry_precision")
+                : -1;
+
+            // A layer that carries a bridge-made join cannot be searched
+            // through the .NET layer API (Pro reports the joined view as an
+            // invalid definition), so joined reads are done client-side.
+            if (source.Layer != null && JoinRegistry.HasJoins(source.Layer.Name))
+                return GetJoinedFeatures(parameters, source);
 
             var fields = parameters.GetStringList("fields") ?? ReadableFields(source);
-            var filter = BuildFilter(parameters, includeGeometry ? null : fields);
+            // A shape summary needs the shape loaded; a plain attribute read
+            // should not pay for it.
+            var needsShape = includeGeometry || geometrySummary;
+            var filter = BuildFilter(parameters, needsShape ? null : fields);
 
             var orderBy = ParseOrderBy(parameters.GetString("order_by"));
             // Sorting means reading the matches before paging them, so a
@@ -172,8 +189,19 @@ namespace ArcGISProMCP.Commands
                             try { record[field] = MapHelpers.Normalise(row[field]); }
                             catch { record[field] = null; }
                         }
-                        if (includeGeometry && row is Feature feature)
-                            record["SHAPE@WKT"] = MapHelpers.ToWkt(feature.GetShape());
+                        if (row is Feature feature)
+                        {
+                            var shape = feature.GetShape();
+                            if (includeGeometry)
+                            {
+                                record["SHAPE@WKT"] = RoundWkt(
+                                    MapHelpers.ToWkt(shape), geometryPrecision);
+                            }
+                            else if (geometrySummary)
+                            {
+                                record["SHAPE@SUMMARY"] = GeometrySummary(shape);
+                            }
+                        }
                         rows.Add(record);
                     }
                 }
@@ -181,6 +209,7 @@ namespace ArcGISProMCP.Commands
 
             if (orderBy != null) Sort(rows, orderBy);
             var page = rows.Skip(offset).Take(limit).ToList();
+            var hasMoreInPage = rows.Count > offset + page.Count;
 
             var result = new Dictionary<string, object>
             {
@@ -189,8 +218,11 @@ namespace ArcGISProMCP.Commands
                 ["count"] = page.Count,
                 ["offset"] = offset,
                 ["limit"] = limit,
+                ["truncated"] = truncated || hasMoreInPage,
                 ["features"] = page,
             };
+            if (truncated || hasMoreInPage)
+                result["next_offset"] = offset + page.Count;
             if (orderBy != null)
             {
                 result["ordered_by"] = orderBy.Select(o => o.Field + (o.Descending ? " DESC" : ""))
@@ -202,6 +234,213 @@ namespace ArcGISProMCP.Commands
                         + "where clause.";
             }
             return result;
+        }
+
+        /// <summary>
+        /// Read a layer that carries a bridge-made join. Pro's joined view
+        /// fails .NET validation ("does not have a valid definition"), so the
+        /// base layer and each join table are read separately and merged on
+        /// the join key here (J1/J2, live test 2026-11-18).
+        /// </summary>
+        private static object GetJoinedFeatures(Params parameters, DataSource source)
+        {
+            var joins = JoinRegistry.Snapshot(source.Layer.Name);
+            var basePath = joins.Select(j => j.BasePath)
+                                .FirstOrDefault(p => !string.IsNullOrWhiteSpace(p))
+                           ?? source.Layer.GetPath()?.LocalPath;
+            using var baseSource = OpenByName(basePath);
+            if (baseSource == null)
+                throw new InvalidOperationException(
+                    $"'{source.Name}' has a join and cannot be read through the layer "
+                    + "view; remove the join (remove_join) or read the base dataset by path.");
+
+            var baseNames = baseSource.Definition.GetFields().Select(f => f.Name).ToList();
+            var qualified = joins.SelectMany(j => j.Fields.Select(f => j.Table + "." + f))
+                                 .ToList();
+            var requested = parameters.GetStringList("fields");
+            var fields = requested ?? baseNames.Concat(qualified).ToList();
+
+            var missing = new List<string>();
+            foreach (var name in fields)
+            {
+                if (baseNames.Contains(name, StringComparer.OrdinalIgnoreCase)) continue;
+                if (name.Contains('.')) continue;
+                if (!joins.Any(j => j.Fields.Contains(name, StringComparer.OrdinalIgnoreCase)))
+                    missing.Add(name);
+            }
+            if (missing.Count > 0)
+                throw new ArgumentException(
+                    "Field(s) not found on '" + source.Name + "': "
+                    + string.Join(", ", missing)
+                    + ". Available fields (joined fields are table-qualified): "
+                    + string.Join(", ", baseNames.Concat(qualified)) + ".");
+
+            var lookups = new List<(JoinRegistry.JoinSnapshot join,
+                                    Dictionary<string, Dictionary<string, object>> rows)>();
+            foreach (var join in joins)
+            {
+                using var joinSource = OpenByName(join.Table);
+                if (joinSource == null) continue;
+                var lookup = new Dictionary<string, Dictionary<string, object>>(
+                    StringComparer.OrdinalIgnoreCase);
+                using var cursor = joinSource.Search(new QueryFilter());
+                while (cursor.MoveNext())
+                {
+                    using var row = cursor.Current;
+                    var values = new Dictionary<string, object>();
+                    foreach (var field in join.Fields)
+                    {
+                        try { values[field] = MapHelpers.Normalise(row[field]); }
+                        catch { values[field] = null; }
+                    }
+                    values.TryGetValue(join.JoinField, out var key);
+                    var text = Convert.ToString(key);
+                    if (!string.IsNullOrEmpty(text)) lookup[text] = values;
+                }
+                lookups.Add((join, lookup));
+            }
+
+            var offset = Math.Max(parameters.GetInt("offset"), 0);
+            var limit = Math.Min(parameters.GetInt("limit", 50), MaxRows);
+            var includeGeometry = parameters.GetBool("include_geometry");
+            var geometrySummary = parameters.GetBool("geometry_summary");
+            var geometryPrecision = parameters.Has("geometry_precision")
+                ? parameters.GetInt("geometry_precision") : -1;
+            var orderBy = ParseOrderBy(parameters.GetString("order_by"));
+
+            var rows = new List<Dictionary<string, object>>();
+            var truncated = false;
+            try
+            {
+                using var cursor = baseSource.Search(BuildFilter(parameters));
+                while (cursor.MoveNext())
+                {
+                    if (rows.Count >= MaxRows) { truncated = true; break; }
+                    using var row = cursor.Current;
+                    var record = new Dictionary<string, object>();
+                    foreach (var name in baseNames)
+                    {
+                        try { record[name] = MapHelpers.Normalise(row[name]); }
+                        catch { record[name] = null; }
+                    }
+
+                    foreach (var (join, lookup) in lookups)
+                    {
+                        record.TryGetValue(join.LayerField, out var layerValue);
+                        var key = Convert.ToString(layerValue);
+                        if (string.IsNullOrEmpty(key) || !lookup.TryGetValue(key, out var values))
+                            continue;
+                        foreach (var pair in values)
+                        {
+                            record[join.Table + "." + pair.Key] = pair.Value;
+                            if (fields.Any(f => !f.Contains('.')
+                                && string.Equals(f, pair.Key, StringComparison.OrdinalIgnoreCase)))
+                                record[pair.Key] = pair.Value;
+                        }
+                    }
+
+                    if (row is Feature feature)
+                    {
+                        var shape = feature.GetShape();
+                        if (includeGeometry)
+                            record["SHAPE@WKT"] = RoundWkt(
+                                MapHelpers.ToWkt(shape), geometryPrecision);
+                        else if (geometrySummary)
+                            record["SHAPE@SUMMARY"] = GeometrySummary(shape);
+                    }
+                    rows.Add(record);
+                }
+            }
+            catch (Exception exception)
+            {
+                throw new InvalidOperationException(
+                    "Reading the joined layer failed: " + exception.Message
+                    + ". A where clause can only use the base layer's fields.");
+            }
+
+            if (orderBy != null) Sort(rows, orderBy);
+            var page = rows.Skip(offset).Take(limit).ToList();
+            var result = new Dictionary<string, object>
+            {
+                ["layer"] = source.Name,
+                ["fields"] = fields,
+                ["count"] = page.Count,
+                ["offset"] = offset,
+                ["limit"] = limit,
+                ["truncated"] = truncated || rows.Count > offset + page.Count,
+                ["features"] = page,
+                ["join"] = "client-side; joined fields use Table.Field names",
+            };
+            if (truncated || rows.Count > offset + page.Count)
+                result["next_offset"] = offset + page.Count;
+            return result;
+        }
+
+        internal static DataSource OpenByName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return null;
+            try
+            {
+                var json = JsonDocument.Parse(
+                    "{\"layer_name\":" + JsonSerializer.Serialize(name) + "}");
+                return DataSource.Resolve(new Params(json.RootElement));
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// A compact stand-in for full WKT: type, extent and the measures
+        /// that matter for a map. Keeps big layers readable in one response.
+        /// </summary>
+        private static Dictionary<string, object> GeometrySummary(Geometry shape)
+        {
+            if (shape == null || shape.IsEmpty) return null;
+            var summary = new Dictionary<string, object>
+            {
+                ["type"] = shape.GeometryType.ToString(),
+            };
+            var extent = shape.Extent;
+            if (extent != null && !extent.IsEmpty)
+            {
+                summary["extent"] = new[]
+                {
+                    extent.XMin, extent.YMin, extent.XMax, extent.YMax,
+                };
+            }
+            summary["sr_wkid"] = shape.SpatialReference?.Wkid;
+            try
+            {
+                var length = GeometryEngine.Instance.Length(shape);
+                if (!double.IsNaN(length)) summary["length"] = Math.Round(length, 3);
+            }
+            catch { }
+            try
+            {
+                var area = GeometryEngine.Instance.Area(shape);
+                if (!double.IsNaN(area)) summary["area"] = Math.Round(area, 3);
+            }
+            catch { }
+            return summary;
+        }
+
+        /// <summary>
+        /// Trim WKT coordinates to a fixed number of decimals. The geometry
+        /// itself is untouched; this only shortens the text we return.
+        /// </summary>
+        private static string RoundWkt(string wkt, int decimals)
+        {
+            if (string.IsNullOrEmpty(wkt) || decimals < 0) return wkt;
+            return Regex.Replace(wkt, @"-?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?", match =>
+            {
+                if (!double.TryParse(match.Value, NumberStyles.Float,
+                                     CultureInfo.InvariantCulture, out var value))
+                    return match.Value;
+                return Math.Round(value, decimals).ToString(
+                    "0." + new string('#', decimals), CultureInfo.InvariantCulture);
+            });
         }
 
         private static object CountFeatures(Params parameters)

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ArcGIS.Core.Data;
+using ArcGIS.Core.Data.Raster;
 using System.IO;
 using System.Threading.Tasks;
 using ArcGIS.Desktop.Core;
@@ -642,9 +643,7 @@ namespace ArcGISProMCP.Commands
             var name = parameters.Require("layer_name");
             var dataset = parameters.GetString("dataset_name");
 
-            var layer = map.GetLayersAsFlattenedList()
-                .FirstOrDefault(l => string.Equals(l.Name, name,
-                                                   StringComparison.OrdinalIgnoreCase));
+            var layer = MapHelpers.FindLayer(map, name, required: false);
             var table = layer != null ? null : map.GetStandaloneTablesAsFlattenedList()
                 .FirstOrDefault(t => string.Equals(t.Name, name,
                                                    StringComparison.OrdinalIgnoreCase));
@@ -664,6 +663,14 @@ namespace ArcGISProMCP.Commands
                 {
                     using var featureClass = OpenDataset<FeatureClass>(datastore, datasetName);
                     featureLayer.ReplaceDataSource(featureClass);
+                }
+                else if (layer is BasicRasterLayer rasterLayer)
+                {
+                    // Raster layers repoint the same way, through a
+                    // RasterDataset (D4, live test 2026-11-18).
+                    using var rasterDataset = OpenDataset<RasterDataset>(datastore,
+                                                                        datasetName);
+                    rasterLayer.ReplaceDataSource(rasterDataset);
                 }
                 else if (table != null)
                 {

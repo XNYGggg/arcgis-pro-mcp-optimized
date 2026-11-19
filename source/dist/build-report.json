@@ -1,6 +1,6 @@
 ﻿{
     "status":  "candidate-not-certified",
-    "version":  "1.1.6",
+    "version":  "1.1.11",
     "proTargetVersion":  "3.7",
     "targetFramework":  "net10.0-windows",
     "referenceVersion":  "13.7.0.1901",
@@ -8,7 +8,7 @@
     "signed":  false,
     "registrationTests":  "passed",
     "runtimeValidation":  "pending: install exact candidate and test on each claimed Pro version",
-    "packageSha256":  "96C7829E2A26E16C270722A84605F9945DA2348DFCF202C658A64EA9E012E625",
-    "installerSha256":  "38F6A3B73A373E5840934676CEAE2B93209EEA1162E39378AF272D5E0668A9B0",
+    "packageSha256":  "A728B7ED63B07391A83D49D14E88735D0926E7F2F0B1E4D3E755452D6593F06E",
+    "installerSha256":  "04A4D1FEB0352D51E8252D471FA74B9B6F9ECD47FB0C134A8423EEDAA4116B61",
     "gpParametersSha256":  "DDDA8655FCB4EC54FA4367D0A5756A6E26747B8137F487CC8FA0607845F501F8"
 }

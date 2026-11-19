@@ -159,11 +159,14 @@ namespace ArcGISProMCP.Commands
 
             var type = (parameters.GetString("map_type", "MAP") ?? "MAP").ToUpperInvariant();
             var basemapName = parameters.GetString("basemap", "none") ?? "none";
-
+            var scene = type == "SCENE";
+            // A scene needs a 3D viewing mode: asking for Scene with
+            // MapViewingMode.Map made Pro refuse the new map with
+            // "3D 地图视图无法更改为地图" (S1, tasks test 2026-11-18).
             var map = await QueuedTask.Run(() => MapFactory.Instance.CreateMap(
                 name,
-                type == "SCENE" ? MapType.Scene : MapType.Map,
-                MapViewingMode.Map,
+                scene ? MapType.Scene : MapType.Map,
+                scene ? MapViewingMode.SceneLocal : MapViewingMode.Map,
                 ParseBasemap(basemapName))).ConfigureAwait(false);
 
             var applied = new Dictionary<string, object>

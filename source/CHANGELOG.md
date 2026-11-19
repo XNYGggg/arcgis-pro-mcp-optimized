@@ -4,6 +4,137 @@ Notable changes, newest first. Versions are the add-in version in
 `addin/ArcGISProMCP/Config.daml`, which is what the ribbon, the installer and
 the MCP handshake all report.
 
+## 1.1.11 — 2026-11-19
+
+### Fixed
+
+- **`create_feature_class` / `create_table` failure cleanup no longer guesses
+  by name.** When field verification fails after creation, the map layers and
+  standalone tables that referenced the new dataset are resolved by their data
+  source *before* the dataset is deleted, then removed by object identity — an
+  unrelated layer that merely shares the name is left alone.
+- **Cleanup failures are reported, not swallowed.** A failed dataset delete or
+  layer removal is appended to the tool error (`Cleanup problems: …`) so the
+  caller can see which step failed.
+
+### Changed
+
+- `scripts/update_installed.py` no longer hardcodes this machine's paths: the
+  add-in path defaults to the user's Documents AddIns folder and the package
+  root to the script's own tree; both remain overridable via `MCP_*` env vars.
+- The build maps the project directory to `/_/src` in compiler debug info, so
+  the shipped DLL/PDB no longer carry the build machine's source paths.
+
+## 1.1.10 — 2026-11-18
+
+### Fixed
+
+- **restart_pro can no longer wedge.** The save-prompt probe (UI automation)
+  runs in a child PowerShell process and is abandoned after 15 s, so a busy
+  ArcGIS Pro cannot block the helper indefinitely. The restart log is UTF-8
+  and carries phase heartbeats (close progress, bridge wait), and the probe
+  answers localized `否(N)` / `取消(C)` buttons, not just the `(&N)` form.
+- **A dead restart helper no longer blocks retries.** The scheduled guard now
+  expires after 10 minutes instead of rejecting every later restart_pro call
+  until ArcGIS Pro is restarted by hand.
+
+### Changed
+
+- Local upgrade bookkeeping is one parameterised `scripts/update_installed.py`
+  (positional: version, expected SHA-256, note) instead of a one-off script
+  per release.
+- `scripts/restart_pro.ps1` shares the bounded save-prompt probe and matches
+  localized button labels too.
+
+## 1.1.9 — 2026-11-18
+
+### Fixed
+
+- **Layer commands accept a dataset path.** get_layer_info, set_raster_symbology
+  and repair_layer_source resolve a full dataset path to the loaded layer that
+  points at it; several matches are refused with their names (I1/R1).
+- **repair_layer_source repoints raster layers** through a RasterDataset, not
+  just feature layers and tables (D4).
+- **search_data no longer lists a dataset twice.** The default roots can name
+  one geodatabase both directly and through its parent folder; each workspace
+  is searched once.
+- **check_extension says what it is.** It now returns
+  `status:"not_inspectable", inspectable:false` instead of a bare "unknown"
+  that read like a licence state.
+- **GP wrapper outputs drop empty strings**, so zonal_statistics no longer
+  returns a trailing "" in outputs.
+- **get_features explains a raster name**: the "not found" error now says the
+  name is a raster layer and points at get_raster_info / sample_raster_values
+  instead of listing it among the candidates.
+
+### Notes
+
+- Python-toolbox cold start measures about 0.7 s once per Pro process (warm
+  ~25 ms). No prewarm was added: it moves that cost rather than removing it,
+  and only pays off when a batch is already known to follow.
+
+## 1.1.8 — 2026-11-18
+
+### Fixed
+
+- **insert_features / update_features / delete_features work on standalone
+  tables and dataset paths.** EditOperation is layer-shaped, so table rows are
+  written through the Table API instead: insert/update/delete now accept a
+  table in the map or a full path exactly like the read commands do. Table
+  writes are immediate and say so in the result (D2, tasks test 2026-11-18).
+- **sample_raster_values samples pixels directly.** `points` is finally
+  accepted (`[{x,y}]` or `[[x,y]]`), point layers can be anywhere and are
+  projected to the raster; values come back inline and nothing is written to
+  the default geodatabase. The old sa.Sample table path stays behind
+  `write_table=true` with a unique default table name (D3 + its overwrite
+  side effect).
+- **create_map makes a real scene.** A Scene was being created with
+  MapViewingMode.Map, which Pro rejected with "3D 地图视图无法更改为地图";
+  scenes now use MapViewingMode.SceneLocal (S1).
+- **get_features reads joined fields.** Joins made through add_join are
+  remembered; requested joined fields are resolved to their qualified
+  "Table.Field" names, an unfiltered read includes them, and a missing field
+  now fails with the full candidate list (J1/J2).
+- **Layout elements report and verify page-space bounds.** x/y are the
+  element's lower-left in page units (GetBounds), creation and
+  set_layout_element read the real box back, a placement off by more than
+  0.02 page units raises, and an element that runs past the page edge is
+  refused (L1).
+
+### Changed
+
+- **run_batch reports per-step milliseconds** and states that steps run
+  serially on Pro's main thread, so writes to one map or dataset cannot
+  interleave.
+
+## 1.1.7 — 2026-11-18
+
+### Fixed
+
+- **create_feature_class / create_table apply and verify their `fields`.**
+  arcpy's CreateFeatureclass/CreateTable have no fields parameter, so the
+  wrappers add each requested field with AddField and read the new dataset
+  back (names, types, TEXT lengths) before reporting success. A mismatch or a
+  failed AddField deletes the dataset this call created and raises; an invalid
+  request is rejected before anything is created. (D1, tasks test 2026-11-18.)
+- **run_batch no longer embeds images by default.** export_map_view,
+  export_layout and preview_layout return the inline picture only outside a
+  batch or when `return_image=true` is passed; inside run_batch they return
+  the path, byte count and SHA-256. A 1.16 MB batch response becomes under a
+  kilobyte. `Params.InBatch` carries the flag explicitly because an
+  AsyncLocal set by run_batch did not reach handlers on the MCT dispatcher.
+- **preview_layout can write its image out** with `output_path` and reports
+  size/hash when it does not return the picture inline.
+- **Exports wait briefly for the file to appear** before deciding whether to
+  inline it, so a just-written PNG is not missed.
+
+### Added
+
+- **get_features pages and summarises geometry.** Results carry `truncated`
+  and `next_offset`; `geometry_summary=true` returns type/extent/length/area
+  instead of WKT; `geometry_precision=N` rounds WKT coordinates. The shape is
+  loaded for a summary even though attributes alone would not need it.
+
 ## 1.1.6 — 2026-11-18
 
 ### Changed

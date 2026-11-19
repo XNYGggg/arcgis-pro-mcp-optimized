@@ -574,14 +574,17 @@ namespace ArcGISProMCP.Commands
         private static object CheckExtension(Params parameters)
         {
             var name = parameters.Require("extension");
-            // Extension licensing is not exposed to add-ins the way arcpy exposes
-            // it; the tools themselves fail with a clear message when unlicensed.
+            // Extension licensing is not exposed to add-ins the way arcpy
+            // exposes it. Say that plainly instead of a bare "unknown", which
+            // reads like a licence state (observation cleanup, 2026-11-18).
             return new Dictionary<string, object>
             {
                 ["extension"] = name,
-                ["status"] = "unknown",
-                ["note"] = "ArcGIS Pro does not expose extension checkout to add-ins. "
-                         + "Run the tool: it reports clearly if the licence is missing.",
+                ["status"] = "not_inspectable",
+                ["inspectable"] = false,
+                ["note"] = "ArcGIS Pro does not expose extension checkout to add-ins, "
+                         + "so this is not a licence state. Run the tool: it reports "
+                         + "clearly if the licence is missing.",
             };
         }
 

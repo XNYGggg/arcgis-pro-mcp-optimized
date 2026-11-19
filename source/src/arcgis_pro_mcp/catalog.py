@@ -269,7 +269,9 @@ CATALOG: List[Tool] = [
     # --- data ----------------------------------------------------------------
     T("get_features", "Data",
       "Read attribute rows from a layer, table or dataset path, with an "
-      "optional where clause, field subset, ordering and WKT geometry.",
+      "optional where clause, field subset, ordering and geometry. Pages "
+      "report truncated and next_offset; geometry can be a compact summary "
+      "or full WKT.",
       LAYER,
       P("where", "str", None, "SQL where clause."),
       P("fields", "list[str]", None, "Fields to return; default all."),
@@ -278,6 +280,10 @@ CATALOG: List[Tool] = [
       P("order_by", "str", None, 'ORDER BY clause, e.g. "POP DESC".'),
       P("include_geometry", "bool", False,
         "Add SHAPE@WKT geometry (can be very large)."),
+      P("geometry_summary", "bool", False,
+        "Add SHAPE@SUMMARY (type, extent, length, area) instead of WKT."),
+      P("geometry_precision", "int", None,
+        "Round WKT coordinates to this many decimals (with include_geometry)."),
       MAP_NAME),
 
     T("count_features", "Data",
@@ -468,7 +474,8 @@ CATALOG: List[Tool] = [
 
     T("create_feature_class", "Schema",
       "Create an empty feature class, by default in the project's default "
-      "geodatabase, and add it to the map.",
+      "geodatabase, and add it to the map. Requested fields are added after "
+      "creation and verified; a mismatch deletes the new dataset and fails.",
       P("name", "str", REQUIRED, "Feature class name."),
       P("geometry_type", "str", "POLYGON",
         "POINT, MULTIPOINT, POLYLINE or POLYGON."),
@@ -476,19 +483,20 @@ CATALOG: List[Tool] = [
       P("out_path", "str", None, "Target geodatabase or folder."),
       P("template", "str", None, "Dataset to copy the schema from."),
       P("fields", "list[dict]", None,
-        'Fields to create, e.g. [{"name": "NAME", "type": "TEXT", '
-        '"length": 50}].'),
+        'Fields to create and verify, e.g. [{"name": "NAME", "type": '
+        '"TEXT", "length": 50}].'),
       P("has_z", "str", "DISABLED", "ENABLED or DISABLED."),
       P("has_m", "str", "DISABLED", "ENABLED or DISABLED."),
       P("add_to_map", "bool", True, "Add the result to the map."),
       MAP_NAME),
 
     T("create_table", "Schema",
-      "Create an empty standalone table.",
+      "Create an empty standalone table. Requested fields are added after "
+      "creation and verified; a mismatch deletes the new table and fails.",
       P("name", "str", REQUIRED, "Table name."),
       P("out_path", "str", None, "Target geodatabase or folder."),
       P("template", "str", None, "Table to copy the schema from."),
-      P("fields", "list[dict]", None, "Fields to create."),
+      P("fields", "list[dict]", None, "Fields to create and verify."),
       P("add_to_map", "bool", True, "Add the result to the map."),
       MAP_NAME),
 
@@ -568,10 +576,12 @@ CATALOG: List[Tool] = [
         "by the native add-in; e.g. [script_file] for run-code toolboxes).")),
 
     T("check_extension", "Geoprocessing",
-      "Check, and optionally check out, an ArcGIS extension licence.",
+      "Report whether the add-in can inspect an extension licence. ArcGIS Pro "
+      "does not expose checkout to add-ins, so this answers inspectable:false; "
+      "run the tool itself to learn whether a licence is missing.",
       P("extension", "str", REQUIRED,
         '"Spatial", "3D", "Network", "ImageAnalyst", "GeoStats", ...'),
-      P("checkout", "bool", False, "Check the licence out if it is available.")),
+      P("checkout", "bool", False, "Ignored; kept for compatibility.")),
 
     T("get_messages", "Geoprocessing",
       "Messages from the most recent geoprocessing operation.",
@@ -685,7 +695,9 @@ CATALOG: List[Tool] = [
       P("fit", "str", "preserve",
         "preserve keeps the exact width/height; auto adjusts the output size to "
         "the view extent ratio so there are no letterbox bands."),
-      P("return_image", "bool", True, "Return the image inline."),
+      P("return_image", "bool", True,
+        "Return the image inline. Inside run_batch this defaults to false "
+        "(file path, size and SHA-256 only) unless set true."),
       MAP_NAME, returns_image=True),
 
     T("list_bookmarks", "View",
@@ -835,14 +847,23 @@ CATALOG: List[Tool] = [
       P("output_path", "str", REQUIRED,
         "Output file; the format follows the extension."),
       P("dpi", "int", 200, "Export resolution."),
-      P("return_image", "bool", True, "Return PNG/JPEG output inline."),
+      P("return_image", "bool", True,
+        "Return PNG/JPEG output inline. Inside run_batch this defaults to "
+        "false (path, size and SHA-256 only) unless set true."),
       returns_image=True),
 
     T("preview_layout", "Layouts",
-      "Render a layout to a temporary image and return it, without writing a "
-      "file -- use it to visually check a layout while building it.",
+      "Render a layout to an image, without writing a project file unless "
+      "output_path is given -- use it to visually check a layout while "
+      "building it.",
       P("layout_name", "str", REQUIRED, "Layout name."),
-      P("dpi", "int", 100, "Render resolution."), returns_image=True),
+      P("dpi", "int", 100, "Render resolution."),
+      P("output_path", "str", None,
+        "Optional file to save to; omit for a temporary image."),
+      P("return_image", "bool", True,
+        "Return the image inline. Inside run_batch this defaults to false "
+        "(size and SHA-256 only) unless set true."),
+      returns_image=True),
 
     T("export_map_series", "Layouts",
       "Export a layout's map series (map book) to a multi-page PDF.",
@@ -888,13 +909,19 @@ CATALOG: List[Tool] = [
       MAP_NAME),
 
     T("sample_raster_values", "Raster",
-      "Read raster cell values at map coordinates or at a point layer's features.",
+      "Read raster cell values at map coordinates or at a point layer's "
+      "features. Values come back inline; no table is written unless "
+      "write_table=true.",
       LAYER,
       P("points", "list[dict]", None,
-        'Coordinates to sample, e.g. [{"x": 100.5, "y": 13.7}].'),
-      P("point_layer", "str", None, "Point layer to sample at instead."),
-      P("band", "str", None, "Band to read for multiband rasters."),
-      P("limit", "int", 100, "Maximum points to sample from a layer."),
+        'Coordinates to sample, e.g. [{"x": 100.5, "y": 13.7}] or [[100.5, 13.7]].'),
+      P("point_layer", "str", None, "Point layer (or dataset path) to sample at instead."),
+      P("band", "int", 1, "Band to read for multiband rasters (1-based)."),
+      P("limit", "int", 1000, "Maximum points to sample from a layer."),
+      P("write_table", "bool", False,
+        "Write an sa.Sample output table instead of returning values inline."),
+      P("output_table", "str", None,
+        "Table path for write_table; default a unique table in the default geodatabase."),
       MAP_NAME),
 
     T("zonal_statistics", "Raster",

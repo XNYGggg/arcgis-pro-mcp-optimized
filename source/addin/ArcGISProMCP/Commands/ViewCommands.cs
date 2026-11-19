@@ -195,10 +195,22 @@ namespace ArcGISProMCP.Commands
             if (fitNote != null) result["fit_note"] = fitNote;
             if (!temporary) result["exported"] = outputPath;
 
-            if (parameters.GetBool("return_image", true) && File.Exists(outputPath))
+            // Inside run_batch the picture stays on disk unless asked for;
+            // callers that want bytes set return_image=true explicitly.
+            var returnImage = parameters.Has("return_image")
+                ? parameters.GetBool("return_image")
+                : !parameters.InBatch;
+            var fileReady = MapHelpers.WaitForFile(outputPath);
+            if (returnImage && fileReady)
             {
                 result["image_base64"] = Convert.ToBase64String(File.ReadAllBytes(outputPath));
                 result["image_format"] = "png";
+            }
+            else if (!temporary && fileReady)
+            {
+                var info = new FileInfo(outputPath);
+                result["exported_bytes"] = info.Length;
+                result["exported_sha256"] = MapHelpers.Sha256(outputPath);
             }
 
             if (temporary)

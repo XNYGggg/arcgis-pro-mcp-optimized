@@ -201,6 +201,12 @@ namespace ArcGISProMCP.Commands
         }
 
         private static int _restartScheduled;
+        private static long _restartScheduledAtTicks;
+
+        // Close (240s) + bridge (240s) + delay (10s) + margin: a helper that
+        // died without cleaning up must not block restarts forever.
+        private static readonly TimeSpan RestartGuardLifetime =
+            TimeSpan.FromMinutes(10);
 
         /// <summary>
         /// Saves, then hands the close/reopen to a detached PowerShell helper:
@@ -210,8 +216,29 @@ namespace ArcGISProMCP.Commands
         private static async Task<object> RestartProAsync(Params parameters)
         {
             if (Interlocked.CompareExchange(ref _restartScheduled, 1, 0) != 0)
-                throw new ArgumentException(
-                    "A restart is already scheduled; wait for ArcGIS Pro to come back.");
+            {
+                var scheduledAt = new DateTime(
+                    Interlocked.Read(ref _restartScheduledAtTicks),
+                    DateTimeKind.Utc);
+                var age = scheduledAt.Ticks == 0
+                    ? TimeSpan.Zero
+                    : DateTime.UtcNow - scheduledAt;
+                if (age < RestartGuardLifetime)
+                    throw new ArgumentException(
+                        "A restart is already scheduled; wait for ArcGIS Pro "
+                        + "to come back" + (scheduledAt.Ticks == 0 ? "."
+                            : " (if the helper died, retry after "
+                              + DateTime.UtcNow
+                                  .Add(RestartGuardLifetime - age)
+                                  .ToString("yyyy-MM-dd HH:mm:ss") + " UTC)."));
+                // Stale guard from a helper that never finished: take it over.
+                if (Interlocked.CompareExchange(ref _restartScheduled, 0, 1) != 0
+                    || Interlocked.CompareExchange(ref _restartScheduled, 1, 0) != 0)
+                    throw new ArgumentException(
+                        "A restart is already scheduled; wait for ArcGIS Pro to come back.");
+            }
+            Interlocked.Exchange(ref _restartScheduledAtTicks,
+                DateTime.UtcNow.Ticks);
 
             var save = parameters.GetBool("save", true);
             // The reply needs time to leave the HTTP socket before the window
@@ -449,10 +476,12 @@ namespace ArcGISProMCP.Commands
                         ["command"] = command,
                     };
 
+                    var stopwatch = System.Diagnostics.Stopwatch.StartNew();
                     try
                     {
                         entry["data"] = await CommandRouter.DispatchAsync(
-                            command, new Params(stepParameters), stepParameters)
+                            command, new Params(stepParameters, inBatch: true),
+                            stepParameters)
                             .ConfigureAwait(false);
                         entry["success"] = true;
                     }
@@ -461,6 +490,7 @@ namespace ArcGISProMCP.Commands
                         failed++;
                         entry["success"] = false;
                         entry["error"] = Unwrap(exception).Message;
+                        entry["ms"] = stopwatch.ElapsedMilliseconds;
                         results.Add(entry);
 
                         if (!continueOnError)
@@ -477,6 +507,7 @@ namespace ArcGISProMCP.Commands
                         continue;
                     }
 
+                    entry["ms"] = stopwatch.ElapsedMilliseconds;
                     results.Add(entry);
                 }
 
@@ -485,6 +516,9 @@ namespace ArcGISProMCP.Commands
                     ["results"] = results,
                     ["completed"] = results.Count,
                     ["failed"] = failed,
+                    ["execution"] = "serial",
+                    ["note"] = "Steps run one at a time on Pro's main thread; writes "
+                             + "to the same map or dataset therefore cannot interleave.",
                 };
             }
             finally
