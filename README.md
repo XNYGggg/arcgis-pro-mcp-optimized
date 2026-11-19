@@ -16,7 +16,7 @@ This package bundles **every component** needed to run — fully offline, **no P
 
 ## 🆚 What is new versus 1.14 (v1.1.4)
 
-Everything below was merged after the v1.1.4 customer package. Tool count 113 → **126** (1.1.5 added `add_table` and `restart_pro`; 1.1.12 merged the 2.x template distillation module — 10 new `template_*` tools; 1.1.13 added `template_delete`); the add-in binary is now ``669E1B74…8E99`` (432,751 bytes).
+Everything below was merged after the v1.1.4 customer package. Tool count 113 → **126** (1.1.5 added `add_table` and `restart_pro`; 1.1.12 merged the 2.x template distillation module — 10 new `template_*` tools; 1.1.13 added `template_delete`); the add-in binary is now ``CDBAEE33…327B`` (432,750 bytes).
 
 | Build | Type | Highlights |
 |---|---|---|

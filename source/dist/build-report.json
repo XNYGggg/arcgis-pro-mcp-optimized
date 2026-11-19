@@ -8,7 +8,7 @@
     "signed":  false,
     "registrationTests":  "passed",
     "runtimeValidation":  "passed 2026-11-19 on Pro 3.7.0.1901: install via install.ps1, handshake 1.1.13.0, ping command_count=123, tools/list 126 incl template_delete; distill import/measure/delete round-trip OK (repeat delete -> not_found/exit 3); check.ps1 22 passed / 0 failed",
-    "packageSha256":  "669E1B74B52934AE753ECD6A104A18E69EF236B15B908F6FBE697C1416E78E99",
-    "installerSha256":  "A11C7C74FF8AF2AAEEE697930A296EC5BAE7FD848E2DE1E7AF88A005F14F3F16",
+    "packageSha256":  "CDBAEE33A5360518E29A0DC3EF2174ADB8D983D44A15DFA563663CAC21EB327B",
+    "installerSha256":  "9646CEF6FA1B49862B5D6D3575408B1360F378FCF3DDE3F3EBD33D1B8E523BD8",
     "gpParametersSha256":  "DDDA8655FCB4EC54FA4367D0A5756A6E26747B8137F487CC8FA0607845F501F8"
 }

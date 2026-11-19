@@ -14,7 +14,7 @@
 
 ## 验证（2026-11-19）
 
-- 构建：`scripts/build.ps1` 全过；add-in 432,751 字节 SHA256 `669E1B74…8E99`；自安装包 600,555 字节 SHA256 `A11C7C74…3F16`。
+- 构建：`scripts/build.ps1` 全过；add-in 432,750 字节 SHA256 `CDBAEE33…327B`；自安装包 600,551 字节 SHA256 `9646CEF6…3BD8`。
 - 单元测试：`pytest tests/` 26 passed，其中 `tests/test_distill.py` 14/14、`tests/test_catalog_matches_bridge.py` 4/4；`tools.json` ↔ `catalog.py` 126 工具全等价。
 - 打包校验：SHA256SUMS 重新生成并全量校验通过；`install/runtime/distill` 与 `source/src/arcgis_agentkit` 逐文件一致。
 - 实机（2026-11-19，Pro 3.7，真实终端）：安装后握手 `1.1.13.0`、`ping` 命令数 **123**、`tools/list` **126** 工具（含 `template_delete`）；经已安装 `run-distill.ps1` 跑通 import → measure → delete（重复删除 → `not_found`/exit 3，用户模板库未受影响）；官方自检 **22 通过 / 2 警告（非失败）/ 0 失败**。

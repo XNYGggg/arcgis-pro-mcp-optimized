@@ -7,7 +7,7 @@
   - 安全语义：删除不存在的 id 返回 `not_found`（退出码 3），重复删除安全；`ready`（已批准）模板需 `--force`（否则退出码 5）；`inbox` 不受影响。
   - C# 薄封装 `template_delete`（TemplateCommands.cs）+ catalog Template 组条目；`tests/test_distill.py` 14/14（7 个删除用例）、`tests/test_catalog_matches_bridge.py` 4/4；工具数 125→126、命令 122→123。
   - 文档：`docs/distill.md`、`skills/template-distill/SKILL.md` 增加删除一节；四语 README、`docs/使用指南.md`、`VERSION.json` 同步。
-  - 构建：全过；add-in 432,751 字节 SHA256 `669E1B74…8E99`；自安装包 600,555 字节 SHA256 `A11C7C74…3F16`。
+  - 构建：全过；add-in 432,750 字节 SHA256 `CDBAEE33…327B`；自安装包 600,551 字节 SHA256 `9646CEF6…3BD8`。
   - 验证：pytest 全绿；`tools.json` 与 `catalog.py` 全等价（126 工具）；SHA256SUMS 重新生成并全量校验。
   - 实机（2026-11-19，Pro 3.7，真实终端）：握手 `1.1.13.0`、`ping` 123、`tools/list` 126（含 `template_delete`）；import → measure → delete 全链路通过（重复删除 not_found/exit 3）；自检 22 通过 / 0 失败。
 
