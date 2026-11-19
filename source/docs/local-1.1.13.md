@@ -29,8 +29,8 @@
 
 - 环境：dotnet SDK 10.0.300；ArcGIS Pro 3.7.0.1901（net10.0-windows）；Pro 自带 Python（pytest 8.4.2）。
 - `scripts/build.ps1` 全过（installer 脚本检查、client-registration、HTTP transport net8.0+net10.0、单文件安装器检查）。
-- **ArcGISProMCP.esriAddinX**：476,408 字节，SHA256 `4B90BB43F0BAD77DE817F19F0C342603CE9B2603C36E285066CF623B643D7419`，未签名。
-- 自安装包 `Install-ArcGISProMCP.cmd`：659,248 字节，SHA256 `B1E4922F3D97F31164990420CCD829BA3293AB37B361BAE1BFEC432D9133A07F`，内嵌载荷回算一致。
+- **ArcGISProMCP.esriAddinX**：432,751 字节，SHA256 `669E1B74B52934AE753ECD6A104A18E69EF236B15B908F6FBE697C1416E78E99`，未签名。
+- 自安装包 `Install-ArcGISProMCP.cmd`：600,555 字节，SHA256 `A11C7C74FF8AF2AAEEE697930A296EC5BAE7FD848E2DE1E7AF88A005F14F3F16`，内嵌载荷回算一致。
 
 ## 单元测试
 
@@ -43,7 +43,14 @@
 - `SHA256SUMS.txt` 重新生成（232 个文件）并全量校验通过。
 - `install/runtime/distill` 与 `source/src/arcgis_agentkit` 自 source 重新复制后逐文件一致；`docs/distill.md` 与 `source/docs/distill.md`、`skills/` 与 `source/skills/` 副本一致。
 
+## 实机部署与验收（2026-11-19，真实终端）
+
+- 安装：真实终端运行 `install/install.ps1 -SkipClients`（经 ASCII 路径中转脚本调用）——add-in 与运行时均更新，旧 add-in 备份 `ArcGISProMCP.esriAddinX.bak-20261119-213144`、旧运行时备份 `ArcGIS Pro MCP.bak-20261119-213144`，**旧模板库保留**；installed.json 记录 add-in SHA256 `669E1B74…8E99`。
+- 重启与握手：`restart_pro` 保存并重开 MyProject_95.aprx；MCP initialize `serverInfo.version = 1.1.13.0`；`ping` → `command_count = 123`；`tools/list` → **126 工具**，Template 组 11 个（含 `template_delete`）。
+- 蒸馏全链路（经已安装启动器 `%LOCALAPPDATA%\ArcGIS Pro MCP\distill\run-distill.ps1`，临时库 E:\mcp113\lib）：doctor → `{"version":"1.1.13","status":"ready"}`；import → measure → delete 全部 exit 0，delete 返回 `removed{index_entry,spec,image,job}` 且 `errors: []`；list 计数归 0；**重复删除 → `not_found`/exit 3**。
+- 官方自检 `install/check.ps1`：**22 通过 / 2 警告（6520 端口 http.sys 归属显示）/ 0 失败**；新增的版本门槛与 `tools/list` 探测均生效（首轮发现探测代码用 Invoke-RestMethod 解析对象导致误报，已改为 Invoke-WebRequest 原文匹配后复检通过）。
+- 回滚：add-in 备份见上；运行时备份见上；两者任一恢复后重启 Pro 即回到 1.1.12。
+
 ## 未做 / 边界
 
-- 未做实机安装与 MCP 握手验收（本任务只要求构建 + 测试 + 包级校验）；`install.ps1` 升级保留旧模板库的既有行为不变，删除命令不影响既有模板。
-- 未创建 Release、未打 tag、未推送远端。
+- 未在 3.7 以外的 Pro 版本验证；未创建 Gitee 发行版（本轮只发 GitHub）。

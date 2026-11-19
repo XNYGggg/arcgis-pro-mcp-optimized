@@ -16,7 +16,7 @@
 
 ## 🆚 相对 1.14（v1.1.4）升级了什么
 
-以下全部是 v1.1.4 客户包之后合入的变更。工具数 113 → **126**（1.1.5 新增 `add_table` 与 `restart_pro`；1.1.12 并入 2.x 模板蒸馏，新增 10 个 `template_*` 工具；1.1.13 新增 `template_delete`）；add-in 二进制哈希 ``4B90BB43…3D7419``（476,408 字节）。
+以下全部是 v1.1.4 客户包之后合入的变更。工具数 113 → **126**（1.1.5 新增 `add_table` 与 `restart_pro`；1.1.12 并入 2.x 模板蒸馏，新增 10 个 `template_*` 工具；1.1.13 新增 `template_delete`）；add-in 二进制哈希 ``669E1B74…8E99``（432,751 字节）。
 
 | 构建 | 类型 | 升级要点 |
 |---|---|---|
@@ -32,7 +32,7 @@
 
 本机实机验证（**仅 ArcGIS Pro 3.7**）：1.1.7 回归 21/21 PASS；1.1.8 连续两轮回归 0 失败；1.1.9 P2 回归 10/10、P1 重跑 0 失败；1.1.10 握手 `1.1.10.0`；1.1.11 握手 `1.1.11.0`、ping `command_count=112`，D1 字段回归对当前测试工程适用的断言全部通过（4 条历史断言引用已退役工程的图层名），`get_features` 分页/摘要/精度已实机复验。其他 Pro 版本未覆盖。
 
-1.1.13（模板删除）：构建全过（client-registration / installer / HTTP net8.0+net10.0），`tests/test_distill.py` 13/13（6 个删除用例：无共享图片删除、共享图片保留、未知 id not_found、ready 需 force、路径型 id 拒绝、孤儿索引清理）、`tests/test_catalog_matches_bridge.py` 4/4 通过；`tools.json` 与 `catalog.py` 在 126 工具 / 123 命令上全等价。1.1.12 的实机验收记录（握手、125 工具、`template_*` 全流程 11/11、官方自检 21 通过 / 0 失败）见 `docs/CHANGELOG.md`。细节见 `docs/CHANGELOG.md` 与 `RELEASE-NOTES.md`。
+1.1.13（模板删除）：构建全过（client-registration / installer / HTTP net8.0+net10.0），`tests/test_distill.py` 13/13（6 个删除用例：无共享图片删除、共享图片保留、未知 id not_found、ready 需 force、路径型 id 拒绝、孤儿索引清理）、`tests/test_catalog_matches_bridge.py` 4/4 通过；`tools.json` 与 `catalog.py` 在 126 工具 / 123 命令上全等价。1.1.12 的实机验收记录（握手、125 工具、`template_*` 全流程 11/11、官方自检 21 通过 / 0 失败）见 `docs/CHANGELOG.md`。细节见 `docs/CHANGELOG.md` 与 `RELEASE-NOTES.md`。 1.1.13（模板删除）实机验收（2026-11-19，Pro 3.7，真实终端）：安装后的构建握手 `1.1.13.0`、`ping` 命令数 **123**、`tools/list` 共 **126** 工具（含 `template_delete`）；经已安装的 `run-distill.ps1` 跑通 import → measure → delete 全链路（重复删除 → `not_found`/exit 3），官方自检 **22 通过 / 0 失败**。 1.1.13（模板删除）实机验收（2026-11-19，Pro 3.7，真实终端）：安装后的构建握手 `1.1.13.0`、`ping` 命令数 **123**、`tools/list` 共 **126** 工具（含 `template_delete`）；经已安装的 `run-distill.ps1` 跑通 import → measure → delete 全链路（重复删除 → `not_found`/exit 3），官方自检 **22 通过 / 0 失败**。
 
 ---
 

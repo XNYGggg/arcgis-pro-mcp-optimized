@@ -16,7 +16,7 @@
 
 ## 🆚 1.14(v1.1.4) 대비 업그레이드 내용
 
-아래는 모두 v1.1.4 고객 패키지 이후 반영된 변경입니다. 도구 수 113 → **126**(1.1.5에서 `add_table`과 `restart_pro` 추가, 1.1.12에서 2.x 템플릿 증류 모듈 통합으로 `template_*` 도구 10개 추가, 1.1.13에서 `template_delete` 추가); add-in 바이너리 해시 ``4B90BB43…3D7419``(476,408 바이트).
+아래는 모두 v1.1.4 고객 패키지 이후 반영된 변경입니다. 도구 수 113 → **126**(1.1.5에서 `add_table`과 `restart_pro` 추가, 1.1.12에서 2.x 템플릿 증류 모듈 통합으로 `template_*` 도구 10개 추가, 1.1.13에서 `template_delete` 추가); add-in 바이너리 해시 ``669E1B74…8E99``(432,751 바이트).
 
 | 빌드 | 유형 | 주요 내용 |
 |---|---|---|
@@ -32,7 +32,7 @@
 
 이 컴퓨터 실기 검증(**ArcGIS Pro 3.7 전용**): 1.1.7 회귀 21/21 PASS; 1.1.8 연속 두 라운드 0 실패; 1.1.9 P2 10/10 및 P1 재실행 0 실패; 1.1.10 핸드셰이크 `1.1.10.0`; 1.1.11 핸드셰이크 `1.1.11.0`, ping `command_count=112`, D1 필드 회귀는 현재 테스트 프로젝트에 적용되는 모든 어서션 PASS(4개 레거시 어서션은 퇴역 프로젝트의 레이어 이름 참조), `get_features` 페이징/요약/정밀도 실기 재확인. 다른 Pro 버전은 미검증.
 
-1.1.13(템플릿 삭제): 빌드 전 과정 통과(client-registration / installer / HTTP net8.0+net10.0), `tests/test_distill.py` 13/13(삭제 6개: 공유되지 않은 이미지 삭제, 공유 이미지 유지, 미지의 id not_found, ready는 force 필요, 경로형 id 거부, 고아 색인 정리), `tests/test_catalog_matches_bridge.py` 4/4 통과. `tools.json`과 `catalog.py`는 126개 도구 / 123개 명령에서 완전 동일. 1.1.12 실기 인수 기록(핸드셰이크, 125개 도구, `template_*` 전체 흐름 11/11, 공식 자체 점검 21 통과 / 0 실패)은 `docs/CHANGELOG.md`에 있습니다.
+1.1.13(템플릿 삭제): 빌드 전 과정 통과(client-registration / installer / HTTP net8.0+net10.0), `tests/test_distill.py` 13/13(삭제 6개: 공유되지 않은 이미지 삭제, 공유 이미지 유지, 미지의 id not_found, ready는 force 필요, 경로형 id 거부, 고아 색인 정리), `tests/test_catalog_matches_bridge.py` 4/4 통과. `tools.json`과 `catalog.py`는 126개 도구 / 123개 명령에서 완전 동일. 1.1.12 실기 인수 기록(핸드셰이크, 125개 도구, `template_*` 전체 흐름 11/11, 공식 자체 점검 21 통과 / 0 실패)은 `docs/CHANGELOG.md`에 있습니다. 1.1.13(템플릿 삭제) 실기 인수(2026-11-19, Pro 3.7, 실제 터미널): 설치된 빌드는 핸드셰이크 `1.1.13.0`, `ping` 명령 수 **123**, `tools/list` **126**개 도구(`template_delete` 포함). 설치된 `run-distill.ps1`로 import → measure → delete 전 경로 통과(재삭제 → `not_found`/exit 3), 공식 자체 점검 **22 통과 / 0 실패**. 1.1.13(템플릿 삭제) 실기 인수(2026-11-19, Pro 3.7, 실제 터미널): 설치된 빌드는 핸드셰이크 `1.1.13.0`, `ping` 명령 수 **123**, `tools/list` **126**개 도구(`template_delete` 포함). 설치된 `run-distill.ps1`로 import → measure → delete 전 경로 통과(재삭제 → `not_found`/exit 3), 공식 자체 점검 **22 통과 / 0 실패**.
 
 ---
 

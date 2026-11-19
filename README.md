@@ -16,7 +16,7 @@ This package bundles **every component** needed to run — fully offline, **no P
 
 ## 🆚 What is new versus 1.14 (v1.1.4)
 
-Everything below was merged after the v1.1.4 customer package. Tool count 113 → **126** (1.1.5 added `add_table` and `restart_pro`; 1.1.12 merged the 2.x template distillation module — 10 new `template_*` tools; 1.1.13 added `template_delete`); the add-in binary is now ``4B90BB43…3D7419`` (476,408 bytes).
+Everything below was merged after the v1.1.4 customer package. Tool count 113 → **126** (1.1.5 added `add_table` and `restart_pro`; 1.1.12 merged the 2.x template distillation module — 10 new `template_*` tools; 1.1.13 added `template_delete`); the add-in binary is now ``669E1B74…8E99`` (432,751 bytes).
 
 | Build | Type | Highlights |
 |---|---|---|
@@ -32,7 +32,7 @@ Everything below was merged after the v1.1.4 customer package. Tool count 113 �
 
 Verification on this machine (live, **ArcGIS Pro 3.7 only**): 1.1.7 regression 21/21 PASS; 1.1.8 two consecutive rounds with zero failures; 1.1.9 P2 10/10 plus a P1 re-run with zero failures; 1.1.10 handshake `1.1.10.0`; 1.1.11 handshake `1.1.11.0`, ping `command_count=112`, the D1 fields regression passes every assertion that applies to the current test project (four legacy assertions reference layers from a retired project), and `get_features` paging / summary / precision were re-verified live. Other Pro versions are not covered.
 
-1.1.13 (template deletion): build passed end to end (client-registration / installer / HTTP on net8.0+net10.0); `tests/test_distill.py` 13/13 (the six delete cases cover image removal, shared-image safety, not_found, the ready gate, path-like ids and orphan index entries) and `tests/test_catalog_matches_bridge.py` 4/4 passed; `tools.json` and `catalog.py` are fully equivalent at 126 tools / 123 commands. The 1.1.12 live acceptance (handshake, 125 tools, the full `template_*` flow 11/11, self-check 21 passed / 0 failed) is recorded in `docs/CHANGELOG.md`. Details are in `docs/CHANGELOG.md` and `RELEASE-NOTES.md`.
+1.1.13 (template deletion): build passed end to end (client-registration / installer / HTTP on net8.0+net10.0); `tests/test_distill.py` 13/13 (the six delete cases cover image removal, shared-image safety, not_found, the ready gate, path-like ids and orphan index entries) and `tests/test_catalog_matches_bridge.py` 4/4 passed; `tools.json` and `catalog.py` are fully equivalent at 126 tools / 123 commands. The 1.1.12 live acceptance (handshake, 125 tools, the full `template_*` flow 11/11, self-check 21 passed / 0 failed) is recorded in `docs/CHANGELOG.md`. Details are in `docs/CHANGELOG.md` and `RELEASE-NOTES.md`. 1.1.13 (template deletion) live acceptance (2026-11-19, Pro 3.7, real terminal): the installed build handshakes as `1.1.13.0`, `ping` returns **123** commands, `tools/list` advertises **126** tools including `template_delete`; a full import → measure → delete round-trip through the installed `run-distill.ps1` passed (repeat delete → `not_found`/exit 3), and the official self-check reports **22 passed / 0 failed**. 1.1.13 (template deletion) live acceptance (2026-11-19, Pro 3.7, real terminal): the installed build handshakes as `1.1.13.0`, `ping` returns **123** commands, `tools/list` advertises **126** tools including `template_delete`; a full import → measure → delete round-trip through the installed `run-distill.ps1` passed (repeat delete → `not_found`/exit 3), and the official self-check reports **22 passed / 0 failed**.
 
 ---
 

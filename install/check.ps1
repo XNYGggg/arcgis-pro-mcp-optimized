@@ -160,7 +160,9 @@ if ($tcpOk) {
     try {
         $headers = @{ Accept = 'application/json, text/event-stream' }
         $init = '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"agentkit-check","version":"1.0"}}}'
-        $initText = [string](Invoke-RestMethod -Uri 'http://127.0.0.1:6520/mcp' -Method Post -Body ([Text.Encoding]::UTF8.GetBytes($init)) -ContentType 'application/json; charset=utf-8' -Headers $headers -TimeoutSec 10)
+        # Invoke-WebRequest keeps the raw body: Invoke-RestMethod would parse it
+        # into an object and the version regex below could not see it.
+        $initText = [string](Invoke-WebRequest -Uri 'http://127.0.0.1:6520/mcp' -Method Post -Body ([Text.Encoding]::UTF8.GetBytes($init)) -ContentType 'application/json; charset=utf-8' -Headers $headers -TimeoutSec 10 -UseBasicParsing).Content
         # A running 1.1.12 add-in answers fine but has no template_delete, so
         # the reported server version is part of the check.
         if ($initText -match '"version"\s*:\s*"1\.1\.13') {
@@ -170,7 +172,7 @@ if ($tcpOk) {
         }
         try {
             $listBody = '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}'
-            $toolsText = [string](Invoke-RestMethod -Uri 'http://127.0.0.1:6520/mcp' -Method Post -Body ([Text.Encoding]::UTF8.GetBytes($listBody)) -ContentType 'application/json; charset=utf-8' -Headers $headers -TimeoutSec 10)
+            $toolsText = [string](Invoke-WebRequest -Uri 'http://127.0.0.1:6520/mcp' -Method Post -Body ([Text.Encoding]::UTF8.GetBytes($listBody)) -ContentType 'application/json; charset=utf-8' -Headers $headers -TimeoutSec 10 -UseBasicParsing).Content
             if ($toolsText -match '"template_delete"') {
                 Ok 'tools/list 含 template_delete'
             } else {

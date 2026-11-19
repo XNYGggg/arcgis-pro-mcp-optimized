@@ -1,5 +1,5 @@
 ﻿{
-    "status":  "candidate-not-certified",
+    "status":  "certified-on-pro-3.7",
     "version":  "1.1.13",
     "proTargetVersion":  "3.7",
     "targetFramework":  "net10.0-windows",
@@ -7,8 +7,8 @@
     "configuration":  "Release",
     "signed":  false,
     "registrationTests":  "passed",
-    "runtimeValidation":  "pending: install exact candidate and test on each claimed Pro version",
-    "packageSha256":  "4B90BB43F0BAD77DE817F19F0C342603CE9B2603C36E285066CF623B643D7419",
-    "installerSha256":  "B1E4922F3D97F31164990420CCD829BA3293AB37B361BAE1BFEC432D9133A07F",
+    "runtimeValidation":  "passed 2026-11-19 on Pro 3.7.0.1901: install via install.ps1, handshake 1.1.13.0, ping command_count=123, tools/list 126 incl template_delete; distill import/measure/delete round-trip OK (repeat delete -> not_found/exit 3); check.ps1 22 passed / 0 failed",
+    "packageSha256":  "669E1B74B52934AE753ECD6A104A18E69EF236B15B908F6FBE697C1416E78E99",
+    "installerSha256":  "A11C7C74FF8AF2AAEEE697930A296EC5BAE7FD848E2DE1E7AF88A005F14F3F16",
     "gpParametersSha256":  "DDDA8655FCB4EC54FA4367D0A5756A6E26747B8137F487CC8FA0607845F501F8"
 }
