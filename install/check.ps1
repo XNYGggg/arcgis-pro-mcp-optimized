@@ -15,7 +15,7 @@ function Step($t) { Write-Host ''; Write-Host ('== ' + $t) -ForegroundColor Cyan
 $script:pass = 0; $script:warn = 0; $script:fail = 0
 $runtimeDst = Join-Path $env:LOCALAPPDATA 'ArcGIS Pro MCP'
 
-Write-Host 'ArcGIS Pro MCP 优化版 客户版 Customer 1.1.11（1.14 增强版） · 自检'
+Write-Host 'ArcGIS Pro MCP 优化版 客户版 Customer 1.1.13（1.14 增强版 + 模板蒸馏 + 模板删除） · 自检'
 
 Step 'ArcGIS Pro'
 $proExe = $null
@@ -86,7 +86,7 @@ if (Test-Path -LiteralPath $addin) {
     if (Test-Path -LiteralPath $side) {
         $want = (Get-Content -LiteralPath $side -TotalCount 1).Trim().Split(' ')[0].ToLower()
         $got = (Get-FileHash -LiteralPath $addin -Algorithm SHA256).Hash.ToLower()
-        if ($want -eq $got) { Ok ('SHA256 与客户包一致：' + $got) } else { Warn ('SHA256 不一致（可能已被其他版本覆盖）：' + $got) }
+        if ($want -eq $got) { Ok ('SHA256 与客户包一致：' + $got) } else { Fail ('SHA256 与客户包不一致（已安装的 add-in 不是本包版本，请重新运行 00-install.cmd）：' + $got) }
     }
 } else {
     Fail 'add-in 未安装，请先运行 00-install.cmd'
@@ -97,8 +97,53 @@ foreach ($item in @(
     @{ p = (Join-Path $runtimeDst 'stdio-bridge.ps1'); n = 'stdio 桥' },
     @{ p = (Join-Path $runtimeDst 'runcode\RunCode.pyt'); n = 'RunCode 工具箱' },
     @{ p = (Join-Path $runtimeDst 'guard\watch_pro_dialog.ps1'); n = '弹窗守护' },
-    @{ p = (Join-Path $runtimeDst 'plugin\mcp_bridge.py'); n = 'Python 桥' })) {
+    @{ p = (Join-Path $runtimeDst 'plugin\mcp_bridge.py'); n = 'Python 桥' },
+    @{ p = (Join-Path $runtimeDst 'distill\run-distill.ps1'); n = '模板蒸馏启动器' },
+    @{ p = (Join-Path $runtimeDst 'distill\arcgis_agentkit\distill\cli.py'); n = '模板蒸馏模块' })) {
     if (Test-Path -LiteralPath $item.p) { Ok $item.n } else { Fail ('缺少 ' + $item.n + '：' + $item.p) }
+}
+
+Step '模板蒸馏组件（1.1.12 起）'
+$proPy = $null
+try {
+    $proDir = (Get-ItemProperty 'HKLM:\SOFTWARE\ESRI\ArcGISPro' -ErrorAction SilentlyContinue).InstallDir
+    if ($proDir) { $c = Join-Path $proDir 'bin\Python\envs\arcgispro-py3\python.exe'; if (Test-Path -LiteralPath $c) { $proPy = $c } }
+} catch { }
+if (-not $proPy) {
+    foreach ($c in @("$env:ProgramW6432\ArcGIS\Pro\bin\Python\envs\arcgispro-py3\python.exe",
+                     "$env:ProgramFiles\ArcGIS\Pro\bin\Python\envs\arcgispro-py3\python.exe")) {
+        if ($c -and (Test-Path -LiteralPath $c)) { $proPy = $c; break }
+    }
+}
+if ($proPy) {
+    try {
+        $pil = (& $proPy -c "import PIL; print(PIL.__version__)" 2>$null | Select-Object -Last 1)
+        if ($LASTEXITCODE -eq 0 -and $pil) { Ok ('Pro 自带 Python：' + $pil + '（Pillow）') } else { Fail 'Pro 自带 Python 无法导入 Pillow（模板蒸馏不可用）' }
+    } catch { Fail ('Pillow 探测失败：' + $_.Exception.Message) }
+} else {
+    Fail '未找到 ArcGIS Pro 自带 Python（arcgispro-py3），模板蒸馏不可用'
+}
+$launcher = Join-Path $runtimeDst 'distill\run-distill.ps1'
+if (Test-Path -LiteralPath $launcher) {
+    try {
+        $docText = (& powershell -NoProfile -ExecutionPolicy Bypass -File $launcher doctor --json 2>$null | Select-Object -Last 1)
+        $docExit = $LASTEXITCODE
+        $doc = $docText | ConvertFrom-Json
+        $libDetail = ($doc.checks | Where-Object { $_.check -eq 'library' } | Select-Object -First 1).detail
+        # doctor keeps ok=true even when a critical check fails; status and the
+        # exit code are what actually say whether the module is usable. The
+        # version gate matters too: a stale 1.1.12 runtime has no delete
+        # command even though doctor says ready.
+        if ($docExit -eq 0 -and $doc.status -eq 'ready' -and $doc.ok -and [string]$doc.version -eq '1.1.13') {
+            Ok ('distill doctor：ready（' + $doc.version + '，库 ' + $libDetail + '）')
+        } elseif ($docExit -eq 0 -and $doc.status -eq 'ready' -and $doc.ok) {
+            Fail ('distill 运行时版本不是 1.1.13（当前 ' + $doc.version + '，缺少模板删除命令），请重新运行 00-install.cmd')
+        } else {
+            Fail ('distill doctor 未就绪（exit=' + $docExit + '，status=' + $doc.status + '）：' + $docText)
+        }
+    } catch { Fail ('distill doctor 探测失败：' + $_.Exception.Message) }
+} else {
+    Fail ('缺少模板蒸馏启动器：' + $launcher)
 }
 
 Step 'MCP 桥接端口 127.0.0.1:6520'
@@ -115,8 +160,27 @@ if ($tcpOk) {
     try {
         $headers = @{ Accept = 'application/json, text/event-stream' }
         $init = '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"agentkit-check","version":"1.0"}}}'
-        $null = Invoke-RestMethod -Uri 'http://127.0.0.1:6520/mcp' -Method Post -Body ([Text.Encoding]::UTF8.GetBytes($init)) -ContentType 'application/json; charset=utf-8' -Headers $headers -TimeoutSec 10
-        Ok 'MCP initialize 成功'
+        # Invoke-WebRequest keeps the raw body: Invoke-RestMethod would parse it
+        # into an object and the version regex below could not see it.
+        $initText = [string](Invoke-WebRequest -Uri 'http://127.0.0.1:6520/mcp' -Method Post -Body ([Text.Encoding]::UTF8.GetBytes($init)) -ContentType 'application/json; charset=utf-8' -Headers $headers -TimeoutSec 10 -UseBasicParsing).Content
+        # A running 1.1.12 add-in answers fine but has no template_delete, so
+        # the reported server version is part of the check.
+        if ($initText -match '"version"\s*:\s*"1\.1\.13') {
+            Ok 'MCP initialize 成功（server 1.1.13）'
+        } else {
+            Fail ('MCP initialize 成功，但服务端版本不是 1.1.13（旧 add-in 仍在运行？请重启 ArcGIS Pro）：' + ($initText -replace '\s+', ' ').Substring(0, [Math]::Min(200, $initText.Length)))
+        }
+        try {
+            $listBody = '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}'
+            $toolsText = [string](Invoke-WebRequest -Uri 'http://127.0.0.1:6520/mcp' -Method Post -Body ([Text.Encoding]::UTF8.GetBytes($listBody)) -ContentType 'application/json; charset=utf-8' -Headers $headers -TimeoutSec 10 -UseBasicParsing).Content
+            if ($toolsText -match '"template_delete"') {
+                Ok 'tools/list 含 template_delete'
+            } else {
+                Fail 'tools/list 缺少 template_delete：add-in 可能仍是旧版'
+            }
+        } catch {
+            Warn ('tools/list 探测未成功（部分传输要求先完成会话初始化）：' + $_.Exception.Message)
+        }
     } catch {
         Fail ('MCP HTTP 无响应：' + $_.Exception.Message)
     }

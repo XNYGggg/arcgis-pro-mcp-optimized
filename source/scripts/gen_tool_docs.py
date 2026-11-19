@@ -31,6 +31,7 @@ GROUP_TITLES = {
     "Raster": "Raster",
     "Catalog": "Finding and inspecting data",
     "Utility": "Escape hatch",
+    "Template": "Template distillation",
 }
 
 

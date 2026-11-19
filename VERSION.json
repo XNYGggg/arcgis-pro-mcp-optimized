@@ -1,26 +1,27 @@
 {
-  "name": "ArcGIS Pro MCP 优化版客户版 Customer 1.1.11（1.14 增强版，构建号 1.1.11）",
-  "version": "1.1.11",
+  "name": "ArcGIS Pro MCP 优化版客户版 Customer 1.1.13（1.14 增强版 + 模板蒸馏 + 模板删除，构建号 1.1.13）",
+  "version": "1.1.13",
   "built": "2026-11-19",
-  "tools": 115,
-  "commands": 112,
+  "tools": 126,
+  "commands": 123,
   "requirements": {
     "os": "Windows 11 x64 (AMD64); ARM64 not supported",
     "arcgis_pro": "3.7 (built and live-verified on 3.7; later versions untested)",
-    "external_deps": "none (PowerShell/.NET provided by Windows and ArcGIS Pro)"
+    "external_deps": "none for this package; ArcGIS Pro 3.7 system requirements (Microsoft .NET Desktop Runtime 10 x64, WebView2) are Esri prerequisites - install per Esri docs if missing"
   },
   "addin": {
     "file": "install/ArcGISProMCP.esriAddinX",
-    "file_version": "1.1.11.0",
+    "file_version": "1.1.13.0",
     "desktop_version": "3.7",
-    "sha256": "0abb872fbcd6fb65aa12f118501216f2bd3f305a9c6c68537870a5eddf306df9"
+    "sha256": "cdbaee33a5360518e29a0dc3ef2174adb8d983d44a15dfa563663cac21eb327b",
+    "size": 432750
   },
   "license": "AGPL-3.0-or-later",
   "upstream": "https://github.com/Knight60/ArcGIS-Pro-MCP",
   "source": "source/",
-  "branch": "customer-v1.1.11",
+  "branch": "customer-v1.1.13",
   "release": {
-    "status": "stable",
-    "note": "正式版：经测试稳定，推荐下载（2026-11-19）。tag v1.1.11；GitHub Release 与 Gitee 发行版提供 ArcGIS-Pro-MCP-1.1.11.zip；v1.1.4 为上一稳定版，可回滚"
+    "status": "enhanced",
+    "note": "1.14 增强版（构建号 1.1.13），在 1.1.12 基础上为模板库新增 template_delete（删除 spec/index 条目/作业单/无引用去重图片，ready 模板需 --force）；正式版：经测试稳定，推荐下载；已发布 GitHub Release v1.1.13（tag v1.1.13，main 分支内容同此版本），接替并删除 v1.1.11；v1.1.4 保留供回滚"
   }
 }

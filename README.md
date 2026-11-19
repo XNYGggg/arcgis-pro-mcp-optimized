@@ -1,14 +1,14 @@
-[![English](https://img.shields.io/badge/Language-English-1f6feb?style=flat-square)](README.md) [![简体中文](https://img.shields.io/badge/Language-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-d1242f?style=flat-square)](README.zh-CN.md) [![日本語](https://img.shields.io/badge/Language-%E6%97%A5%E6%9C%AC%E8%AA%9E-bc002d?style=flat-square)](README.ja.md) [![한국어](https://img.shields.io/badge/Language-%ED%95%9C%EA%B5%AD%EC%96%B4-0047a0?style=flat-square)](README.ko.md) [![Version](https://img.shields.io/badge/Version-1.1.11%20(stable%2C%20recommended)-2ea44f?style=flat-square)](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/releases/tag/v1.1.11) [![Changelog](https://img.shields.io/badge/Docs-Changelog-6f42c1?style=flat-square)](docs/CHANGELOG.md) [![License: AGPL v3+](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue?style=flat-square)](LICENSE) [![ArcGIS Pro](https://img.shields.io/badge/ArcGIS%20Pro-3.7-00a1e0?style=flat-square)](https://www.esri.com/en-us/arcgis/products/arcgis-pro/overview) [![Platform](https://img.shields.io/badge/Platform-Windows%2011%20x64-lightgrey?style=flat-square)]()
+[![English](https://img.shields.io/badge/Language-English-1f6feb?style=flat-square)](README.md) [![简体中文](https://img.shields.io/badge/Language-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-d1242f?style=flat-square)](README.zh-CN.md) [![日本語](https://img.shields.io/badge/Language-%E6%97%A5%E6%9C%AC%E8%AA%9E-bc002d?style=flat-square)](README.ja.md) [![한국어](https://img.shields.io/badge/Language-%ED%95%9C%EA%B5%AD%EC%96%B4-0047a0?style=flat-square)](README.ko.md) [![Version](https://img.shields.io/badge/Version-Customer%201.1.13-2ea44f?style=flat-square)](VERSION.json) [![Changelog](https://img.shields.io/badge/Docs-Changelog-6f42c1?style=flat-square)](docs/CHANGELOG.md) [![License: AGPL v3+](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue?style=flat-square)](LICENSE) [![ArcGIS Pro](https://img.shields.io/badge/ArcGIS%20Pro-3.7-00a1e0?style=flat-square)](https://www.esri.com/en-us/arcgis/products/arcgis-pro/overview) [![Platform](https://img.shields.io/badge/Platform-Windows%2011%20x64-lightgrey?style=flat-square)]()
 
-# 🗺️ ArcGIS Pro MCP (Optimized) · Customer 1.1.11 (1.14 Enhanced Edition) · Official Release (tested and stable, recommended) 🎁
+# 🗺️ ArcGIS Pro MCP (Optimized) · Customer 1.1.13 (1.14 Enhanced Edition + Template Distillation) 🚀
 
 One natural-language sentence lets your AI assistant drive the ArcGIS Pro project you already have open: add layers, change symbology, query attributes, run geoprocessing, export maps. Your data never leaves your machine — all traffic stays on `127.0.0.1` 🔒.
 
-> **✅ Official release — tested and stable, recommended download (2026-11-19)**: this is **Customer 1.1.11 (1.14 Enhanced Edition, build 1.1.11)**, stacking the fixes accumulated since 1.14 (v1.1.4) — 1.1.5 (F1–F10), 1.1.6 (V-1–V-7), the P0–P2 defects confirmed by the full live test on 2026-11-18 (1.1.7–1.1.9), 1.1.10's restart self-healing and 1.1.11's cleanup fixes — and it has passed the live regression on this machine. **This version is now the official stable release — tested and stable, recommended download**: the offline package `ArcGIS-Pro-MCP-1.1.11.zip` (with SHA256) is available in the GitHub Release [`v1.1.11`](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/releases/tag/v1.1.11) and the Gitee mirror release; v1.1.4 stays as the previous stable release for rollback.
+> **🚀 This is Customer 1.1.13 (1.14 Enhanced Edition + template distillation + template deletion, build 1.1.13) — the official, tested-and-stable, recommended release.** It stacks every fix accumulated since 1.14 (v1.1.4): 1.1.5 (F1–F10), 1.1.6 (V-1–V-7), the P0–P2 defects confirmed by the 2026-11-18 live test (1.1.7–1.1.9), 1.1.10's restart self-healing, 1.1.11's cleanup fixes, 1.1.12's template-distillation module ported from 2.x and 1.1.13's template deletion. The **GitHub Release `v1.1.13` ships the offline package** (same content as the `install/` tree in this repository); **v1.1.11 has been retired — its release and tag were removed — and this version replaces it as the recommended download**; v1.1.4 stays available as the previous stable release for rollback.
 
-> **📌 Version note (2026-11-19)**: **the 1.1 line (v1.1.11, official release) is tested and stable — recommended download**; v1.1.4 is the previous stable release, available for rollback; **2.0 is a testing line** — its optimisation is unfinished, and its GitHub Release assets and tags have been removed, so it is not downloadable for now. 2.0 code lives only on the `customer-v2.0.1` / `customer-v2.0.0` branches. See [BRANCHES.md](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/blob/main/BRANCHES.md) for the branch / tag / release map.
+> **📌 Version note (2026-11-19)**: **Customer 1.1.13 is the current official release of the 1.x stable line — tested and recommended for daily work**; v1.1.11 is retired (its release and tag were removed) and fully superseded by 1.1.13; v1.1.4 remains the previous stable release for rollback. **2.0 is a testing line** — its optimisation is unfinished, and its GitHub Release assets and tags have been removed, so it is not downloadable for now. 2.0 code lives only on the `customer-v2.0.1` / `customer-v2.0.0` branches.
 
-> **🙏 Upstream project and original author**: this Customer Edition is based on **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)** (original author **Pisut Nakmuenwai**, AGPL-3.0-or-later), with local patches accumulated up to **v1.1.11**. Full attribution and modification notices are in `NOTICE` and `source/SOURCE-NOTICE.md`.
+> **🙏 Upstream project and original author**: this Customer Edition is based on **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)** (original author **Pisut Nakmuenwai**, AGPL-3.0-or-later), with local patches accumulated up to **v1.1.13**. Full attribution and modification notices are in `NOTICE` and `source/SOURCE-NOTICE.md`.
 
 This package bundles **every component** needed to run — fully offline, **no Python, no pip, no internet required**, and no dependency other than ArcGIS Pro itself. Batteries included 🔋
 
@@ -16,7 +16,7 @@ This package bundles **every component** needed to run — fully offline, **no P
 
 ## 🆚 What is new versus 1.14 (v1.1.4)
 
-Everything below was merged after the v1.1.4 customer package. Tool count 113 → **115** (new `add_table` and `restart_pro`); the add-in binary is now `0ABB872F…6DF9` (469,634 bytes).
+Everything below was merged after the v1.1.4 customer package. Tool count 113 → **126** (1.1.5 added `add_table` and `restart_pro`; 1.1.12 merged the 2.x template distillation module — 10 new `template_*` tools; 1.1.13 added `template_delete`); the add-in binary is now ``CDBAEE33…327B`` (432,750 bytes).
 
 | Build | Type | Highlights |
 |---|---|---|
@@ -27,8 +27,12 @@ Everything below was merged after the v1.1.4 customer package. Tool count 113 �
 | **1.1.9** | P2 | `get_layer_info` / `set_raster_symbology` / `repair_layer_source` accept dataset paths (unique match resolves, multiple matches list layer names). `repair_layer_source` gained a raster branch (`RasterDataset.ReplaceDataSource`). `search_data` de-duplicates. `check_extension` reports `inspectable:false` semantics (Pro does not expose checkout to add-ins). GP outputs filter empty strings. `get_features` suggests `get_raster_info` when given a raster layer name |
 | **1.1.10** | Restart self-healing | `restart_pro` probes the save dialog in a child process with a hard 15 s timeout (give up and log on timeout); button matching accepts localised `是(Y) / 否(N) / 取消(C)`; `restart.log` is UTF-8 with phase heartbeats; TCP connect has a 5 s timeout; it still never force-kills Pro. The restart scheduling flag expires after 10 minutes so a crashed assistant no longer blocks new restart requests. Deployment normalised to `scripts/update_installed.py` (positional, refuses hash mismatch) |
 | **1.1.11** | Cleanup fixes | Failure cleanup of `create_feature_class` / `create_table` now resolves the map layers and standalone tables that reference the half-created dataset *before* deleting it and removes them by object identity — an unrelated layer that merely shares the name is left alone; cleanup failures are appended to the tool error instead of being swallowed. `scripts/update_installed.py` no longer hardcodes machine paths, and the build maps source paths out of the shipped DLL/PDB |
+| **1.1.12** | Template distillation | Merges the 2.x template distillation module: 10 `template_*` tools + the `arcgis-distill` CLI (runs on Pro's own Python, no extra dependency) + a local template library (`%LOCALAPPDATA%\ArcGIS Pro MCP\library`, kept on upgrades); new `skills/template-distill` and `docs/distill.md`; tool count 115→125, commands 112→122 |
+| **1.1.13** | Template deletion | The template library gains `template_delete` — deletes a template's spec, index entry, job sheet and its deduplicated sample image (kept while another template still references it); approved (ready) templates need `force`; tool count 125→126, commands 122→123 |
 
-Verification on this machine (live, **ArcGIS Pro 3.7 only**): 1.1.7 regression 21/21 PASS; 1.1.8 two consecutive rounds with zero failures; 1.1.9 P2 10/10 plus a P1 re-run with zero failures; 1.1.10 handshake `1.1.10.0`; 1.1.11 handshake `1.1.11.0`, ping `command_count=112`, the D1 fields regression passes every assertion that applies to the current test project (four legacy assertions reference layers from a retired project), and `get_features` paging / summary / precision were re-verified live. Other Pro versions are not covered. Details are in `docs/CHANGELOG.md` and `RELEASE-NOTES.md`.
+Verification on this machine (live, **ArcGIS Pro 3.7 only**): 1.1.7 regression 21/21 PASS; 1.1.8 two consecutive rounds with zero failures; 1.1.9 P2 10/10 plus a P1 re-run with zero failures; 1.1.10 handshake `1.1.10.0`; 1.1.11 handshake `1.1.11.0`, ping `command_count=112`, the D1 fields regression passes every assertion that applies to the current test project (four legacy assertions reference layers from a retired project), and `get_features` paging / summary / precision were re-verified live. Other Pro versions are not covered.
+
+1.1.13 (template deletion): build passed end to end (client-registration / installer / HTTP on net8.0+net10.0); `tests/test_distill.py` 16/16 (the eight delete cases cover image removal, shared-image safety, not_found, the ready gate, path-like ids, orphan index entries, long-id collisions and id reservations after interrupted deletes) and `tests/test_catalog_matches_bridge.py` 4/4 passed; `tools.json` and `catalog.py` are fully equivalent at 126 tools / 123 commands. The 1.1.12 live acceptance (handshake, 125 tools, the full `template_*` flow 11/11, self-check 21 passed / 0 failed) is recorded in `docs/CHANGELOG.md`. Details are in `docs/CHANGELOG.md` and `RELEASE-NOTES.md`. 1.1.13 (template deletion) live acceptance (2026-11-19, Pro 3.7, real terminal): the installed build handshakes as `1.1.13.0`, `ping` returns **123** commands, `tools/list` advertises **126** tools including `template_delete`; a full import → measure → delete round-trip through the installed `run-distill.ps1` passed (repeat delete → `not_found`/exit 3), and the official self-check reports **22 passed / 0 failed**.
 
 ---
 
@@ -154,9 +158,9 @@ The project is designed as “one repository, three modules”; each stands alon
 
 | Module | One-line purpose | When to use it | Status in this build |
 |---|---|---|---|
-| 🧩 **MCP add-in** | The only road between AI and Pro: 115 MCP tools plus two arcpy channels (RunCode / Python bridge) | All daily operations; batch scripts; interactive sessions that need `CURRENT` | ✅ Works out of the box |
+| 🧩 **MCP add-in** | The only road between AI and Pro: 126 MCP tools plus two arcpy channels (RunCode / Python bridge) | All daily operations; batch scripts; interactive sessions that need `CURRENT` | ✅ Works out of the box |
 | 🛡️ **Dialog guard** | Clicks the “third-party code library” trust dialog for you; falls back to a topmost ringing reminder | The first RunCode.pyt run; unattended batch jobs | ✅ Standalone script `03-dialog-guard.cmd` |
-| 🧪 **Template distillation** | Distils a sample map image into a reusable layout template for consistent batch output | Many maps with one layout; reproducing paper/report figures | ❌ Not in this build; see V2.01 (v2.0.1) |
+| 🧪 **Template distillation** | Distils a sample map image into a reusable layout template for consistent batch output | Many maps with one layout; reproducing paper/report figures | ✅ Included since 1.1.12 (ported from 2.x) |
 
 ### 🧩 Module one: the MCP add-in (the core)
 
@@ -186,11 +190,12 @@ The project is designed as “one repository, three modules”; each stands alon
   - ✅ “This time remind only, do not click.”
   - ❌ “Dismiss all dialogs for me.” — the guard handles trust dialogs only; other confirmations are yours to decide.
 
-### 🧪 Module three: template distillation (2.x feature)
+### 🧪 Module three: template distillation (included since 1.1.12, ported from 2.x)
 
 - **What it does**: distils a sample finished map into a reusable layout template; later batch exports reuse the template for a consistent, reproducible look.
-- **How to use it**: this build **does not include** it (no `template_*` tools). After upgrading to **V2.01 (v2.0.1)**: call the 10 `template_*` tools in the flow `import → measure → patch → validate → preview → review → approve → apply`; the template library lives in `%LOCALAPPDATA%\ArcGIS Pro MCP\library`, and upgrades keep it.
+- **How to use it**: **included in this build** (since 1.1.12, ported from 2.x) — just tell the assistant “distil this figure into a template”; it then drives the 11 `template_*` tools through `import → measure → patch → validate → preview → review → approve → apply`. Deterministic steps run in `arcgis-distill`; semantic fields are written by the assistant per `skills/template-distill/SKILL.md`; the template library lives in `%LOCALAPPDATA%\ArcGIS Pro MCP\library` and upgrades keep it.
 - **How to ask**: name the template and spell out the flow and confirmation points.
+- **Cleaning up**: `template_delete` (or `arcgis-distill delete <id> [--force]`) removes a template — its spec, index entry, job sheet and its sample image when no other template references it; an approved (ready) template needs `force`.
   - ✅ “Distil `D:\samples\fig3.png` into a template named 'Study area overview': import → measure → patch → validate → preview; send me the preview first, then review + approve after I confirm.”
   - ✅ “Use the 'Study area overview' template to export every map in `maps` as A3 PDF, title = map name, output to `D:\out\maps\`.”
   - ❌ “Do it like this picture.” — no template name, flow or confirmation points; the layout cannot be reproduced.
@@ -346,31 +351,33 @@ print(mcp_bridge.start_pump())
 
 ---
 
-## 🧪 About the distillation module (2.x feature)
+## 🧪 About the distillation module (included since 1.1.12)
 
-This build **does not include** template distillation: no `template_*` tools, no `guard_summon` / `guard_status`. If you want to turn a sample map's layout into a reusable template and keep many maps consistent, upgrade to **V2.01 (v2.0.1)**:
+Since **1.1.12** this branch **includes** template distillation (ported wholesale from 2.x, with `template_delete` added in 1.1.13): 11 `template_*` tools + the `arcgis-distill` CLI + a local template library. The guard tools (`guard_summon` / `guard_status`) unique to 2.x are still not in this line — the dialog guard stays a standalone script (`03-dialog-guard.cmd`).
 
-- 2.x provides 10 `template_*` tools: import / measure / patch / validate / preview / review / approve / apply / list / get;
+- 11 `template_*` tools: import / measure / patch / validate / preview / review / approve / apply / list / get / delete;
 - the template library lives in `%LOCALAPPDATA%\ArcGIS Pro MCP\library`; upgrades keep existing templates;
+- deterministic steps (measure / validate / preview / import) run in `arcgis-distill` on Pro's own Python with no extra dependency; semantic fields are written by the assistant per `skills/template-distill/SKILL.md`; the tools themselves need no API key;
 - typical use: “Distil `D:\samples\fig3.png` into a template named Study-area overview; run import → measure → patch → validate → preview, show me the preview, then review + approve.”
+- cleaning up: `arcgis-distill delete <id> [--force]` removes the template together with its unreferenced sample image; a ready template needs `force`.
 
-Capability comparison between 1.1.11 and 2.x:
+Capability comparison between 1.1.13 and 2.x:
 
-| Capability | 1.1.11 (this branch) | 2.0.1 (recommended upgrade) |
+| Capability | 1.1.13 (this branch) | 2.x |
 |---|---|---|
-| Native MCP tools | 115 (12 groups) | 125 (14 groups) |
+| Native MCP tools | 126 (13 groups) | 125 (14 groups, incl. 2 guard tools) |
 | RunCode / Python bridge | ✅ | ✅ |
 | Dialog guard | Standalone script `03-dialog-guard.cmd` | `guard_summon` / `guard_status` + automatic arm/settle around RunCode |
-| Template distillation | ❌ | ✅ 10 `template_*` tools + schema v1.1 |
+| Template distillation | ✅ 11 `template_*` tools + schema v1.1 | ✅ Same |
 
 ---
 
-## 🧰 All 115 MCP tools (12 groups)
+## 🧰 All 126 MCP tools (13 groups)
 
 Everything the assistant can do, listed by name. Click to expand 👇
 
 <details>
-<summary><b>📜 Full tool catalogue — Session 16 · Layers 20 · Data 11 · Selection 6 · Fields/Datasets 11 · Geoprocessing 7 · Symbology 6 · View 7 · Layout 16 · Raster 5 · Catalog 6 · Utilities 4</b></summary>
+<summary><b>📜 Full tool catalogue — Session 16 · Layers 20 · Data 11 · Selection 6 · Fields/Datasets 11 · Geoprocessing 7 · Symbology 6 · View 7 · Layout 16 · Raster 5 · Catalog 6 · Utilities 4 · Template distillation 11</b></summary>
 
 ### Session and project (16)
 
@@ -547,6 +554,21 @@ Everything the assistant can do, listed by name. Click to expand 👇
 | `stop_pump` | Remove the main-thread dispatcher; live-project commands stop working until the user installs it again. |
 | `run_batch` | Run several commands in one round trip — much faster for multi-step workflows. Image results are reduced to path/bytes/sha by default, and each step reports its milliseconds. |
 
+### Template distillation (11)
+
+| Tool | What it does |
+|---|---|
+| `template_list` | Lists layout templates in the local library, optionally filtered by status or tag. |
+| `template_get` | Reads one template's full spec (layout geometry, palette, typography, regions, pitfalls and review record). |
+| `template_import` | Imports a sample map figure into the library as a draft, deduplicated by image sha256; next step is template_measure. |
+| `template_measure` | Measures the sample figure — figure bbox, aspect, strong frame lines, palette and DPI — into the un-editable measured block. |
+| `template_patch` | Submits semantic fields (regions / legend / typography / palette / pitfalls) as a validated merge; protected fields such as measured are rejected. |
+| `template_validate` | Runs schema and geometric consistency checks (frame/regions inside the canvas, measured tolerance ≤3%, typography order, colours, pitfalls). |
+| `template_review` | Records a human review decision (reviewer + notes) for a validated template. |
+| `template_approve` | Approves a reviewed, validated template to ready; refuses on validation errors or a missing review unless force is set (recorded). |
+| `template_preview` | Renders the template as a wireframe PNG side by side with the sample figure for visual checking. |
+| `template_apply` | Writes a ready template into a mapping context JSON (layout / palette / typography) for the assistant to compose the map with. |
+| `template_delete` | Deletes a template from the library — its spec, index entry, job sheet and its sample image when no other template references it; approved (ready) templates need force. |
 </details>
 
 ---
@@ -555,7 +577,8 @@ Everything the assistant can do, listed by name. Click to expand 👇
 
 | Path | Content | Notes |
 |---|---|---|
-| `install\ArcGISProMCP.esriAddinX` | 🧩 add-in v1.1.11 | 115 MCP tools + all GP tools; HTTP MCP 6520 / legacy TCP 6510 |
+| `install\ArcGISProMCP.esriAddinX` | 🧩 add-in v1.1.13 | 126 MCP tools + all GP tools; HTTP MCP 6520 / legacy TCP 6510 |
+| `install\runtime\distill\` | 🧪 Template distillation | `arcgis-distill` CLI + the `arcgis_agentkit` package on Pro's own Python; template library at `%LOCALAPPDATA%\ArcGIS Pro MCP\library` (kept on upgrades) |
 | `install\runtime\stdio-bridge.ps1` | 🌉 stdio bridge | For clients that can only launch a local process (e.g. Claude Desktop); pure PowerShell, no Python |
 | `install\runtime\runcode\RunCode.pyt` | 🐍 RunCode toolbox | For frequent arbitrary arcpy; asks for trust once on first run |
 | `install\runtime\guard\` | 🛡️ Dialog guard | Clicks the “third-party code library” trust dialog; topmost reminder (≥30 s, ringing) on failure |
@@ -567,10 +590,10 @@ Everything the assistant can do, listed by name. Click to expand 👇
 
 ### 🔍 Dependency audit (why “fully bundled” holds)
 
-- 🧩 add-in: a self-contained C# assembly running on the .NET Desktop Runtime 10 x64 that ArcGIS Pro 3.7's supported environment provides — nothing extra to install.
+- 🧩 add-in: a self-contained C# assembly running on the .NET Desktop Runtime 10 x64 that **ArcGIS Pro 3.7 lists among its system requirements** — nothing extra to install *for this package*.
 - 🌉 stdio bridge, 🛡️ dialog guard: Windows' built-in PowerShell 5.1 + WinForms — nothing extra to install.
 - 🐍 RunCode toolbox, Python bridge: run inside ArcGIS Pro's own Python (arcpy) — no separate Python needed.
-- ✅ **So the package has no external dependency that needs pip or internet.** “Works offline” refers to this package's own install and run chain; ArcGIS Pro 3.7's own prerequisites (.NET Desktop Runtime 10 x64, WebView2 ≥132) come with Pro's installer.
+- ✅ **So the package has no external dependency that needs pip or internet.** “Works offline” refers to this package's own install and run chain. ArcGIS Pro 3.7's system requirements (Microsoft .NET Desktop Runtime 10 x64 and WebView2) are Esri's prerequisites — if either is missing on this machine, install it as Esri's system requirements describe (the Pro installer normally prompts for or installs them).
 
 ---
 
@@ -616,9 +639,9 @@ Safety boundary: handles only trust dialogs with “third-party / code library /
 
 ## 📜 Version and licence
 
-- 🏷️ Version: **1.1.11** (Customer 1.1.11, 1.14 Enhanced Edition; build date in `VERSION.json`; 115 tools)
+- 🏷️ Version: **1.1.13** (Customer 1.1.13, 1.14 Enhanced Edition + template distillation; build date in `VERSION.json`; 126 tools)
 - 👤 Maintainer: **Law** ([@XNYGggg](https://github.com/XNYGggg))
-- 🙏 Upstream project and original author: **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**, author **Pisut Nakmuenwai** (AGPL-3.0-or-later). This package accumulates local patches up to 1.1.11 (see `docs\CHANGELOG.md` and `RELEASE-NOTES.md`).
+- 🙏 Upstream project and original author: **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**, author **Pisut Nakmuenwai** (AGPL-3.0-or-later). This package accumulates local patches up to 1.1.12 (see `docs\CHANGELOG.md` and `RELEASE-NOTES.md`).
 - ⚖️ Licence: **AGPL-3.0-or-later** (the package ships the full source snapshot and upstream NOTICE)
 - 🏷️ Trademarks: “ArcGIS” is a trademark of Esri; this project is a third-party tool and is not affiliated with Esri.
 

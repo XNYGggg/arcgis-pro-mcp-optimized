@@ -1,6 +1,28 @@
 # 更新日志
 
-## Customer 1.1.11（1.14 增强版，构建号 1.1.11，2026-11-19）· 正式版
+## Customer 1.1.13（1.14 增强版 + 模板蒸馏 + 模板删除，构建号 1.1.13，2026-11-19）
+
+- 相对 1.1.12：模板库补齐**删除命令** `template_delete`（`arcgis-distill delete <id> [--force]`）。
+  - 删除内容：spec、index 条目、作业单，以及不再被其他模板引用的去重样本图（共享图片保留，返回 `removed.image_kept_for`）。
+  - 安全语义：删除不存在的 id 返回 `not_found`（退出码 3），重复删除安全；`ready`（已批准）模板需 `--force`（否则退出码 5）；`inbox` 不受影响。
+  - C# 薄封装 `template_delete`（TemplateCommands.cs）+ catalog Template 组条目；`tests/test_distill.py` 16/16（8 个删除用例）、`tests/test_catalog_matches_bridge.py` 4/4；工具数 125→126、命令 122→123。
+  - 文档：`docs/distill.md`、`skills/template-distill/SKILL.md` 增加删除一节；四语 README、`docs/使用指南.md`、`VERSION.json` 同步。
+  - 构建：全过；add-in 432,750 字节 SHA256 `CDBAEE33…327B`；自安装包 600,551 字节 SHA256 `9646CEF6…3BD8`。
+  - 验证：pytest 全绿；`tools.json` 与 `catalog.py` 全等价（126 工具）；SHA256SUMS 重新生成并全量校验。
+  - 实机（2026-11-19，Pro 3.7，真实终端）：握手 `1.1.13.0`、`ping` 123、`tools/list` 126（含 `template_delete`）；import → measure → delete 全链路通过（重复删除 not_found/exit 3）；自检 22 通过 / 0 失败。
+
+## Customer 1.1.12（1.14 增强版 + 模板蒸馏，构建号 1.1.12，2026-11-19）
+
+- 相对 1.1.11：**整体并入 2.x（v2.0.2）模板蒸馏模块**（1.1.x 客户线首次具备）。
+  - 新增 `arcgis_agentkit.distill` Python 包（仅依赖 Pillow，用 Pro 自带 Python 运行）+ 运行时 `distill\` 目录与 `run-distill.ps1` 启动器；模板库 `%LOCALAPPDATA%\ArcGIS Pro MCP\library`（升级保留）。
+  - 新增 10 个 MCP 工具：`template_list / get / import / measure / patch / validate / review / approve / preview / apply`（C# 薄封装 arcgis-distill CLI）；工具数 115→125、命令 112→122。
+  - 新增 `skills/template-distill/SKILL.md`、`docs/distill.md`、`tests/test_distill.py`；`test_catalog_matches_bridge.py` 将 template_* 记为 C# 原生实现。
+  - 2.x 的 `guard_summon / guard_status` 不并入；弹窗守护仍为独立脚本 `03-dialog-guard.cmd`。
+  - 构建：全过；add-in 476,195 字节 SHA256 `A20E263B…C6C7`；自安装包 658,962 字节 SHA256 `F1ACCDCA…7BB9`。
+  - 验证：`test_distill.py` 7/7、`test_catalog_matches_bridge.py` 4/4；50 张专家级地图图件的批量蒸馏回归（49 幅全绿，1 幅封面页被正确拒绝）与三方评审见 `release/distill-verify-20261119/`。
+  - 实机：握手 `1.1.12.0`、`ping` 122、`tools/list` 125；MCP `template_*` 全流程 11/11 通过；官方自检 21 通过 / 0 失败。
+
+## Customer 1.1.11（1.14 增强版，构建号 1.1.11，2026-11-19）
 
 - 相对 v1.1.4 累计合入 1.1.5 的 F1–F10、1.1.6 的 V-1–V-7，以及 2026-11-18 实机全量测试确认的 P0–P2 缺陷修复：
   - 1.1.7（P0）：`create_feature_class` / `create_table` 的 `fields` 真正生效（AddField + describe 回读校验、失败清理）；`run_batch` 图片默认剥离为 path/bytes/sha；`get_features` 分页与几何摘要/精度；`preview_layout` 支持 `output_path`。
@@ -9,7 +31,7 @@
   - 1.1.10：`restart_pro` 超时自愈（15 秒硬超时、本地化按钮、UTF-8 心跳日志、5 秒 TCP 超时）；重启调度标志 10 分钟过期；部署脚本归一。
   - 1.1.11（发布前评审修正）：失败清理改为按对象身份、从捕获时所属地图移除并逐条上报；`update_installed.py` 去本机路径并支持 RunCode `__mcprun__` 入口；清理旧部署脚本与历史文档本机路径；构建 PathMap 剔除 DLL/PDB 源码路径；兼容口径统一为仅实机验证 Pro 3.7；第 3 轮终审后清理在字段处理前捕获、AddField 异常入清理、版本提示按主/次版本判断、live_verify 路径参数化、登记脚本优先读 MCP_UPDATE_ARGS；失败清理扫描全部地图并按所属地图移除（不依赖活动视图）。
 - 规模：112 命令 / 115 工具；add-in SHA256 `0ABB872F…6DF9`（469,634 字节）。
-- 正式发行：经测试稳定，推荐下载；tag `v1.1.11`，GitHub Release（Latest）与 Gitee 发行版提供 `ArcGIS-Pro-MCP-1.1.11.zip` + SHA256；默认分支 main 同步为本版内容。
+- 未创建 Release：不上传发行资产、不打 tag；默认分支保持 v1.1.4。
 
 ## Customer 1.16（1.14 增强版，构建号 1.1.6，2026-11-18）
 

@@ -1,6 +1,66 @@
-# 发布说明 · Customer 1.1.11（1.14 增强版，构建号 1.1.11）· 正式版 · 经测试稳定，推荐下载（2026-11-19）
+# 发布说明 · Customer 1.1.13（1.14 增强版 + 模板蒸馏 + 模板删除，构建号 1.1.13，2026-11-19）
 
-> **✅ 发布定位：正式版 · 经测试稳定，推荐下载**（2026-11-19）。本包是 **Customer 1.1.11（1.14 增强版）**，在 v1.1.4 之上累计合入 1.1.5–1.1.11 的修复与增强，重点是把 2026-11-18 实机全量测试确认的 P0–P2 缺陷全部修掉，并按发布前三方评审修正了失败清理与文档口径；已完成本机实机回归（见下方「验证」）。**本版已作为正式版正式发行**：tag `v1.1.11`，GitHub Release 与 Gitee 发行版均提供离线包 `ArcGIS-Pro-MCP-1.1.11.zip`（含 SHA256 校验文件）。v1.1.4 保留为上一稳定版，随时可回滚。
+> **🚀 发布定位**：本包是 **Customer 1.1.13（正式版）——经测试稳定，推荐下载**。在 Customer 1.1.12 的基础上为模板库补齐**删除命令**（`template_delete` / `arcgis-distill delete`），验收清理模板不再需要手工改 index/文件；其余能力与 1.1.12 完全一致（含 1.1.12 模板蒸馏与 1.1.5–1.1.11 全部修复）。本版**接替 v1.1.11 成为推荐版本**：v1.1.11 已下线，其 GitHub Release 与 tag 均已删除。GitHub Release `v1.1.13` 提供离线包（与本仓 `install/` 内容一致）；`main` 分支内容即本版本；上一稳定版 v1.1.4 保留供回滚。
+
+## 变更摘要（相对 1.1.12）
+
+**1.1.13（模板删除）**：
+
+- 新增 MCP 工具 `template_delete`（catalog 第 126 个工具，Template 组第 11 个）：C# 薄封装 `arcgis-distill delete <id> [--force]`，与 CLI 单一实现不漂移。
+- `delete` 删除模板的 spec、index 条目、作业单，以及**不再被其他模板引用**的去重样本图（共享图片保留，返回 `removed.image_kept_for`）。
+- 安全语义：删除不存在的 id 报 `not_found`（退出码 3），重复删除安全；`ready`（已批准）模板需 `--force`（否则退出码 5）；`inbox` 不受影响。
+- 测试：`tests/test_distill.py` 16/16（8 个删除用例：无共享图片删除、共享图片保留、未知 id not_found、ready 需 force、路径型 id 拒绝、孤儿索引清理、超长 id 撞名后可删除、中断删除后 id 仍保留）；`tests/test_catalog_matches_bridge.py` 4/4（CSHARP_ONLY 增补 template_delete）。
+- 文档与版本：`docs/distill.md`、`skills/template-distill/SKILL.md` 增加删除一节；四语 README 工具表/能力对照/版本同步；`docs/使用指南.md`、`VERSION.json`（126 工具 / 123 命令）、Config.daml / csproj / pyproject 统一 1.1.13；`source/docs/local-1.1.13.md` 记录本轮。
+
+## 验证（2026-11-19）
+
+- 构建：`scripts/build.ps1` 全过；add-in 432,750 字节 SHA256 `CDBAEE33…327B`；自安装包 600,551 字节 SHA256 `9646CEF6…3BD8`。
+- 单元测试：`pytest tests/` 28 passed，其中 `tests/test_distill.py` 16/16、`tests/test_catalog_matches_bridge.py` 4/4；`tools.json` ↔ `catalog.py` 126 工具全等价。
+- 打包校验：SHA256SUMS 重新生成并全量校验通过；`install/runtime/distill` 与 `source/src/arcgis_agentkit` 逐文件一致。
+- 实机（2026-11-19，Pro 3.7，真实终端）：安装后握手 `1.1.13.0`、`ping` 命令数 **123**、`tools/list` **126** 工具（含 `template_delete`）；经已安装 `run-distill.ps1` 跑通 import → measure → delete（重复删除 → `not_found`/exit 3，用户模板库未受影响）；官方自检 **22 通过 / 2 警告（非失败）/ 0 失败**。
+- **规模**：123 命令 / 126 工具（已实机验证）。仅验证 ArcGIS Pro 3.7；add-in 未签名（首次加载需信任）。
+
+## 回滚
+
+- add-in 回退到 1.1.12：SHA256 `A20E263B041E78A1F5631B1DD4EFC1B7946C05A28038751DC20C38F0AB55C6C7`（476,195 字节）——即基线提交 `7a20f9e`（分支 `customer-v1.1.11-distill`）中的 `install/ArcGISProMCP.esriAddinX`；
+- 运行时回退：用基线提交中的 `install/runtime/distill` 覆盖 `%LOCALAPPDATA%\ArcGIS Pro MCP\distill`；`arcgis_agentkit` 1.1.13 与 1.1.12 的库格式一致（schema v1.1 未变），删除命令不影响旧库。
+
+---
+
+## 历史发布 · Customer 1.1.12（1.14 增强版 + 模板蒸馏，构建号 1.1.12，2026-11-19）
+
+> **🚀 发布定位**：本包是 **Customer 1.1.12**，在 Customer 1.1.11 的基础上**整体并入 2.x（v2.0.2）的模板蒸馏模块**——1.1.x 客户线首次具备 10 个 `template_*` 工具与 `arcgis-distill` 命令行；其余能力与 1.1.11 完全一致（含 1.1.5–1.1.11 全部修复）。**v1.1.4 是已发布的稳定版（推荐日常使用）**，本分支是其增强构建；不创建 GitHub Release / Gitee 发行版、不上传发行资产、不打 tag；安装包仅随仓库提供（`install/`）。可随时回滚到 v1.1.11 或 v1.1.4。
+
+## 变更摘要（相对 1.1.11）
+
+**1.1.12（模板蒸馏移植，模块来源 v2.0.2-opt @ 0aa42aa）**：
+
+- 新增 `arcgis_agentkit.distill` Python 包（2.x 原样移植，仅依赖 Pillow；用 Pro 自带 `arcgispro-py3` 运行，零额外安装）。
+- 新增 10 个 MCP 工具：`template_list` / `get` / `import` / `measure` / `patch` / `validate` / `review` / `approve` / `preview` / `apply`（C# 薄封装 `TemplateCommands.cs` → `arcgis-distill` CLI，单一实现不漂移）；工具数 115→**125**，命令 112→**122**。
+- 新增运行时 `%LOCALAPPDATA%\ArcGIS Pro MCP\distill\`（`arcgis_agentkit` 包 + `run-distill.ps1` 启动器）与模板库种子 `library\`；模板库实际位置 `%LOCALAPPDATA%\ArcGIS Pro MCP\library`，**升级安装保留已有模板**。
+- 新增 `skills/template-distill/SKILL.md`（语义 patch 作业指导）与 `docs/distill.md`（状态机/命令/库结构）；`tests/test_distill.py` 覆盖 import→measure→patch→validate→preview→review→approve→apply 全链。
+- 2.x 的 `guard_summon` / `guard_status` **不并入**本线，弹窗守护仍为独立脚本 `03-dialog-guard.cmd`。
+- 版本与文档：Config.daml / csproj / pyproject / VERSION.json 统一 1.1.12；四语 README（模块状态、能力对照、工具目录 Template 组）、`docs/使用指南.md`、`docs/CHANGELOG.md`、`source/docs/local-1.1.12.md` 同步。
+
+## 验证（2026-11-19）
+
+- 构建：`scripts/build.ps1` 全过（installer 脚本检查、client-registration、HTTP transport net8.0+net10.0、单文件安装器检查）；add-in **476,195 字节** SHA256 `A20E263B041E78A1F5631B1DD4EFC1B7946C05A28038751DC20C38F0AB55C6C7`；自安装包 658,962 字节 SHA256 `F1ACCDCABA406617816B7318BEBE33732968D3065332BB5FA451791A34657BB9`。
+- 单元测试：`tests/test_distill.py` 7/7；`tests/test_catalog_matches_bridge.py` 4/4（新增 tools.json 一致性与非图片拒绝、force 评审完整性测试）。
+- 批量蒸馏测试：**50 张**专家级地图图件（10 类，已验证 49 幅全绿；1 幅图集封面页被工具确定性拒绝）的 import/measure/validate/preview 批量回归，及三方会谈评审记录，见 `release/distill-verify-20261119/`。
+- 安装口径：`install/00-install.cmd` 是完整客户安装入口（add-in + 运行时 + 模板蒸馏）；`source/dist/Install-ArcGISProMCP.cmd` 是 add-in 单文件安装器，只安装 add-in，供源码审阅与校验。
+- 实机（2026-11-19，真实终端）：握手 `1.1.12.0`、`ping` 命令数 122、`tools/list` 125 工具；MCP 端 `template_*` 全流程 11/11 通过（含 preview 1.5MB PNG 与 apply context），用户库验完清空；官方自检 21 通过 / 2 警告（均非失败）/ 0 失败。
+- **规模**：122 命令 / 125 工具（已实机验证）。仅验证 ArcGIS Pro 3.7；add-in 未签名（首次加载需信任）。
+
+## 回滚
+
+- add-in 回退到 1.1.11：`release/isolation-1.1.11-20261119/addin/ArcGISProMCP.esriAddinX`（SHA256 `0ABB872F…6DF9`，469,634 字节）；
+- 运行时回退：`release/isolation-1.1.11-20261119/runtime/ArcGIS Pro MCP`；installed.json 回写 version=1.1.11、addin_sha256=`0ABB872F…`、addin_size=469634；重启 Pro。
+
+---
+
+## 历史发布 · Customer 1.1.11（1.14 增强版，构建号 1.1.11，2026-11-19）
+
+> **🚀 发布定位**：本包是 **Customer 1.1.11（1.14 增强版）**，在 v1.1.4 之上累计合入 1.1.5–1.1.11 的修复与增强，重点是把 2026-11-18 实机全量测试确认的 P0–P2 缺陷全部修掉，并按发布前三方评审修正了失败清理与文档口径。**v1.1.4 是已发布的稳定版（推荐日常使用）**，本分支是其增强构建；本分支不创建 GitHub Release / Gitee 发行版、不上传发行资产、不打 tag；安装包仅随仓库提供（`install/`）。可随时回滚到 v1.1.4。
 
 ## 变更摘要（相对 v1.1.4）
 
@@ -33,8 +93,8 @@ Codex 结论「修正后可以发布」：完整性/版本一致性/哈希口径
 ## 本包的定位与边界
 
 - 面向客户端的完整离线包（安装脚本、运行时、客户端接入、文档、源码快照与构建产物），与 v1.1.4 客户版同构。
-- **已正式发行**：tag `v1.1.11`；GitHub Release（Latest）与 Gitee 发行版提供 `ArcGIS-Pro-MCP-1.1.11.zip` + `.sha256`；仓库默认分支 `main` 同步为本版内容。
-- 遇问题可回滚到 v1.1.4（上一稳定版），并按 `docs/排障手册.md` 反馈。
+- 不创建 Release、不上传发行资产、不打 tag；默认分支保持 v1.1.4。
+- 作为 1.14 增强版使用；遇问题可回滚 1.1.4，并按 `docs/排障手册.md` 反馈。
 
 ---
 

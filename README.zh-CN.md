@@ -1,14 +1,14 @@
-[![English](https://img.shields.io/badge/Language-English-1f6feb?style=flat-square)](README.md) [![简体中文](https://img.shields.io/badge/Language-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-d1242f?style=flat-square)](README.zh-CN.md) [![日本語](https://img.shields.io/badge/Language-%E6%97%A5%E6%9C%AC%E8%AA%9E-bc002d?style=flat-square)](README.ja.md) [![한국어](https://img.shields.io/badge/Language-%ED%95%9C%EA%B5%AD%EC%96%B4-0047a0?style=flat-square)](README.ko.md) [![Version](https://img.shields.io/badge/Version-1.1.11%20(stable%2C%20recommended)-2ea44f?style=flat-square)](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/releases/tag/v1.1.11) [![Changelog](https://img.shields.io/badge/Docs-Changelog-6f42c1?style=flat-square)](docs/CHANGELOG.md) [![License: AGPL v3+](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue?style=flat-square)](LICENSE) [![ArcGIS Pro](https://img.shields.io/badge/ArcGIS%20Pro-3.7-00a1e0?style=flat-square)](https://www.esri.com/en-us/arcgis/products/arcgis-pro/overview) [![Platform](https://img.shields.io/badge/Platform-Windows%2011%20x64-lightgrey?style=flat-square)]()
+[![English](https://img.shields.io/badge/Language-English-1f6feb?style=flat-square)](README.md) [![简体中文](https://img.shields.io/badge/Language-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-d1242f?style=flat-square)](README.zh-CN.md) [![日本語](https://img.shields.io/badge/Language-%E6%97%A5%E6%9C%AC%E8%AA%9E-bc002d?style=flat-square)](README.ja.md) [![한국어](https://img.shields.io/badge/Language-%ED%95%9C%EA%B5%AD%EC%96%B4-0047a0?style=flat-square)](README.ko.md) [![Version](https://img.shields.io/badge/Version-Customer%201.1.13-2ea44f?style=flat-square)](VERSION.json) [![Changelog](https://img.shields.io/badge/Docs-Changelog-6f42c1?style=flat-square)](docs/CHANGELOG.md) [![License: AGPL v3+](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue?style=flat-square)](LICENSE) [![ArcGIS Pro](https://img.shields.io/badge/ArcGIS%20Pro-3.7-00a1e0?style=flat-square)](https://www.esri.com/en-us/arcgis/products/arcgis-pro/overview) [![Platform](https://img.shields.io/badge/Platform-Windows%2011%20x64-lightgrey?style=flat-square)]()
 
-# 🗺️ ArcGIS Pro MCP 优化版 · Customer 1.1.11（1.14 增强版）· 正式版（经测试稳定，推荐下载）🎁
+# 🗺️ ArcGIS Pro MCP 优化版 · Customer 1.1.13（1.14 增强版 + 模板蒸馏）🚀
 
 用一句自然语言，让 AI 助手直接操作你正开着的 ArcGIS Pro 工程：加图层、改符号、查属性、跑地理处理、出图导出。数据不出本机，所有通信都走 `127.0.0.1` 🔒。
 
-> **✅ 正式版 · 经测试稳定，推荐下载（2026-11-19）**：本版为 **Customer 1.1.11（1.14 增强版，构建号 1.1.11）**，在 **v1.1.4** 之上累计合入 1.14 之后的修复——1.1.5（F1–F10）、1.1.6（V-1–V-7）、2026-11-18 实机全量测试确认的 P0–P2 缺陷修复（1.1.7–1.1.9）、1.1.10 的重启自愈与 1.1.11 的清理修复，并已完成本机实机回归。**本版已作为正式版发行，经测试稳定，推荐下载**：离线包 `ArcGIS-Pro-MCP-1.1.11.zip`（含 SHA256）见 GitHub Release [`v1.1.11`](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/releases/tag/v1.1.11) 与 Gitee 发行版；v1.1.4 保留为上一稳定版，可随时回滚。
+> **🚀 本版为 Customer 1.1.13（1.14 增强版 + 模板蒸馏 + 模板删除，构建号 1.1.13）——正式版：经测试稳定，推荐下载**。在 **v1.1.4** 之上累计合入 1.14 之后的全部修复：1.1.5（F1–F10）、1.1.6（V-1–V-7）、2026-11-18 实机全量测试确认的 P0–P2 缺陷修复（1.1.7–1.1.9）、1.1.10 的重启自愈、1.1.11 的清理修复、1.1.12 从 2.x 并入的模板蒸馏模块，以及 1.1.13 的模板删除（template_delete）。**GitHub Release `v1.1.13` 提供离线包**（与本仓 `install/` 内容一致）；**v1.1.11 已下线（发行版与 tag 均已删除），由本版接替成为推荐下载**；v1.1.4 保留为上一稳定版供回滚。
 
-> **📌 版本说明（2026-11-19 更新）**：**1.1 线（v1.1.11 正式版）经测试稳定，推荐下载**；v1.1.4 为上一稳定版，遇问题可回滚；**2.0 线为测试版**——优化尚未完成，其 GitHub Release 资产与 tag 已移除，暂不可下载；2.0 代码仅保留在 `customer-v2.0.1` / `customer-v2.0.0` 分支中。分支 / 标签 / Release 对照见 [BRANCHES.md](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/blob/main/BRANCHES.md)。
+> **📌 版本说明（2026-11-19 更新）**：**Customer 1.1.13 是 1.x 稳定线的当前正式版——经测试稳定，推荐日常使用**；v1.1.11 已下线（发行版与 tag 均已删除），由 1.1.13 完全接替；v1.1.4 保留为上一稳定版供回滚。**2.0 线为测试版**——优化尚未完成，其 GitHub Release 资产与 tag 已移除，暂不可下载；2.0 代码仅保留在 `customer-v2.0.1` / `customer-v2.0.0` 分支中。
 
-> **🙏 上游项目与原作者**：本客户版基于 **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**（原作者 **Pisut Nakmuenwai**，AGPL-3.0-or-later），在其基础上累计本地补丁至 **v1.1.11**。完整署名与修改声明见包根 `NOTICE` 与 `source/SOURCE-NOTICE.md`。
+> **🙏 上游项目与原作者**：本客户版基于 **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**（原作者 **Pisut Nakmuenwai**，AGPL-3.0-or-later），在其基础上累计本地补丁至 **v1.1.13**。完整署名与修改声明见包根 `NOTICE` 与 `source/SOURCE-NOTICE.md`。
 
 本客户版把运行所需的**全部组件**打包在一起，离线可用，**不需要安装 Python、不需要 pip、不需要联网**，除 ArcGIS Pro 本身外没有任何额外依赖。电池都给你装好了 🔋
 
@@ -16,7 +16,7 @@
 
 ## 🆚 相对 1.14（v1.1.4）升级了什么
 
-以下全部是 v1.1.4 客户包之后合入的变更。工具数 113 → **115**（新增 `add_table` 与 `restart_pro`）；add-in 二进制哈希 `0ABB872F…6DF9`（469,634 字节）。
+以下全部是 v1.1.4 客户包之后合入的变更。工具数 113 → **126**（1.1.5 新增 `add_table` 与 `restart_pro`；1.1.12 并入 2.x 模板蒸馏，新增 10 个 `template_*` 工具；1.1.13 新增 `template_delete`）；add-in 二进制哈希 ``CDBAEE33…327B``（432,750 字节）。
 
 | 构建 | 类型 | 升级要点 |
 |---|---|---|
@@ -27,8 +27,12 @@
 | **1.1.9** | P2 | `get_layer_info` / `set_raster_symbology` / `repair_layer_source` 接受数据集路径（唯一匹配自动解析，多匹配列出图层名）；`repair_layer_source` 新增栅格分支（`RasterDataset.ReplaceDataSource`）；`search_data` 去重；`check_extension` 语义修正（`inspectable:false`，Pro 不向 add-in 暴露检出）；GP 输出过滤空串；`get_features` 对栅格图层名给出 `get_raster_info` 提示 |
 | **1.1.10** | 重启自愈 | `restart_pro` 超时自愈——保存框探测改为子进程 + 15 秒硬超时（超时放弃并记日志）；按钮匹配支持本地化 `是(Y) / 否(N) / 取消(C)`；`restart.log` 改 UTF-8 并加阶段心跳；TCP 连接 5 秒超时；仍保持"不强杀 Pro"。重启调度标志 10 分钟后可接管（助手挂掉不再永久拒绝新请求）。部署归一为 `scripts/update_installed.py`（位置参数、哈希不符拒写） |
 | **1.1.11** | 清理修复 | `create_feature_class` / `create_table` 失败清理改为：删除数据集前先按数据源解析引用它的图层与独立表，删除后按对象身份移除——同名但异源的图层不再被误删；清理失败随工具错误一并报告（不再吞异常）。`scripts/update_installed.py` 去除本机路径硬编码；构建把源码路径从 DLL/PDB 中映射剔除 |
+| **1.1.12** | 模板蒸馏 | 并入 2.x 模板蒸馏模块：10 个 `template_*` 工具 + `arcgis-distill` CLI（Pro 自带 Python，零额外依赖）+ 本地模板库（`%LOCALAPPDATA%\ArcGIS Pro MCP\library`，升级保留）；新增 `skills/template-distill` 与 `docs/distill.md`；工具数 115→125、命令 112→122 |
+| **1.1.13** | 模板删除 | 模板库新增 `template_delete`——删除模板的 spec、索引条目、作业单与去重样本图（仍被其他模板引用时保留）；已批准（ready）模板需 `force`；工具数 125→126、命令 122→123 |
 
-本机实机验证（**仅 ArcGIS Pro 3.7**）：1.1.7 回归 21/21 PASS；1.1.8 连续两轮回归 0 失败；1.1.9 P2 回归 10/10、P1 重跑 0 失败；1.1.10 握手 `1.1.10.0`；1.1.11 握手 `1.1.11.0`、ping `command_count=112`，D1 字段回归对当前测试工程适用的断言全部通过（4 条历史断言引用已退役工程的图层名），`get_features` 分页/摘要/精度已实机复验。其他 Pro 版本未覆盖。细节见 `docs/CHANGELOG.md` 与 `RELEASE-NOTES.md`。
+本机实机验证（**仅 ArcGIS Pro 3.7**）：1.1.7 回归 21/21 PASS；1.1.8 连续两轮回归 0 失败；1.1.9 P2 回归 10/10、P1 重跑 0 失败；1.1.10 握手 `1.1.10.0`；1.1.11 握手 `1.1.11.0`、ping `command_count=112`，D1 字段回归对当前测试工程适用的断言全部通过（4 条历史断言引用已退役工程的图层名），`get_features` 分页/摘要/精度已实机复验。其他 Pro 版本未覆盖。
+
+1.1.13（模板删除）：构建全过（client-registration / installer / HTTP net8.0+net10.0），`tests/test_distill.py` 16/16（8 个删除用例：无共享图片删除、共享图片保留、未知 id not_found、ready 需 force、路径型 id 拒绝、孤儿索引清理、超长 id 撞名后可删除、中断删除后 id 仍保留）、`tests/test_catalog_matches_bridge.py` 4/4 通过；`tools.json` 与 `catalog.py` 在 126 工具 / 123 命令上全等价。1.1.12 的实机验收记录（握手、125 工具、`template_*` 全流程 11/11、官方自检 21 通过 / 0 失败）见 `docs/CHANGELOG.md`。细节见 `docs/CHANGELOG.md` 与 `RELEASE-NOTES.md`。 1.1.13（模板删除）实机验收（2026-11-19，Pro 3.7，真实终端）：安装后的构建握手 `1.1.13.0`、`ping` 命令数 **123**、`tools/list` 共 **126** 工具（含 `template_delete`）；经已安装的 `run-distill.ps1` 跑通 import → measure → delete 全链路（重复删除 → `not_found`/exit 3），官方自检 **22 通过 / 0 失败**。
 
 ---
 
@@ -154,9 +158,9 @@ url = "http://127.0.0.1:6520/mcp"
 
 | 模块 | 作用（一句话） | 什么时候用 | 本版状态 |
 |---|---|---|---|
-| 🧩 **MCP 插件** | AI 操作 Pro 的唯一干道：115 个 MCP 工具 + RunCode / Python 桥两条 arcpy 通道 | 所有日常操作；批量脚本；需要 `CURRENT` 的交互 | ✅ 装好即用 |
+| 🧩 **MCP 插件** | AI 操作 Pro 的唯一干道：126 个 MCP 工具 + RunCode / Python 桥两条 arcpy 通道 | 所有日常操作；批量脚本；需要 `CURRENT` 的交互 | ✅ 装好即用 |
 | 🛡️ **弹窗守护** | 自动点击"第三方代码库"信任框，点不到就置顶响铃提醒 | 第一次跑 RunCode.pyt、无人值守批处理 | ✅ 独立脚本 `03-dialog-guard.cmd` |
-| 🧪 **模板蒸馏** | 把一张样图蒸馏成可复用版式模板，批量出图版式统一 | 多张图套同一版式、复现论文/汇报图 | ❌ 本版不含，见 V2.01（v2.0.1） |
+| 🧪 **模板蒸馏** | 把一张样图蒸馏成可复用版式模板，批量出图版式统一 | 多张图套同一版式、复现论文/汇报图 | ✅ 已包含（自 1.1.12，移植自 2.x） |
 
 ### 🧩 模块一：MCP 插件（核心）
 
@@ -186,11 +190,12 @@ url = "http://127.0.0.1:6520/mcp"
   - ✅ "这次只提醒、不自动点。"
   - ❌ "帮我点掉所有弹窗。"——守护只处理信任框，其他确认框必须由你拍板。
 
-### 🧪 模块三：模板蒸馏（2.x 功能）
+### 🧪 模块三：模板蒸馏（自 1.1.12 起已包含，移植自 2.x）
 
 - **作用**：把一张样本成图蒸馏成可复用的版式模板；之后批量出图直接套模板，多张图版式统一、可复现。
-- **使用方法**：本版**不含**此模块（没有 `template_*` 工具）。升级 **V2.01（v2.0.1）** 后：按 `import → measure → patch → validate → preview → review → approve → apply` 流程调用 10 个 `template_*` 工具；模板库在 `%LOCALAPPDATA%\ArcGIS Pro MCP\library`，升级安装会保留。
+- **使用方法**：本版**已包含**（1.1.12 起，模块移植自 2.x）：直接对助手说“把这张图蒸馏成模板”即可；助手按 `import → measure → patch → validate → preview → review → approve → apply` 流程调用 11 个 `template_*` 工具，确定性步骤由 `arcgis-distill` 完成，语义字段由助手按 `skills/template-distill/SKILL.md` 撰写；模板库在 `%LOCALAPPDATA%\ArcGIS Pro MCP\library`，升级安装会保留。
 - **提示词写法**：给模板起名，并把流程和确认点写进去。
+- **清理模板**：`template_delete`（或 `arcgis-distill delete <id> [--force]`）删除模板——spec、索引条目、作业单，以及不再被其他模板引用的样本图；已批准（ready）模板需 `force`。
   - ✅ "把 `D:\samples\fig3.png` 蒸馏成模板，命名『研究区总览图』：import → measure → patch → validate → preview，预览先发我确认，确认后再 review + approve。"
   - ✅ "用『研究区总览图』模板给 `maps` 里每张地图出 A3 PDF，标题用地图名，输出到 `D:\out\maps\`。"
   - ❌ "照着这张图做。"——没说模板名、流程和确认点，版式无法复现。
@@ -346,31 +351,33 @@ print(mcp_bridge.start_pump())
 
 ---
 
-## 🧪 关于蒸馏模块（2.x 功能）
+## 🧪 关于蒸馏模块（1.1.12 起已包含）
 
-本版**不包含**模板蒸馏：没有 `template_*` 工具，也没有 `guard_summon` / `guard_status`。如果你想把样图版式变成可复用模板、让多张图版式统一，请升级到 **V2.01（v2.0.1）**：
+本分支自 **1.1.12** 起**包含**模板蒸馏（从 2.x 整体移植，1.1.13 增加 `template_delete`）：11 个 `template_*` 工具 + `arcgis-distill` CLI + 本地模板库。2.x 独有的 `guard_summon` / `guard_status` 仍不在本线，弹窗守护继续用独立脚本 `03-dialog-guard.cmd`。
 
-- 2.x 提供 10 个 `template_*` 工具：import / measure / patch / validate / preview / review / approve / apply / list / get；
+- 11 个 `template_*` 工具：import / measure / patch / validate / preview / review / approve / apply / list / get / delete；
 - 模板库在 `%LOCALAPPDATA%\ArcGIS Pro MCP\library`，升级安装会保留已有模板；
+- 确定性步骤（测量/校验/预览/入库）由 `arcgis-distill` 完成（Pro 自带 Python，零额外依赖），语义字段由助手按 `skills/template-distill/SKILL.md` 撰写，工具本身零 API key；
 - 典型用法："把 `D:\samples\fig3.png` 蒸馏成模板，名称研究区总览图；按 import → measure → patch → validate → preview 流程，预览给我确认后再 review + approve。"
+- 清理：`arcgis-distill delete <id> [--force]` 删除模板及无引用样本图；ready 模板需 `force`。
 
-1.1.11 与 2.x 的能力对照：
+1.1.13 与 2.x 的能力对照：
 
-| 能力 | 1.1.11（本分支） | 2.0.1（推荐升级） |
+| 能力 | 1.1.13（本分支） | 2.x |
 |---|---|---|
-| 原生 MCP 工具 | 115 个（12 组） | 125 个（14 组） |
+| 原生 MCP 工具 | 126 个（13 组） | 125 个（14 组，含 guard 2 个） |
 | RunCode / Python 桥 | ✅ | ✅ |
 | 弹窗守护 | 独立脚本 `03-dialog-guard.cmd` | `guard_summon` / `guard_status` + RunCode 自动 arm/settle |
-| 模板蒸馏 | ❌ | ✅ 10 个 `template_*` 工具 + schema v1.1 |
+| 模板蒸馏 | ✅ 11 个 `template_*` 工具 + schema v1.1 | ✅ 同左 |
 
 ---
 
-## 🧰 全部 115 个 MCP 工具（12 组）
+## 🧰 全部 126 个 MCP 工具（13 组）
 
 助手能做的全部事情，按名字列在这里。点开看看 👇
 
 <details>
-<summary><b>📜 完整工具清单 —— 会话 16 · 图层 20 · 数据 11 · 选择 6 · 字段/数据集 11 · 地理处理 7 · 符号化 6 · 视图 7 · 布局 16 · 栅格 5 · 目录 6 · 实用工具 4</b></summary>
+<summary><b>📜 完整工具清单 —— 会话 16 · 图层 20 · 数据 11 · 选择 6 · 字段/数据集 11 · 地理处理 7 · 符号化 6 · 视图 7 · 布局 16 · 栅格 5 · 目录 6 · 实用工具 4 · 模板蒸馏 11</b></summary>
 
 ### 会话与工程（16）
 
@@ -547,6 +554,21 @@ print(mcp_bridge.start_pump())
 | `stop_pump` | 移除主线程调度器；实时工程类命令将停止工作，直到用户重新安装。 |
 | `run_batch` | 一次往返运行多条命令，多步工作流会快很多；图片结果默认降为 path/bytes/sha，每步带耗时。 |
 
+### 模板蒸馏（11）
+
+| 工具 | 用途 |
+|---|---|
+| `template_list` | 列出本地模板库中的版式模板，可按状态或标签过滤。 |
+| `template_get` | 读取单个模板的完整 spec（版式几何、配色、字体、分区、坑点与评审记录）。 |
+| `template_import` | 把一张样本成图导入模板库为草稿（按图片 sha256 去重），下一步是 template_measure。 |
+| `template_measure` | 测量样本图：图幅包围盒、纵横比、强框线、主色与 DPI，写入不可手改的 measured 块。 |
+| `template_patch` | 提交语义字段（分区/图例/字体/配色/坑点）并做校验合并；禁止修改 measured 等保护字段。 |
+| `template_validate` | 运行 schema 与几何一致性校验（图框/分区在画布内、测量容差 ≤3%、字体层级、颜色、坑点）。 |
+| `template_review` | 记录模板的人工评审结论（评审人 + 备注）。 |
+| `template_approve` | 批准已评审且校验通过的模板为 ready；缺评审或有校验错误时拒绝（force 可覆盖并记录）。 |
+| `template_preview` | 渲染模板线框图（与样本图并排）并返回 PNG，供视觉核对。 |
+| `template_apply` | 把 ready 模板写成制图上下文 JSON（版式/配色/字体），助手据此在 Pro 中出图。 |
+| `template_delete` | 从模板库删除模板——spec、索引条目、作业单，以及不再被其他模板引用的样本图；已批准（ready）模板需 force。 |
 </details>
 
 ---
@@ -555,7 +577,8 @@ print(mcp_bridge.start_pump())
 
 | 路径 | 内容 | 说明 |
 |---|---|---|
-| `install\ArcGISProMCP.esriAddinX` | 🧩 add-in v1.1.11 | 115 个 MCP 工具 + 全部 GP 工具；HTTP MCP 6520 / 旧 TCP 6510 |
+| `install\ArcGISProMCP.esriAddinX` | 🧩 add-in v1.1.13 | 126 个 MCP 工具 + 全部 GP 工具；HTTP MCP 6520 / 旧 TCP 6510 |
+| `install\runtime\distill\` | 🧪 模板蒸馏 | `arcgis-distill` 命令行 + `arcgis_agentkit` 包（Pro 自带 Python 运行）；模板库在 `%LOCALAPPDATA%\ArcGIS Pro MCP\library`，升级保留 |
 | `install\runtime\stdio-bridge.ps1` | 🌉 stdio 桥 | 给只能启动本地进程的客户端（如 Claude Desktop）转接 6520；纯 PowerShell，无需 Python |
 | `install\runtime\runcode\RunCode.pyt` | 🐍 RunCode 工具箱 | 需要高频执行任意 arcpy 时使用；首次运行会弹一次信任框 |
 | `install\runtime\guard\` | 🛡️ 弹窗守护 | 自动点击“第三方代码库执行”信任框；失败时置顶提醒（≥30 秒、响铃） |
@@ -567,10 +590,10 @@ print(mcp_bridge.start_pump())
 
 ### 🔍 依赖审计（为什么说“全打包”）
 
-- 🧩 add-in：自包含 C# 程序集，运行在 Pro 3.7 受支持环境自带的 .NET Desktop Runtime 10 x64 上——本包无需另装 .NET。
+- 🧩 add-in：自包含 C# 程序集，运行在 **ArcGIS Pro 3.7 系统要求所列的** .NET Desktop Runtime 10 x64 上——**本包**无需另装 .NET。
 - 🌉 stdio 桥、🛡️ 弹窗守护：Windows 自带的 PowerShell 5.1 + WinForms——无需另装。
 - 🐍 RunCode 工具箱、Python 桥：运行在 ArcGIS Pro 自带的 Python（arcpy）里——无需另装 Python。
-- ✅ **因此本包没有任何需要 pip / 联网安装的外部依赖。**“离线可用”指本包自身的安装与运行链路；ArcGIS Pro 3.7 的安装前提（.NET Desktop Runtime 10 x64、WebView2 ≥132）由 Pro 的安装程序提供。
+- ✅ **因此本包没有任何需要 pip / 联网安装的外部依赖。**“离线可用”指本包自身的安装与运行链路。ArcGIS Pro 3.7 的系统要求（Microsoft .NET Desktop Runtime 10 x64 与 WebView2）属于 Esri 的前置条件——若本机缺失，请按 Esri 系统要求安装对应组件（Pro 安装器通常会提示或代为安装）。
 
 ---
 
@@ -616,9 +639,9 @@ print(mcp_bridge.start_pump())
 
 ## 📜 版本与许可
 
-- 🏷️ 版本：**1.1.11**（Customer 1.1.11 · 1.14 增强版；构建日期见 `VERSION.json`；工具数 115）
+- 🏷️ 版本：**1.1.13**（Customer 1.1.13 · 1.14 增强版 + 模板蒸馏；构建日期见 `VERSION.json`；工具数 126）
 - 👤 维护者：**Law**（[@XNYGggg](https://github.com/XNYGggg)）
-- 🙏 上游项目与原作者：**[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**，作者 **Pisut Nakmuenwai**（AGPL-3.0-or-later）。本包在其基础上累计补丁至 1.1.11（修改点见 `docs\CHANGELOG.md` 与 `RELEASE-NOTES.md`）。
+- 🙏 上游项目与原作者：**[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**，作者 **Pisut Nakmuenwai**（AGPL-3.0-or-later）。本包在其基础上累计补丁至 1.1.12（修改点见 `docs\CHANGELOG.md` 与 `RELEASE-NOTES.md`）。
 - ⚖️ 许可证：**AGPL-3.0-or-later**（本包附带完整源码快照与上游 NOTICE）
 - 🏷️ 商标：“ArcGIS”为 Esri 商标；本项目为第三方工具，与 Esri 无隶属关系。
 
