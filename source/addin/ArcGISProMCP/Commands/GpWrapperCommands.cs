@@ -540,34 +540,56 @@ namespace ArcGISProMCP.Commands
                     + "so the requested fields cannot be applied or verified.");
             }
 
+            // Capture the map that received the output -- and the objects that
+            // reference it -- before any field work. By the time a failure
+            // happens the active view may have changed, and cleanup has to act
+            // on the map the layer/table actually lives in.
+            var captured = await CaptureCreatedOutputAsync(datasetPath).ConfigureAwait(false);
+
             var added = new List<string>();
             foreach (var request in requests)
             {
-                var result = await GeoprocessingCommands.RunNamedAsync(
-                    "management.AddField",
-                    new Dictionary<string, object>
-                    {
-                        ["in_table"] = datasetPath,
-                        ["field_name"] = request.Name,
-                        ["field_type"] = request.Type,
-                        ["field_precision"] = request.Precision,
-                        ["field_scale"] = request.Scale,
-                        ["field_length"] = request.Length,
-                        ["field_alias"] = request.Alias,
-                        ["field_is_nullable"] = "NULLABLE",
-                        ["field_domain"] = null,
-                    },
-                    addToMap: false).ConfigureAwait(false);
-
-                if (result.IsFailed)
+                bool failed = false;
+                var failureText = "";
+                try
                 {
-                    var messages = result.ErrorMessages != null
-                                   && result.ErrorMessages.Any()
-                        ? string.Join("; ", result.ErrorMessages.Select(m => m.Text))
-                        : "the tool reported no error text";
-                    var cleanup = await DeleteHalfCreatedAsync(datasetPath).ConfigureAwait(false);
+                    var result = await GeoprocessingCommands.RunNamedAsync(
+                        "management.AddField",
+                        new Dictionary<string, object>
+                        {
+                            ["in_table"] = datasetPath,
+                            ["field_name"] = request.Name,
+                            ["field_type"] = request.Type,
+                            ["field_precision"] = request.Precision,
+                            ["field_scale"] = request.Scale,
+                            ["field_length"] = request.Length,
+                            ["field_alias"] = request.Alias,
+                            ["field_is_nullable"] = "NULLABLE",
+                            ["field_domain"] = null,
+                        },
+                        addToMap: false).ConfigureAwait(false);
+
+                    if (result.IsFailed)
+                    {
+                        failed = true;
+                        failureText = result.ErrorMessages != null
+                                      && result.ErrorMessages.Any()
+                            ? string.Join("; ", result.ErrorMessages.Select(m => m.Text))
+                            : "the tool reported no error text";
+                    }
+                }
+                catch (Exception exception)
+                {
+                    failed = true;
+                    failureText = "threw: " + exception.Message;
+                }
+
+                if (failed)
+                {
+                    var cleanup = await DeleteHalfCreatedAsync(datasetPath, captured)
+                        .ConfigureAwait(false);
                     throw new InvalidOperationException(
-                        $"fields: adding '{request.Name}' failed ({messages}). "
+                        $"fields: adding '{request.Name}' failed ({failureText}). "
                         + (cleanup.DatasetDeleted
                             ? "The dataset created by this call was deleted so no "
                               + "half-configured dataset is left behind. "
@@ -591,7 +613,8 @@ namespace ArcGISProMCP.Commands
             }
             catch (Exception exception)
             {
-                var cleanup = await DeleteHalfCreatedAsync(datasetPath).ConfigureAwait(false);
+                var cleanup = await DeleteHalfCreatedAsync(datasetPath, captured)
+                    .ConfigureAwait(false);
                 throw new InvalidOperationException(
                     "fields: the dataset was created but could not be read back "
                     + $"for verification ({exception.Message}). "
@@ -648,7 +671,8 @@ namespace ArcGISProMCP.Commands
 
             if (problems.Count > 0)
             {
-                var cleanup = await DeleteHalfCreatedAsync(datasetPath).ConfigureAwait(false);
+                var cleanup = await DeleteHalfCreatedAsync(datasetPath, captured)
+                    .ConfigureAwait(false);
                 throw new InvalidOperationException(
                     "fields: verification failed after creation: "
                     + string.Join("; ", problems)
@@ -667,30 +691,31 @@ namespace ArcGISProMCP.Commands
         }
 
         /// <summary>
-        /// Remove a dataset this call just created, plus the map layers and
-        /// standalone tables that referenced it. Map objects are resolved by
-        /// their data source before the dataset is deleted and removed from
-        /// the very map they were captured on, so cleanup works on object
-        /// identity and never guesses by name; every failed step is returned
-        /// so the throw that follows can report it instead of the failure
-        /// happening silently.
+        /// The map that received this call's output and the objects in it that
+        /// reference the new dataset, captured before field work begins.
         /// </summary>
-        private static async Task<CleanupResult> DeleteHalfCreatedAsync(string datasetPath)
+        private sealed class CreatedOutput
         {
-            var cleanup = new CleanupResult();
-            var layers = new List<Layer>();
-            var tables = new List<StandaloneTable>();
-            Map map = null;
+            public Map Map;
+            public readonly List<Layer> Layers = new List<Layer>();
+            public readonly List<StandaloneTable> Tables = new List<StandaloneTable>();
+            public readonly List<string> Problems = new List<string>();
+        }
 
-            // Capture the owning map and the referencing objects while the
-            // dataset still exists.
+        /// <summary>
+        /// Resolve, while the dataset still exists, which map objects reference
+        /// it and which map they live in. Later failures act on this capture.
+        /// </summary>
+        private static async Task<CreatedOutput> CaptureCreatedOutputAsync(string datasetPath)
+        {
+            var captured = new CreatedOutput();
             try
             {
                 await QueuedTask.Run(() =>
                 {
-                    map = MapView.Active?.Map;
-                    if (map == null) return;
-                    foreach (var layer in map.GetLayersAsFlattenedList().ToList())
+                    captured.Map = MapView.Active?.Map;
+                    if (captured.Map == null) return;
+                    foreach (var layer in captured.Map.GetLayersAsFlattenedList().ToList())
                     {
                         if (!(layer is BasicFeatureLayer basic)) continue;
                         try
@@ -698,29 +723,29 @@ namespace ArcGISProMCP.Commands
                             using (var table = basic.GetTable())
                             {
                                 if (PathEquals(table?.GetPath()?.LocalPath, datasetPath))
-                                    layers.Add(layer);
+                                    captured.Layers.Add(layer);
                             }
                         }
                         catch (Exception exception)
                         {
-                            cleanup.Problems.Add(
+                            captured.Problems.Add(
                                 $"reading the data source of layer '{layer.Name}' failed: "
                                 + exception.Message);
                         }
                     }
-                    foreach (var table in map.GetStandaloneTablesAsFlattenedList().ToList())
+                    foreach (var table in captured.Map.GetStandaloneTablesAsFlattenedList().ToList())
                     {
                         try
                         {
                             using (var source = table.GetTable())
                             {
                                 if (PathEquals(source?.GetPath()?.LocalPath, datasetPath))
-                                    tables.Add(table);
+                                    captured.Tables.Add(table);
                             }
                         }
                         catch (Exception exception)
                         {
-                            cleanup.Problems.Add(
+                            captured.Problems.Add(
                                 $"reading the data source of table '{table.Name}' failed: "
                                 + exception.Message);
                         }
@@ -729,8 +754,24 @@ namespace ArcGISProMCP.Commands
             }
             catch (Exception exception)
             {
-                cleanup.Problems.Add("inspecting the map failed: " + exception.Message);
+                captured.Problems.Add("inspecting the map failed: " + exception.Message);
             }
+            return captured;
+        }
+
+        /// <summary>
+        /// Remove a dataset this call just created, plus the map layers and
+        /// standalone tables captured for it before field work began. Objects
+        /// are removed by identity from the map they were captured on, so
+        /// cleanup never guesses by name and never depends on which view is
+        /// active when the failure happens; every failed step is returned so
+        /// the throw that follows can report it.
+        /// </summary>
+        private static async Task<CleanupResult> DeleteHalfCreatedAsync(
+            string datasetPath, CreatedOutput captured)
+        {
+            var cleanup = new CleanupResult();
+            cleanup.Problems.AddRange(captured.Problems);
 
             // Delete the dataset itself.
             try
@@ -756,32 +797,31 @@ namespace ArcGISProMCP.Commands
                 cleanup.Problems.Add("deleting the dataset failed: " + exception.Message);
             }
 
-            // Remove exactly the captured objects, from the map they were
-            // captured on -- the active view may have changed by now.
-            if (layers.Count > 0 || tables.Count > 0)
+            // Remove exactly the captured objects, from the captured map.
+            if (captured.Layers.Count > 0 || captured.Tables.Count > 0)
             {
                 try
                 {
                     await QueuedTask.Run(() =>
                     {
-                        if (map == null)
+                        if (captured.Map == null)
                         {
                             cleanup.Problems.Add("no map was captured; the created "
                                                  + "layers could not be removed");
                             return;
                         }
-                        foreach (var layer in layers)
+                        foreach (var layer in captured.Layers)
                         {
-                            try { map.RemoveLayer(layer); }
+                            try { captured.Map.RemoveLayer(layer); }
                             catch (Exception exception)
                             {
                                 cleanup.Problems.Add($"removing layer '{layer.Name}' failed: "
                                                      + exception.Message);
                             }
                         }
-                        if (tables.Count > 0)
+                        if (captured.Tables.Count > 0)
                         {
-                            try { map.RemoveStandaloneTables(tables); }
+                            try { captured.Map.RemoveStandaloneTables(captured.Tables); }
                             catch (Exception exception)
                             {
                                 cleanup.Problems.Add("removing standalone tables failed: "

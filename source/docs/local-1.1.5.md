@@ -50,7 +50,7 @@ dotnet build addin\ArcGISProMCP\ArcGISProMCP.csproj -c Release -p:DeployAddIn=tr
 
 1. **自重启 `restart_pro`（MCP 命令，三方评审加固版）**：参数 `save`（默认 true）、`delay_seconds`（默认 10，强制 ≥8）、`project`（默认当前工程）。执行顺序：UI 线程 `SaveEditsAsync`→`SaveAsync`（任一异常即中止，不关窗）→ 内嵌脚本写到 `%LOCALAPPDATA%\ArcGIS-MCP\runtime\restart_pro_mcp.ps1` → 经 WMI `Win32_Process.Create` 由 WmiPrvSE 拉起助手（脱离 Pro 的作业对象；失败回退直接启动）→ MCP 先回 `{"scheduled":true,...}`。助手：等待延时 → 按 PID `CloseMainWindow` → 仅当窗口内同时存在"保存/不保存/取消"三类按钮时才点"不保存"（中英文标签经 Unicode 转义；其他弹窗只记日志绝不点击）→ 注册表定位并带工程重启 → 轮询 6510，恢复后要求 `command_count ≥ 112` 且新 PID ≠ 旧 PID，通过才写 `restart.ok`（日志 `restart.log`）。调度后拒绝第二个 restart 请求；客户端断线到桥接恢复后重连。
 2. **Claude Code 权限模板 `scripts/install_claude_permissions.ps1`（评审加固版）**：**默认只预览**，`-Apply` 才写；默认写项目级 `<项目>\.claude\settings.local.json`（`-Scope user` 才写全局）；`-ServerName` 可改前缀；从运行中桥接（127.0.0.1:6520）实时读工具名，桥不通回退 tools.json；**执行/破坏类 14 个工具不进白名单**（run_python_toolbox_tool、execute_arcpy_code、restart_pro、run_geoprocessing_tool、delete_*、remove_*、truncate_table 等，保留逐次确认）；规则无变化直接 no-op；`-Remove` 只撤销本脚本会生成的同名规则，不碰用户自定义规则；写前时间戳备份。Claude Desktop 侧用其自身的工具开关，不需要此脚本。
-3. **路径与编码约定（用户端脚本）**：运行时脚本统一放 `%LOCALAPPDATA%\ArcGIS-MCP\runtime\`（实际路径以 API 取值，不假设纯 ASCII）；含非 ASCII 文本的 .ps1 保存为 UTF-8 with BOM，纯 ASCII 脚本免 BOM（add-in 写出 restart_pro.ps1 时会保持纯 ASCII 内容）；.cmd 启动器首行 `chcp 65001>nul`；中文工程路径一律作为参数传入。`E:\mcp_ops\` 只是本机 Claude 终端链路的 ASCII 中转约定（Claude 终端工具拒绝非 ASCII 命令），不属于产品规范；产品侧如有类似需求，应使用可配置的中转目录。
+3. **路径与编码约定（用户端脚本）**：运行时脚本统一放 `%LOCALAPPDATA%\ArcGIS-MCP\runtime\`（实际路径以 API 取值，不假设纯 ASCII）；含非 ASCII 文本的 .ps1 保存为 UTF-8 with BOM，纯 ASCII 脚本免 BOM（add-in 写出 restart_pro.ps1 时会保持纯 ASCII 内容）；.cmd 启动器首行 `chcp 65001>nul`；中文工程路径一律作为参数传入。本机 ASCII 中转目录 只是本机 Claude 终端链路的 ASCII 中转约定（Claude 终端工具拒绝非 ASCII 命令），不属于产品规范；产品侧如有类似需求，应使用可配置的中转目录。
 
 ## 回滚
 

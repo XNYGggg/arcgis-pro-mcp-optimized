@@ -8,12 +8,16 @@ removed at the end; the 实验12 map's symbology is restored.
 """
 import argparse
 import json
+import os
+import os
 import urllib.request
 
 MAP = "实验12"
-GDB = (r"E:\ArcGIS_Home\project_total\MyProject_04_FirstHomework"
-       r"\project\MyProject\MyProject.gdb")
-SNAP = r"E:\ArcGIS_Home\数据库\数据库_02\02.gdb\土地利用栅格"
+GDB = os.environ.get("MCP_VERIFY_GDB") or os.path.join(
+    os.path.expanduser("~"), "Documents", "ArcGIS", "Projects",
+    "MyProject", "MyProject.gdb")
+SNAP = os.environ.get("MCP_VERIFY_SNAP") or os.path.join(
+    os.path.dirname(GDB), "snap_raster")
 DEM = GDB + r"\DEM_实验12"
 SLOPE_CLASS = "SlopeClass_实验12"
 STAT_TABLE = GDB + r"\土地利用平均坡度统计_实验12"
@@ -188,7 +192,7 @@ def main():
            sym.get("renderer") is not None, sym.get("renderer"))
 
     # -- F6: export fit auto ---------------------------------------------
-    png = r"E:\ArcGIS_Home\project_total\MyProject_04_FirstHomework\02\photo\v115_fit_auto.png"
+    png = os.path.join(os.environ.get("TEMP") or ".", "v115_fit_auto.png")
     exp = mcp.tool("export_map_view", {
         "map_name": MAP, "output_path": png, "width": 600, "height": 400,
         "fit": "auto", "zoom_to_layer": "DEM_实验12", "return_image": False})

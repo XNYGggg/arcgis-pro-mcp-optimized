@@ -64,7 +64,7 @@ if ($ver -lt [version]'3.7') {
     Fail '本客户版的 add-in 基于 ArcGIS Pro 3.7 / .NET 10 构建，需要 3.7 或更高；本版仅在 3.7 上实机验证。'
     exit 2
 }
-if ($ver -gt [version]'3.7') {
+if ($ver.Major -gt 3 -or ($ver.Major -eq 3 -and $ver.Minor -gt 7)) {
     Warn '本客户版仅在 ArcGIS Pro 3.7 上实机验证；当前版本高于 3.7，属未验证组合，请自行评估。'
 }
 

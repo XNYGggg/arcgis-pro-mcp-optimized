@@ -7,8 +7,8 @@
   - 1.1.8（P1）：独立表/数据集路径的增改删；`sample_raster_values` 原生像素采样（无副作用表）；`create_map` SCENE 修复；`add_join` 连接注册表修复；布局元素左下角坐标与回读校验；`run_batch` 每步耗时；GP 入图等待重试。
   - 1.1.9（P2）：图层命令接受数据集路径；`repair_layer_source` 支持栅格；`search_data` 去重；`check_extension` 语义修正；GP 输出过滤；栅格图层名提示。
   - 1.1.10：`restart_pro` 超时自愈（15 秒硬超时、本地化按钮、UTF-8 心跳日志、5 秒 TCP 超时）；重启调度标志 10 分钟过期；部署脚本归一。
-  - 1.1.11（发布前评审修正）：失败清理改为按对象身份、从捕获时所属地图移除并逐条上报；`update_installed.py` 去本机路径并支持 RunCode `__mcprun__` 入口；清理旧部署脚本与历史文档本机路径；构建 PathMap 剔除 DLL/PDB 源码路径；兼容口径统一为仅实机验证 Pro 3.7。
-- 规模：112 命令 / 115 工具；add-in SHA256 `10BAD933…8E85`（468,529 字节）。
+  - 1.1.11（发布前评审修正）：失败清理改为按对象身份、从捕获时所属地图移除并逐条上报；`update_installed.py` 去本机路径并支持 RunCode `__mcprun__` 入口；清理旧部署脚本与历史文档本机路径；构建 PathMap 剔除 DLL/PDB 源码路径；兼容口径统一为仅实机验证 Pro 3.7；第 3 轮终审后清理在字段处理前捕获、AddField 异常入清理、版本提示按主/次版本判断、live_verify 路径参数化、登记脚本优先读 MCP_UPDATE_ARGS。
+- 规模：112 命令 / 115 工具；add-in SHA256 `CC454A9F…5A50`（469,270 字节）。
 - 未创建 Release：不上传发行资产、不打 tag；默认分支保持 v1.1.4。
 
 ## Customer 1.16（1.14 增强版，构建号 1.1.6，2026-11-18）

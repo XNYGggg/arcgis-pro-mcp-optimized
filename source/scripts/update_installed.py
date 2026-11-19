@@ -6,11 +6,12 @@ is the only form the native add-in passes):
 
     update_installed.py <version> <expected_sha256> [note]
 
-RunCode executes the file with ``__name__ == "__mcprun__"`` and passes no
-argv, so this module runs under that name too. Inside Pro, either use a
-small wrapper that sets ``sys.argv`` and ``runpy``-runs this file, or set
-``MCP_UPDATE_ARGS`` to ``"<version> <sha256> [note]"``. From a normal
-shell, pass the arguments on the command line as above.
+RunCode executes the file with ``__name__ == "__mcprun__"`` and its argv is
+Pro's own launch line, not this script's arguments, so this module runs
+under that name too. Inside Pro, either use a small wrapper that sets
+``sys.argv`` and ``runpy``-runs this file, or set ``MCP_UPDATE_ARGS`` to
+``"<version> <sha256> [note]"``. From a normal shell, pass the arguments on
+the command line as above.
 
 This replaces the one-off update_installed_117/118/119.py scripts: the
 version, the expected hash and the note are the only things that change
@@ -81,17 +82,20 @@ def main(argv):
 
 
 def parse_request():
-    """Arguments from argv, or from MCP_UPDATE_ARGS when RunCode gives none."""
-    args = sys.argv[1:]
-    if len(args) < 2:
-        env_args = os.environ.get("MCP_UPDATE_ARGS", "").strip()
-        if env_args:
-            args = env_args.split()
+    """Arguments from MCP_UPDATE_ARGS when set, else from argv."""
+    env_args = os.environ.get("MCP_UPDATE_ARGS", "").strip()
+    if env_args:
+        # Keep the note whole: version, hash, then the rest as one string.
+        args = env_args.split(None, 2)
+    else:
+        # Under RunCode, __name__ is __mcprun__ and sys.argv is Pro's own
+        # launch line -- usually 0-1 entries, but treat it as untrusted.
+        args = sys.argv[1:]
     if len(args) < 2:
         raise SystemExit(
             "usage: update_installed.py <version> <expected_sha256> [note]\n"
-            "inside ArcGIS Pro (RunCode passes no argv) use a wrapper that "
-            "sets sys.argv and runpy-runs this file, or set "
+            "inside ArcGIS Pro (RunCode does not pass this script's arguments) "
+            "use a wrapper that sets sys.argv and runpy-runs this file, or set "
             "MCP_UPDATE_ARGS='<version> <sha256> [note]'")
     return ["update_installed.py"] + args
 
