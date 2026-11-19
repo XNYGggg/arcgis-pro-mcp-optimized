@@ -13,7 +13,7 @@
     "file": "install/ArcGISProMCP.esriAddinX",
     "file_version": "1.1.11.0",
     "desktop_version": "3.7",
-    "sha256": "cc454a9fc20d4c0136673f96147bf55b7ca8d621a6b88adfd7e5e83f519f5a50"
+    "sha256": "0abb872fbcd6fb65aa12f118501216f2bd3f305a9c6c68537870a5eddf306df9"
   },
   "license": "AGPL-3.0-or-later",
   "upstream": "https://github.com/Knight60/ArcGIS-Pro-MCP",

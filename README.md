@@ -16,7 +16,7 @@ This package bundles **every component** needed to run — fully offline, **no P
 
 ## 🆚 What is new versus 1.14 (v1.1.4)
 
-Everything below was merged after the v1.1.4 customer package. Tool count 113 → **115** (new `add_table` and `restart_pro`); the add-in binary is now `CC454A9F…5A50` (469,270 bytes).
+Everything below was merged after the v1.1.4 customer package. Tool count 113 → **115** (new `add_table` and `restart_pro`); the add-in binary is now `0ABB872F…6DF9` (469,634 bytes).
 
 | Build | Type | Highlights |
 |---|---|---|

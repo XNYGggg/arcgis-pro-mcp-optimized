@@ -691,20 +691,24 @@ namespace ArcGISProMCP.Commands
         }
 
         /// <summary>
-        /// The map that received this call's output and the objects in it that
-        /// reference the new dataset, captured before field work begins.
+        /// The layers and standalone tables that reference this call's new
+        /// dataset, each bound to the map it lives in, captured before field
+        /// work begins. Scanning every map in the project -- rather than only
+        /// the active view -- means cleanup never depends on which map the
+        /// user happens to be looking at when a failure happens.
         /// </summary>
         private sealed class CreatedOutput
         {
-            public Map Map;
-            public readonly List<Layer> Layers = new List<Layer>();
-            public readonly List<StandaloneTable> Tables = new List<StandaloneTable>();
+            public readonly List<KeyValuePair<Map, Layer>> Layers =
+                new List<KeyValuePair<Map, Layer>>();
+            public readonly List<KeyValuePair<Map, StandaloneTable>> Tables =
+                new List<KeyValuePair<Map, StandaloneTable>>();
             public readonly List<string> Problems = new List<string>();
         }
 
         /// <summary>
-        /// Resolve, while the dataset still exists, which map objects reference
-        /// it and which map they live in. Later failures act on this capture.
+        /// Resolve, while the dataset still exists, which map members reference
+        /// it and which map each lives in. Later failures act on this capture.
         /// </summary>
         private static async Task<CreatedOutput> CaptureCreatedOutputAsync(string datasetPath)
         {
@@ -713,48 +717,55 @@ namespace ArcGISProMCP.Commands
             {
                 await QueuedTask.Run(() =>
                 {
-                    captured.Map = MapView.Active?.Map;
-                    if (captured.Map == null) return;
-                    foreach (var layer in captured.Map.GetLayersAsFlattenedList().ToList())
+                    var project = Project.Current;
+                    if (project == null) return;
+                    foreach (var item in project.GetItems<MapProjectItem>())
                     {
-                        if (!(layer is BasicFeatureLayer basic)) continue;
-                        try
+                        var map = item.GetMap();
+                        if (map == null) continue;
+                        foreach (var layer in map.GetLayersAsFlattenedList().ToList())
                         {
-                            using (var table = basic.GetTable())
+                            if (!(layer is BasicFeatureLayer basic)) continue;
+                            try
                             {
-                                if (PathEquals(table?.GetPath()?.LocalPath, datasetPath))
-                                    captured.Layers.Add(layer);
+                                using (var table = basic.GetTable())
+                                {
+                                    if (PathEquals(table?.GetPath()?.LocalPath, datasetPath))
+                                        captured.Layers.Add(
+                                            new KeyValuePair<Map, Layer>(map, layer));
+                                }
+                            }
+                            catch (Exception exception)
+                            {
+                                captured.Problems.Add(
+                                    $"reading the data source of layer '{layer.Name}' "
+                                    + $"in map '{map.Name}' failed: " + exception.Message);
                             }
                         }
-                        catch (Exception exception)
+                        foreach (var table in map.GetStandaloneTablesAsFlattenedList().ToList())
                         {
-                            captured.Problems.Add(
-                                $"reading the data source of layer '{layer.Name}' failed: "
-                                + exception.Message);
-                        }
-                    }
-                    foreach (var table in captured.Map.GetStandaloneTablesAsFlattenedList().ToList())
-                    {
-                        try
-                        {
-                            using (var source = table.GetTable())
+                            try
                             {
-                                if (PathEquals(source?.GetPath()?.LocalPath, datasetPath))
-                                    captured.Tables.Add(table);
+                                using (var source = table.GetTable())
+                                {
+                                    if (PathEquals(source?.GetPath()?.LocalPath, datasetPath))
+                                        captured.Tables.Add(
+                                            new KeyValuePair<Map, StandaloneTable>(map, table));
+                                }
                             }
-                        }
-                        catch (Exception exception)
-                        {
-                            captured.Problems.Add(
-                                $"reading the data source of table '{table.Name}' failed: "
-                                + exception.Message);
+                            catch (Exception exception)
+                            {
+                                captured.Problems.Add(
+                                    $"reading the data source of table '{table.Name}' "
+                                    + $"in map '{map.Name}' failed: " + exception.Message);
+                            }
                         }
                     }
                 }).ConfigureAwait(false);
             }
             catch (Exception exception)
             {
-                captured.Problems.Add("inspecting the map failed: " + exception.Message);
+                captured.Problems.Add("inspecting the project maps failed: " + exception.Message);
             }
             return captured;
         }
@@ -797,35 +808,35 @@ namespace ArcGISProMCP.Commands
                 cleanup.Problems.Add("deleting the dataset failed: " + exception.Message);
             }
 
-            // Remove exactly the captured objects, from the captured map.
+            // Remove exactly the captured objects, each from the map it lives in.
             if (captured.Layers.Count > 0 || captured.Tables.Count > 0)
             {
                 try
                 {
                     await QueuedTask.Run(() =>
                     {
-                        if (captured.Map == null)
+                        foreach (var pair in captured.Layers)
                         {
-                            cleanup.Problems.Add("no map was captured; the created "
-                                                 + "layers could not be removed");
-                            return;
-                        }
-                        foreach (var layer in captured.Layers)
-                        {
-                            try { captured.Map.RemoveLayer(layer); }
+                            try { pair.Key.RemoveLayer(pair.Value); }
                             catch (Exception exception)
                             {
-                                cleanup.Problems.Add($"removing layer '{layer.Name}' failed: "
-                                                     + exception.Message);
+                                cleanup.Problems.Add(
+                                    $"removing layer '{pair.Value.Name}' from map "
+                                    + $"'{pair.Key.Name}' failed: " + exception.Message);
                             }
                         }
-                        if (captured.Tables.Count > 0)
+                        foreach (var group in captured.Tables.GroupBy(p => p.Key))
                         {
-                            try { captured.Map.RemoveStandaloneTables(captured.Tables); }
+                            try
+                            {
+                                group.Key.RemoveStandaloneTables(
+                                    group.Select(p => p.Value).ToList());
+                            }
                             catch (Exception exception)
                             {
-                                cleanup.Problems.Add("removing standalone tables failed: "
-                                                     + exception.Message);
+                                cleanup.Problems.Add(
+                                    $"removing standalone tables from map "
+                                    + $"'{group.Key.Name}' failed: " + exception.Message);
                             }
                         }
                     }).ConfigureAwait(false);
