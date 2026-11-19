@@ -398,13 +398,24 @@ def _apply(args, as_json: bool) -> int:
 
 def _delete(args, as_json: bool) -> int:
     library = _library(args)
-    spec = _load_spec(library, args.template_id)
+    try:
+        spec = _load_spec(library, args.template_id)
+    except FileNotFoundError:
+        # The spec may already be gone while an index entry lingers from an
+        # interrupted delete; library.delete still clears that entry and
+        # reports not_found only when neither exists.
+        spec = {}
     if spec.get("status") == "ready" and not args.force:
         return fail(f"template '{args.template_id}' is ready; deleting an approved "
                     "template needs --force", "ready_template",
                     exit_code=EXIT_VALIDATION, as_json=as_json)
     result = library.delete(args.template_id, force=args.force)
     removed = result["removed"]
+    errors = result.get("errors") or []
+    if not removed["spec"] and not removed["index_entry"]:
+        return fail(f"could not delete '{result['template_id']}': "
+                    + ("; ".join(errors) or "nothing was removed"),
+                    "delete_failed", exit_code=EXIT_RUNTIME, as_json=as_json)
     if removed["image"]:
         image_note = f"image removed: {removed['image']}"
     elif removed["image_kept_for"]:
@@ -413,10 +424,12 @@ def _delete(args, as_json: bool) -> int:
         image_note = "no image on record"
     payload = ok(template_id=result["template_id"], deleted=True,
                  was_status=result["status"], removed=removed,
-                 library=str(library.root))
-    emit(payload, as_json,
-         human=f"deleted {result['template_id']} (was {result['status']}); "
-               f"{image_note}")
+                 errors=errors, library=str(library.root))
+    human = (f"deleted {result['template_id']} (was {result['status']}); "
+             f"{image_note}")
+    for message in errors:
+        human += f"\n  WARN leftover: {message}"
+    emit(payload, as_json, human=human)
     return EXIT_OK
 
 

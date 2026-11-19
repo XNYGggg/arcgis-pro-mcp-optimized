@@ -3,7 +3,7 @@
 - 日期：2026-11-19
 - 基线：1.1.12（基线提交 `7a20f9e`，分支 `customer-v1.1.11-distill`；add-in SHA256 `A20E263B041E78A1F5631B1DD4EFC1B7946C05A28038751DC20C38F0AB55C6C7`，476,195 字节，122 命令 / 125 工具）
 - 目标：为 `arcgis-distill` 模板库补齐删除命令（1.1.12 验收清理模板只能手工改 index/文件），新增 MCP 工具 `template_delete`。
-- 分支：`customer-v1.1.13-delete`（独立分支，未推送远端）。
+- 分支：`customer-v1.1.13`（独立分支；发布时推送远端并打 tag `v1.1.13`）。
 
 ## 变更清单
 
@@ -41,7 +41,7 @@
 
 - `tools.json` 由 `export_tool_schemas.py` 重新生成（126 工具、Template 组 11 个）；`source/README.md` 工具表由 `gen_tool_docs.py` 重生成。
 - `SHA256SUMS.txt` 重新生成（232 个文件）并全量校验通过。
-- `install/runtime/distill` 与 `source/src/arcgis_agentkit` 逐文件一致；`docs/distill.md` 与 `source/docs/distill.md`、`skills/` 与 `source/skills/` 副本一致。
+- `install/runtime/distill` 与 `source/src/arcgis_agentkit` 自 source 重新复制后逐文件一致；`docs/distill.md` 与 `source/docs/distill.md`、`skills/` 与 `source/skills/` 副本一致。
 
 ## 未做 / 边界
 

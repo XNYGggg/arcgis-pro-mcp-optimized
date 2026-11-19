@@ -32,7 +32,7 @@
 
 本机实机验证（**仅 ArcGIS Pro 3.7**）：1.1.7 回归 21/21 PASS；1.1.8 连续两轮回归 0 失败；1.1.9 P2 回归 10/10、P1 重跑 0 失败；1.1.10 握手 `1.1.10.0`；1.1.11 握手 `1.1.11.0`、ping `command_count=112`，D1 字段回归对当前测试工程适用的断言全部通过（4 条历史断言引用已退役工程的图层名），`get_features` 分页/摘要/精度已实机复验。其他 Pro 版本未覆盖。
 
-1.1.13（模板删除）：构建全过（client-registration / installer / HTTP net8.0+net10.0），`tests/test_distill.py` 11/11（新增 4 个删除用例：无共享图片删除、共享图片保留、未知 id 返回 not_found、ready 需 force）、`tests/test_catalog_matches_bridge.py` 4/4 通过；`tools.json` 与 `catalog.py` 在 126 工具 / 123 命令上全等价。1.1.12 的实机验收记录（握手、125 工具、`template_*` 全流程 11/11、官方自检 21 通过 / 0 失败）见 `docs/CHANGELOG.md`。细节见 `docs/CHANGELOG.md` 与 `RELEASE-NOTES.md`。
+1.1.13（模板删除）：构建全过（client-registration / installer / HTTP net8.0+net10.0），`tests/test_distill.py` 13/13（6 个删除用例：无共享图片删除、共享图片保留、未知 id not_found、ready 需 force、路径型 id 拒绝、孤儿索引清理）、`tests/test_catalog_matches_bridge.py` 4/4 通过；`tools.json` 与 `catalog.py` 在 126 工具 / 123 命令上全等价。1.1.12 的实机验收记录（握手、125 工具、`template_*` 全流程 11/11、官方自检 21 通过 / 0 失败）见 `docs/CHANGELOG.md`。细节见 `docs/CHANGELOG.md` 与 `RELEASE-NOTES.md`。
 
 ---
 
@@ -590,10 +590,10 @@ print(mcp_bridge.start_pump())
 
 ### 🔍 依赖审计（为什么说“全打包”）
 
-- 🧩 add-in：自包含 C# 程序集，运行在 Pro 3.7 受支持环境自带的 .NET Desktop Runtime 10 x64 上——本包无需另装 .NET。
+- 🧩 add-in：自包含 C# 程序集，运行在 **ArcGIS Pro 3.7 系统要求所列的** .NET Desktop Runtime 10 x64 上——**本包**无需另装 .NET。
 - 🌉 stdio 桥、🛡️ 弹窗守护：Windows 自带的 PowerShell 5.1 + WinForms——无需另装。
 - 🐍 RunCode 工具箱、Python 桥：运行在 ArcGIS Pro 自带的 Python（arcpy）里——无需另装 Python。
-- ✅ **因此本包没有任何需要 pip / 联网安装的外部依赖。**“离线可用”指本包自身的安装与运行链路；ArcGIS Pro 3.7 的安装前提（.NET Desktop Runtime 10 x64、WebView2 ≥132）由 Pro 的安装程序提供。
+- ✅ **因此本包没有任何需要 pip / 联网安装的外部依赖。**“离线可用”指本包自身的安装与运行链路。ArcGIS Pro 3.7 的系统要求（Microsoft .NET Desktop Runtime 10 x64 与 WebView2）属于 Esri 的前置条件——若本机缺失，请按 Esri 系统要求安装对应组件（Pro 安装器通常会提示或代为安装）。
 
 ---
 

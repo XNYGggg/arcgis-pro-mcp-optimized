@@ -32,7 +32,7 @@
 
 이 컴퓨터 실기 검증(**ArcGIS Pro 3.7 전용**): 1.1.7 회귀 21/21 PASS; 1.1.8 연속 두 라운드 0 실패; 1.1.9 P2 10/10 및 P1 재실행 0 실패; 1.1.10 핸드셰이크 `1.1.10.0`; 1.1.11 핸드셰이크 `1.1.11.0`, ping `command_count=112`, D1 필드 회귀는 현재 테스트 프로젝트에 적용되는 모든 어서션 PASS(4개 레거시 어서션은 퇴역 프로젝트의 레이어 이름 참조), `get_features` 페이징/요약/정밀도 실기 재확인. 다른 Pro 버전은 미검증.
 
-1.1.13(템플릿 삭제): 빌드 전 과정 통과(client-registration / installer / HTTP net8.0+net10.0), `tests/test_distill.py` 11/11(신규 삭제 4개: 공유되지 않은 이미지 삭제, 공유 이미지 유지, 미지의 id not_found, ready는 force 필요), `tests/test_catalog_matches_bridge.py` 4/4 통과. `tools.json`과 `catalog.py`는 126개 도구 / 123개 명령에서 완전 동일. 1.1.12 실기 인수 기록(핸드셰이크, 125개 도구, `template_*` 전체 흐름 11/11, 공식 자체 점검 21 통과 / 0 실패)은 `docs/CHANGELOG.md`에 있습니다.
+1.1.13(템플릿 삭제): 빌드 전 과정 통과(client-registration / installer / HTTP net8.0+net10.0), `tests/test_distill.py` 13/13(삭제 6개: 공유되지 않은 이미지 삭제, 공유 이미지 유지, 미지의 id not_found, ready는 force 필요, 경로형 id 거부, 고아 색인 정리), `tests/test_catalog_matches_bridge.py` 4/4 통과. `tools.json`과 `catalog.py`는 126개 도구 / 123개 명령에서 완전 동일. 1.1.12 실기 인수 기록(핸드셰이크, 125개 도구, `template_*` 전체 흐름 11/11, 공식 자체 점검 21 통과 / 0 실패)은 `docs/CHANGELOG.md`에 있습니다.
 
 ---
 
@@ -590,10 +590,10 @@ print(mcp_bridge.start_pump())
 
 ### 🔍 의존성 감사("전부 포함"의 근거)
 
-- 🧩 add-in: 자체 완결형 C# 어셈블리. Pro 3.7 지원 환경에 포함된 .NET Desktop Runtime 10 x64에서 동작 — .NET 별도 설치 불필요.
+- 🧩 add-in: 자체 완결형 C# 어셈블리. **ArcGIS Pro 3.7 시스템 요구 사항에 명시된** .NET Desktop Runtime 10 x64에서 동작 — **본 패키지로서는** 별도 .NET 설치 불필요.
 - 🌉 stdio 브리지, 🛡️ 다이얼로그 가드: Windows 기본 제공 PowerShell 5.1 + WinForms — 별도 설치 불필요.
 - 🐍 RunCode 도구상자, Python 브리지: ArcGIS Pro 자체 Python(arcpy)에서 동작 — 별도 Python 불필요.
-- ✅ **따라서 이 패키지에는 pip / 인터넷이 필요한 외부 의존성이 없습니다.** "오프라인 동작"은 이 패키지 자체의 설치·실행 경로를 뜻하며, ArcGIS Pro 3.7의 전제(.NET Desktop Runtime 10 x64, WebView2 ≥132)는 Pro 설치 프로그램이 제공합니다.
+- ✅ **따라서 이 패키지에는 pip / 인터넷이 필요한 외부 의존성이 없습니다.** "오프라인 동작"은 이 패키지 자체의 설치·실행 경로를 뜻합니다. ArcGIS Pro 3.7의 시스템 요구 사항(Microsoft .NET Desktop Runtime 10 x64와 WebView2)은 Esri의 전제 조건입니다 — 이 컴퓨터에 없으면 Esri 시스템 요구 사항에 따라 설치하세요(보통 Pro 설치 프로그램이 안내·설치합니다).
 
 ---
 

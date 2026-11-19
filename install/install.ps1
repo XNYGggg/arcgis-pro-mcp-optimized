@@ -94,7 +94,7 @@ if ($desktop10.Count -eq 0) {
 if ($desktop10.Count -gt 0) {
     Ok ('已检测到：' + ($desktop10 -join '; '))
 } else {
-    Warn '未自动检测到 .NET Desktop Runtime 10。ArcGIS Pro 3.7 的受支持安装通常已自带；若 add-in 无法加载，请修复/重装 Pro 3.7。'
+    Warn '未自动检测到 .NET Desktop Runtime 10。它属于 ArcGIS Pro 3.7 的系统要求（Esri 文档）；若缺失，请按 Esri 系统要求安装该运行时，或运行 Pro 安装器检查前置组件。'
 }
 
 # ---------- 3. 端口占用（仅提示，不阻塞） ----------

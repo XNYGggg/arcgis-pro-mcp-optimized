@@ -42,6 +42,13 @@
     <PathMap>$(MSBuildProjectDirectory)=/_/src</PathMap>
   </PropertyGroup>
 
+  <!-- The release add-in ships without a PDB: debug symbols embed Source Link
+       data (repository URL + build commit) and are of no use to customers. -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugType>None</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
   <Target Name="ValidateProTarget" BeforeTargets="ResolveAssemblyReferences">
     <Error Condition="'$(ProTargetVersion)' != '3.4' and '$(ProTargetVersion)' != '3.7'"
            Text="ProTargetVersion must be 3.4 or 3.7." />

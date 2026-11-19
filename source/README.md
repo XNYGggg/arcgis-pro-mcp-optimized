@@ -32,7 +32,7 @@ falls through three layers, and takes the fastest one that can answer it:
 
 | | | |
 |---|---|---|
-| **1** | **112 named tools**, written in C# | Layers, attributes, selections, symbology, layouts, rasters, editing — the work of an ordinary day. 109 of them execute inside ArcGIS Pro's own process, in about **9 ms** each. |
+| **1** | **126 named tools**, written in C# | Layers, attributes, selections, symbology, layouts, rasters, editing — the work of an ordinary day. The native commands execute inside ArcGIS Pro's own process (about **9 ms** each in the original measurement; the 11 `template_*` tools wrap the arcgis-distill CLI and take longer). |
 | **2** | **Every geoprocessing tool** | `run_geoprocessing_tool` runs any of Pro's ~2,000 tools by name, with named parameters rather than a positional list to miscount. Still in-process, still C#. |
 | **3** | **Arbitrary arcpy** | `execute_arcpy_code` hands Python straight to arcpy in the running application. Whatever the layers above have no tool for, this reaches. |
 
@@ -477,7 +477,7 @@ earlier all-Python version had to hand work to Pro's Python thread and wait,
 which took around 28 seconds per call. The add-in uses `QueuedTask.Run`
 directly: **9 ms**.
 
-Three of the 112 tools stay on the Python side, and belong there:
+Three of the 126 tools stay on the Python side, and belong there:
 `execute_arcpy_code`, because a compiled add-in cannot run code composed at
 call time, and `get_pump_status` / `stop_pump`, which report on the Python
 bridge's own dispatcher.

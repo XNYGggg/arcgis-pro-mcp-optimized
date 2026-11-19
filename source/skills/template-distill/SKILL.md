@@ -17,6 +17,9 @@ description: Distill a sample map figure into a reusable layout template spec (i
 
 ## 1. 入库与测量（禁止手改 measured）
 
+（客户版命令入口：`%LOCALAPPDATA%\ArcGIS Pro MCP\distill\run-distill.ps1`，
+下文示例中的 `arcgis-distill` 均指它；MCP 场景直接调用对应的 `template_*` 工具。）
+
 ```text
 arcgis-distill import <样本图> --name "研究区总览图" --tag 论文风格 --width-in 6.7 --json
 arcgis-distill measure <id> --json

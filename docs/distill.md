@@ -24,6 +24,10 @@ imported ──measure──► measured ──patch(语义字段)──► anal
 
 ## 2. 命令
 
+以下以 `arcgis-distill` 代指命令行。客户版不把它放进 PATH：实际入口是
+`%LOCALAPPDATA%\ArcGIS Pro MCP\distill\run-distill.ps1 <子命令>`（源码环境
+`pip install .` 后才有 `arcgis-distill` 命令）；MCP 侧直接用 `template_*` 工具。
+
 ```text
 arcgis-distill doctor
 arcgis-distill import <image> --name NAME [--tag T] [--width-in 6.7] [--id ID]

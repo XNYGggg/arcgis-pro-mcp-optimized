@@ -205,3 +205,21 @@ def test_delete_ready_template_requires_force(pipeline):
 
     assert main(["delete", template_id, "--force", "--json"]) == 0
     assert library.list() == []
+
+
+def test_delete_rejects_path_like_ids(pipeline):
+    _tmp, library, template_id = pipeline
+    outside = _tmp / "outside.json"
+    outside.write_text("{}", encoding="utf-8")
+
+    assert main(["delete", "../outside", "--json"]) == 4
+    assert outside.is_file(), "path-like ids must never reach outside specs/"
+    assert [entry["id"] for entry in library.list()] == [template_id]
+
+
+def test_delete_clears_orphan_index_entry(pipeline):
+    _tmp, library, template_id = pipeline
+    # Simulate an interrupted delete that removed the spec before the entry.
+    library.spec_path(template_id).unlink()
+    assert main(["delete", template_id, "--json"]) == 0
+    assert library.list() == []

@@ -54,6 +54,14 @@ def _slug(text: str, fallback_prefix: str = "tpl") -> str:
     return fallback_prefix + "-" + time.strftime("%Y%m%d-%H%M%S") + "-" + secrets.token_hex(2)
 
 
+_TEMPLATE_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$")
+
+
+def _valid_template_id(template_id: str) -> bool:
+    """Ids become file names; anything with a path separator or '..' is out."""
+    return bool(_TEMPLATE_ID.fullmatch(template_id or ""))
+
+
 class TemplateLibrary:
     def __init__(self, root: str | Path | None = None,
                  config: dict[str, Any] | None = None) -> None:
@@ -135,23 +143,43 @@ class TemplateLibrary:
                 return entry
         return None
 
+    def _canonical_id(self, template_id: str,
+                      entries: list[dict[str, Any]]) -> str:
+        """Resolve the stored spelling of an id.
+
+        Windows paths are case-insensitive while the index is not: without
+        this, deleting 'ABC' would remove specs/abc.json and leave the index
+        entry behind. The index entry wins, then the on-disk spec name.
+        """
+        lowered = template_id.lower()
+        for entry in entries:
+            if str(entry.get("id", "")).lower() == lowered:
+                return str(entry["id"])
+        if not (self.specs / f"{template_id}.json").is_file():
+            for path in self.specs.glob("*.json"):
+                if path.stem.lower() == lowered:
+                    return path.stem
+        return template_id
+
+    def _apply_upsert(self, data: dict[str, Any], spec: dict[str, Any]) -> None:
+        entries = [entry for entry in data["templates"]
+                   if entry.get("id") != spec["id"]]
+        entries.append({
+            "id": spec["id"],
+            "name": spec.get("name", spec["id"]),
+            "status": spec.get("status", "imported"),
+            "image_sha256": spec.get("image_sha256"),
+            "tags": spec.get("tags", []),
+            "spec": f"specs/{spec['id']}.json",
+            "image": spec.get("source_image"),
+            "updated_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+        })
+        data["templates"] = sorted(entries, key=lambda item: item["id"])
+        self._write_index(data)
+
     def _upsert(self, spec: dict[str, Any]) -> None:
         with self._lock():
-            data = self.index()
-            entries = [entry for entry in data["templates"]
-                       if entry.get("id") != spec["id"]]
-            entries.append({
-                "id": spec["id"],
-                "name": spec.get("name", spec["id"]),
-                "status": spec.get("status", "imported"),
-                "image_sha256": spec.get("image_sha256"),
-                "tags": spec.get("tags", []),
-                "spec": f"specs/{spec['id']}.json",
-                "image": spec.get("source_image"),
-                "updated_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
-            })
-            data["templates"] = sorted(entries, key=lambda item: item["id"])
-            self._write_index(data)
+            self._apply_upsert(self.index(), spec)
 
     # -- templates ---------------------------------------------------------
 
@@ -165,8 +193,9 @@ class TemplateLibrary:
         return json.loads(path.read_text(encoding="utf-8-sig"))
 
     def save(self, spec: dict[str, Any]) -> None:
-        write_json_atomic(self.spec_path(spec["id"]), spec)
-        self._upsert(spec)
+        with self._lock():
+            write_json_atomic(self.spec_path(spec["id"]), spec)
+            self._apply_upsert(self.index(), spec)
 
     def list(self, status: str | None = None, tag: str | None = None) -> list[dict[str, Any]]:
         entries = self.index().get("templates", [])
@@ -190,57 +219,67 @@ class TemplateLibrary:
         except Exception as exc:
             raise ValueError(f"not a readable image: {image_path.name}: {exc}") from exc
         digest = _sha256(image_path)
-        for entry in self.index().get("templates", []):
-            if entry.get("image_sha256") == digest:
-                existing = self.get(entry["id"])
-                return {"spec": existing, "skipped": True, "reason": "image_sha256 already imported"}
+        # One lock for the whole import: the dedupe check, the image copy, the
+        # spec write and the index commit must not interleave with a delete,
+        # which decides image liveness from the same records under this lock.
+        with self._lock():
+            for entry in self.index().get("templates", []):
+                if entry.get("image_sha256") == digest:
+                    existing = self.get(entry["id"])
+                    return {"spec": existing, "skipped": True,
+                            "reason": "image_sha256 already imported"}
 
-        template_id = template_id or _slug(name)
-        if self.spec_path(template_id).exists():
-            template_id = f"{template_id}-{secrets.token_hex(2)}"
-            while self.spec_path(template_id).exists():
+            template_id = template_id or _slug(name)
+            if not _valid_template_id(template_id):
+                raise ValueError(
+                    f"invalid template id: {template_id!r} (letters, digits, "
+                    "'.', '_' and '-' only; it becomes a file name)")
+            if self.spec_path(template_id).exists():
                 template_id = f"{template_id}-{secrets.token_hex(2)}"
+                while self.spec_path(template_id).exists():
+                    template_id = f"{template_id}-{secrets.token_hex(2)}"
 
-        extension = image_path.suffix.lower() or ".png"
-        stored_name = digest[:16] + extension
-        stored = self.images / stored_name
-        if not stored.exists():
-            shutil.copyfile(image_path, stored)
+            extension = image_path.suffix.lower() or ".png"
+            stored_name = digest[:16] + extension
+            stored = self.images / stored_name
+            if not stored.exists():
+                shutil.copyfile(image_path, stored)
 
-        spec = {
-            "schema_version": 1,
-            "id": template_id,
-            "name": name,
-            "status": "imported",
-            "source_image": f"images/{stored_name}",
-            "image_sha256": digest,
-            "tags": tags or [],
-            "canvas": {
-                "page": "custom",
-                "width_in": width_in,
-                "background": "#FFFFFF",
-            },
-            "map_frame": {},
-            "title": {},
-            "legend": {},
-            "scale_bar": {},
-            "north_arrow": {},
-            "palette": {},
-            "typography": {},
-            "labeling": {},
-            "export": {},
-            "regions": [],
-            "pitfalls": [],
-            "notes": "",
-        }
-        self.save(spec)
-        job = {
-            "template_id": template_id,
-            "image_sha256": digest,
-            "created_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
-            "steps": {},
-        }
-        write_json_atomic(self.jobs / f"{template_id}.json", job)
+            spec = {
+                "schema_version": 1,
+                "id": template_id,
+                "name": name,
+                "status": "imported",
+                "source_image": f"images/{stored_name}",
+                "image_sha256": digest,
+                "tags": tags or [],
+                "canvas": {
+                    "page": "custom",
+                    "width_in": width_in,
+                    "background": "#FFFFFF",
+                },
+                "map_frame": {},
+                "title": {},
+                "legend": {},
+                "scale_bar": {},
+                "north_arrow": {},
+                "palette": {},
+                "typography": {},
+                "labeling": {},
+                "export": {},
+                "regions": [],
+                "pitfalls": [],
+                "notes": "",
+            }
+            write_json_atomic(self.spec_path(spec["id"]), spec)
+            self._apply_upsert(self.index(), spec)
+            job = {
+                "template_id": template_id,
+                "image_sha256": digest,
+                "created_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                "steps": {},
+            }
+            write_json_atomic(self.jobs / f"{template_id}.json", job)
         return {"spec": spec, "skipped": False}
 
     def image_path(self, spec: dict[str, Any]) -> Path:
@@ -263,8 +302,13 @@ class TemplateLibrary:
         ``force`` - the same gate ``approve`` uses in reverse.
         """
         with self._lock():
+            if not _valid_template_id(template_id):
+                raise ValueError(
+                    f"invalid template id: {template_id!r} (letters, digits, "
+                    "'.', '_' and '-' only; it becomes a file name)")
             data = self.index()
             entries = data.get("templates", [])
+            template_id = self._canonical_id(template_id, entries)
             entry = next((item for item in entries if item.get("id") == template_id), None)
             path = self.spec_path(template_id)
             if entry is None and not path.is_file():
@@ -284,22 +328,16 @@ class TemplateLibrary:
 
             image_relative = spec.get("source_image") or (entry or {}).get("image")
             image_digest = spec.get("image_sha256") or (entry or {}).get("image_sha256")
-
-            data["templates"] = [item for item in entries
-                                 if item.get("id") != template_id]
-            self._write_index(data)
-            removed_spec = False
-            if path.is_file():
-                path.unlink()
-                removed_spec = True
+            errors: list[str] = []
 
             # The image is stored once per sha256 and may be shared by templates
             # that arrived through bundle-import, so it is removed only when no
             # remaining spec references the same file or digest.
+            remaining = [item for item in entries if item.get("id") != template_id]
             image_referenced_by: list[str] = []
             image_removed = False
             if image_relative:
-                for other in data["templates"]:
+                for other in remaining:
                     if other.get("image") == image_relative or (
                             image_digest and other.get("image_sha256") == image_digest):
                         image_referenced_by.append(other.get("id"))
@@ -327,8 +365,11 @@ class TemplateLibrary:
                     except ValueError:
                         inside_images = False
                     if inside_images and candidate.is_file():
-                        candidate.unlink()
-                        image_removed = True
+                        try:
+                            candidate.unlink()
+                            image_removed = True
+                        except OSError as exc:
+                            errors.append(f"image {image_relative}: {exc}")
 
             job_path = self.jobs / f"{template_id}.json"
             job_removed = False
@@ -336,19 +377,35 @@ class TemplateLibrary:
                 try:
                     job_path.unlink()
                     job_removed = True
-                except OSError:
-                    pass
+                except OSError as exc:
+                    errors.append(f"job sheet {template_id}.json: {exc}")
+
+            # Files first, index last: if the spec cannot be removed the index
+            # entry stays, so a retry still finds the template and can finish.
+            removed_spec = False
+            if path.is_file():
+                try:
+                    path.unlink()
+                    removed_spec = True
+                except OSError as exc:
+                    errors.append(f"spec {template_id}.json: {exc}")
+            removed_entry = False
+            if removed_spec or not path.is_file():
+                data["templates"] = remaining
+                self._write_index(data)
+                removed_entry = entry is not None
 
             return {
                 "template_id": template_id,
                 "status": status,
                 "removed": {
-                    "index_entry": entry is not None,
+                    "index_entry": removed_entry,
                     "spec": removed_spec,
                     "image": image_relative if image_removed else None,
                     "image_kept_for": sorted(item for item in image_referenced_by if item),
                     "job": job_removed,
                 },
+                "errors": errors,
             }
 
     # -- job sheets --------------------------------------------------------
@@ -405,7 +462,9 @@ class TemplateLibrary:
             if not spec_name:
                 raise ValueError("bundle has no specs/*.json")
             spec = json.loads(archive.read(spec_name).decode("utf-8-sig"))
-            template_id = spec.get("id") or bundle_path.stem
+            declared = str(spec.get("id") or "")
+            template_id = (declared if _valid_template_id(declared)
+                           else _slug(declared or bundle_path.stem))
             target_id = template_id
             if self.spec_path(target_id).exists():
                 target_id = f"{target_id}-{secrets.token_hex(2)}"

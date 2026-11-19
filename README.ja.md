@@ -32,7 +32,7 @@
 
 本機実機検証（**ArcGIS Pro 3.7 のみ**）：1.1.7 回帰 21/21 PASS、1.1.8 連続 2 ラウンド 0 失敗、1.1.9 P2 10/10 と P1 再実行 0 失敗、1.1.10 ハンドシェイク `1.1.10.0`、1.1.11 ハンドシェイク `1.1.11.0`・ping `command_count=112`、D1 フィールド回帰は現行テストプロジェクトに適用可能なアサーションすべて PASS（4 件の旧アサーションは退役プロジェクトのレイヤー名を参照）、`get_features` のページング/サマリ/精度は実機再確認済み。他の Pro バージョンは未検証。
 
-1.1.13（テンプレート削除）：ビルド全通過（client-registration / installer / HTTP net8.0+net10.0）、`tests/test_distill.py` 11/11（新しい削除 4 ケース：非共有画像の削除、共有画像の保持、未知 id の not_found、ready は force 必須）、`tests/test_catalog_matches_bridge.py` 4/4 通過。`tools.json` と `catalog.py` は 126 ツール / 123 コマンドで完全一致。1.1.12 の実機受け入れ記録（ハンドシェイク、125 ツール、`template_*` 全フロー 11/11、公式セルフチェック 21 通過 / 0 失敗）は `docs/CHANGELOG.md` にあります。
+1.1.13（テンプレート削除）：ビルド全通過（client-registration / installer / HTTP net8.0+net10.0）、`tests/test_distill.py` 13/13（削除 6 ケース：非共有画像の削除、共有画像の保持、未知 id の not_found、ready は force 必須、パス風 id の拒否、孤児インデックスの掃除）、`tests/test_catalog_matches_bridge.py` 4/4 通過。`tools.json` と `catalog.py` は 126 ツール / 123 コマンドで完全一致。1.1.12 の実機受け入れ記録（ハンドシェイク、125 ツール、`template_*` 全フロー 11/11、公式セルフチェック 21 通過 / 0 失敗）は `docs/CHANGELOG.md` にあります。
 
 ---
 
@@ -590,10 +590,10 @@ print(mcp_bridge.start_pump())
 
 ### 🔍 依存関係監査（「全部同梱」の根拠）
 
-- 🧩 add-in：自己完結の C# アセンブリ。Pro 3.7 のサポート環境に付属する .NET Desktop Runtime 10 x64 上で動作——.NET の別途インストール不要。
+- 🧩 add-in：自己完結の C# アセンブリ。**ArcGIS Pro 3.7 のシステム要件に記載された** .NET Desktop Runtime 10 x64 上で動作——**本パッケージとして**追加の .NET インストールは不要。
 - 🌉 stdio ブリッジ、🛡️ ダイアログガード：Windows 標準の PowerShell 5.1 + WinForms——別途インストール不要。
 - 🐍 RunCode ツールボックス、Python ブリッジ：ArcGIS Pro 同梱の Python（arcpy）内で動作——別途の Python 不要。
-- ✅ **したがって本パッケージには pip / インターネットが必要な外部依存はありません。**「オフラインで動作」は本パッケージ自身のインストールと実行経路を指します。ArcGIS Pro 3.7 の前提（.NET Desktop Runtime 10 x64、WebView2 ≥132）は Pro のインストーラーが提供します。
+- ✅ **したがって本パッケージには pip / インターネットが必要な外部依存はありません。**「オフラインで動作」は本パッケージ自身のインストールと実行経路を指します。ArcGIS Pro 3.7 のシステム要件（Microsoft .NET Desktop Runtime 10 x64 と WebView2）は Esri の前提条件です——本機に無い場合は Esri のシステム要件に従って導入してください（通常は Pro インストーラーが案内・導入します）。
 
 ---
 

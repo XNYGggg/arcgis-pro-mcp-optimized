@@ -18,7 +18,8 @@ the MCP handshake all report.
   closes the acceptance-cleanup gap where clearing a verification template
   meant hand-editing the index.
 - `tests/test_distill.py` covers deletion (unshared image removed, shared
-  image kept, `not_found` for unknown ids, the ready gate); the `Template`
+  image kept, `not_found` for unknown ids, the ready gate, path-like ids
+  rejected, orphan index entries cleared); the `Template`
   group in `catalog.py`, `Resources/tools.json` and the README tool tables
   now list eleven `template_*` tools (**126 tools / 123 commands**).
 

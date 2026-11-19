@@ -82,7 +82,7 @@ place where a tool is defined.
 
 ## What stays in Python
 
-Three of the 112, and they belong there:
+Three of the 126, and they belong there:
 
 | Command | Why |
 |---|---|

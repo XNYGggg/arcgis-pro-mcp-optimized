@@ -86,7 +86,7 @@ if (Test-Path -LiteralPath $addin) {
     if (Test-Path -LiteralPath $side) {
         $want = (Get-Content -LiteralPath $side -TotalCount 1).Trim().Split(' ')[0].ToLower()
         $got = (Get-FileHash -LiteralPath $addin -Algorithm SHA256).Hash.ToLower()
-        if ($want -eq $got) { Ok ('SHA256 与客户包一致：' + $got) } else { Warn ('SHA256 不一致（可能已被其他版本覆盖）：' + $got) }
+        if ($want -eq $got) { Ok ('SHA256 与客户包一致：' + $got) } else { Fail ('SHA256 与客户包不一致（已安装的 add-in 不是本包版本，请重新运行 00-install.cmd）：' + $got) }
     }
 } else {
     Fail 'add-in 未安装，请先运行 00-install.cmd'
@@ -131,9 +131,13 @@ if (Test-Path -LiteralPath $launcher) {
         $doc = $docText | ConvertFrom-Json
         $libDetail = ($doc.checks | Where-Object { $_.check -eq 'library' } | Select-Object -First 1).detail
         # doctor keeps ok=true even when a critical check fails; status and the
-        # exit code are what actually say whether the module is usable.
-        if ($docExit -eq 0 -and $doc.status -eq 'ready' -and $doc.ok) {
+        # exit code are what actually say whether the module is usable. The
+        # version gate matters too: a stale 1.1.12 runtime has no delete
+        # command even though doctor says ready.
+        if ($docExit -eq 0 -and $doc.status -eq 'ready' -and $doc.ok -and [string]$doc.version -eq '1.1.13') {
             Ok ('distill doctor：ready（' + $doc.version + '，库 ' + $libDetail + '）')
+        } elseif ($docExit -eq 0 -and $doc.status -eq 'ready' -and $doc.ok) {
+            Fail ('distill 运行时版本不是 1.1.13（当前 ' + $doc.version + '，缺少模板删除命令），请重新运行 00-install.cmd')
         } else {
             Fail ('distill doctor 未就绪（exit=' + $docExit + '，status=' + $doc.status + '）：' + $docText)
         }
@@ -156,8 +160,25 @@ if ($tcpOk) {
     try {
         $headers = @{ Accept = 'application/json, text/event-stream' }
         $init = '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"agentkit-check","version":"1.0"}}}'
-        $null = Invoke-RestMethod -Uri 'http://127.0.0.1:6520/mcp' -Method Post -Body ([Text.Encoding]::UTF8.GetBytes($init)) -ContentType 'application/json; charset=utf-8' -Headers $headers -TimeoutSec 10
-        Ok 'MCP initialize 成功'
+        $initText = [string](Invoke-RestMethod -Uri 'http://127.0.0.1:6520/mcp' -Method Post -Body ([Text.Encoding]::UTF8.GetBytes($init)) -ContentType 'application/json; charset=utf-8' -Headers $headers -TimeoutSec 10)
+        # A running 1.1.12 add-in answers fine but has no template_delete, so
+        # the reported server version is part of the check.
+        if ($initText -match '"version"\s*:\s*"1\.1\.13') {
+            Ok 'MCP initialize 成功（server 1.1.13）'
+        } else {
+            Fail ('MCP initialize 成功，但服务端版本不是 1.1.13（旧 add-in 仍在运行？请重启 ArcGIS Pro）：' + ($initText -replace '\s+', ' ').Substring(0, [Math]::Min(200, $initText.Length)))
+        }
+        try {
+            $listBody = '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}'
+            $toolsText = [string](Invoke-RestMethod -Uri 'http://127.0.0.1:6520/mcp' -Method Post -Body ([Text.Encoding]::UTF8.GetBytes($listBody)) -ContentType 'application/json; charset=utf-8' -Headers $headers -TimeoutSec 10)
+            if ($toolsText -match '"template_delete"') {
+                Ok 'tools/list 含 template_delete'
+            } else {
+                Fail 'tools/list 缺少 template_delete：add-in 可能仍是旧版'
+            }
+        } catch {
+            Warn ('tools/list 探测未成功（部分传输要求先完成会话初始化）：' + $_.Exception.Message)
+        }
     } catch {
         Fail ('MCP HTTP 无响应：' + $_.Exception.Message)
     }

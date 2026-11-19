@@ -32,7 +32,7 @@ Everything below was merged after the v1.1.4 customer package. Tool count 113 �
 
 Verification on this machine (live, **ArcGIS Pro 3.7 only**): 1.1.7 regression 21/21 PASS; 1.1.8 two consecutive rounds with zero failures; 1.1.9 P2 10/10 plus a P1 re-run with zero failures; 1.1.10 handshake `1.1.10.0`; 1.1.11 handshake `1.1.11.0`, ping `command_count=112`, the D1 fields regression passes every assertion that applies to the current test project (four legacy assertions reference layers from a retired project), and `get_features` paging / summary / precision were re-verified live. Other Pro versions are not covered.
 
-1.1.13 (template deletion): build passed end to end (client-registration / installer / HTTP on net8.0+net10.0); `tests/test_distill.py` 11/11 (the four new cases cover image removal, shared-image safety, not_found and the ready gate) and `tests/test_catalog_matches_bridge.py` 4/4 passed; `tools.json` and `catalog.py` are fully equivalent at 126 tools / 123 commands. The 1.1.12 live acceptance (handshake, 125 tools, the full `template_*` flow 11/11, self-check 21 passed / 0 failed) is recorded in `docs/CHANGELOG.md`. Details are in `docs/CHANGELOG.md` and `RELEASE-NOTES.md`.
+1.1.13 (template deletion): build passed end to end (client-registration / installer / HTTP on net8.0+net10.0); `tests/test_distill.py` 13/13 (the six delete cases cover image removal, shared-image safety, not_found, the ready gate, path-like ids and orphan index entries) and `tests/test_catalog_matches_bridge.py` 4/4 passed; `tools.json` and `catalog.py` are fully equivalent at 126 tools / 123 commands. The 1.1.12 live acceptance (handshake, 125 tools, the full `template_*` flow 11/11, self-check 21 passed / 0 failed) is recorded in `docs/CHANGELOG.md`. Details are in `docs/CHANGELOG.md` and `RELEASE-NOTES.md`.
 
 ---
 
@@ -590,10 +590,10 @@ Everything the assistant can do, listed by name. Click to expand 👇
 
 ### 🔍 Dependency audit (why “fully bundled” holds)
 
-- 🧩 add-in: a self-contained C# assembly running on the .NET Desktop Runtime 10 x64 that ArcGIS Pro 3.7's supported environment provides — nothing extra to install.
+- 🧩 add-in: a self-contained C# assembly running on the .NET Desktop Runtime 10 x64 that **ArcGIS Pro 3.7 lists among its system requirements** — nothing extra to install *for this package*.
 - 🌉 stdio bridge, 🛡️ dialog guard: Windows' built-in PowerShell 5.1 + WinForms — nothing extra to install.
 - 🐍 RunCode toolbox, Python bridge: run inside ArcGIS Pro's own Python (arcpy) — no separate Python needed.
-- ✅ **So the package has no external dependency that needs pip or internet.** “Works offline” refers to this package's own install and run chain; ArcGIS Pro 3.7's own prerequisites (.NET Desktop Runtime 10 x64, WebView2 ≥132) come with Pro's installer.
+- ✅ **So the package has no external dependency that needs pip or internet.** “Works offline” refers to this package's own install and run chain. ArcGIS Pro 3.7's system requirements (Microsoft .NET Desktop Runtime 10 x64 and WebView2) are Esri's prerequisites — if either is missing on this machine, install it as Esri's system requirements describe (the Pro installer normally prompts for or installs them).
 
 ---
 

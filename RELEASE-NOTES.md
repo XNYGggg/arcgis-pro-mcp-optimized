@@ -9,7 +9,7 @@
 - 新增 MCP 工具 `template_delete`（catalog 第 126 个工具，Template 组第 11 个）：C# 薄封装 `arcgis-distill delete <id> [--force]`，与 CLI 单一实现不漂移。
 - `delete` 删除模板的 spec、index 条目、作业单，以及**不再被其他模板引用**的去重样本图（共享图片保留，返回 `removed.image_kept_for`）。
 - 安全语义：删除不存在的 id 报 `not_found`（退出码 3），重复删除安全；`ready`（已批准）模板需 `--force`（否则退出码 5）；`inbox` 不受影响。
-- 测试：`tests/test_distill.py` 11/11（新增 4 个删除用例：无共享图片删除、共享图片保留、未知 id not_found、ready 需 force）；`tests/test_catalog_matches_bridge.py` 4/4（CSHARP_ONLY 增补 template_delete）。
+- 测试：`tests/test_distill.py` 13/13（6 个删除用例：无共享图片删除、共享图片保留、未知 id not_found、ready 需 force、路径型 id 拒绝、孤儿索引清理）；`tests/test_catalog_matches_bridge.py` 4/4（CSHARP_ONLY 增补 template_delete）。
 - 文档与版本：`docs/distill.md`、`skills/template-distill/SKILL.md` 增加删除一节；四语 README 工具表/能力对照/版本同步；`docs/使用指南.md`、`VERSION.json`（126 工具 / 123 命令）、Config.daml / csproj / pyproject 统一 1.1.13；`source/docs/local-1.1.13.md` 记录本轮。
 
 ## 验证（2026-11-19）
