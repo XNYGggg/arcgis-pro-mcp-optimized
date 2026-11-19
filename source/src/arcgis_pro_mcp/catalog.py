@@ -60,7 +60,18 @@ CATALOG: List[Tool] = [
     T("get_queue_status", "Session",
       "Queue status for the bridge: per-lane depth, the command running now, "
       "and recent completion history. Check it when calls feel slow, are "
-      "queued, or fail with a 'lane busy' error."),
+      "queued, or fail with a 'lane busy' error. Requires the Python bridge "
+      "to be listening."),
+
+    T("restart_pro", "Session",
+      "Restart ArcGIS Pro, saving and reopening the project first -- how a "
+      "rebuilt add-in gets loaded without touching the desktop. The reply "
+      "comes back before the app closes; clients reconnect when the bridge "
+      "answers again.",
+      P("save", "bool", True, "Save the project and pending edits before closing."),
+      P("delay_seconds", "int", 10, "Seconds to wait before the close starts (minimum 8)."),
+      P("project", "str", None, "Project to reopen; defaults to the current one."),
+      destructive=True),
 
     T("diagnose", "Session",
       "Self-check the connection: ArcGIS Pro version, licence, open project, "
@@ -84,11 +95,15 @@ CATALOG: List[Tool] = [
       "List all maps and scenes with coordinate system and layer counts."),
 
     T("create_map", "Session",
-      "Create a new map or scene in the project.",
-      P("name", "str", REQUIRED, "Name for the new map."),
+      "Create a new map or scene in the project. No basemap is added unless "
+      "one is named (basemap='project_default' restores the old default).",
+      P("name", "str", None, "Name for the new map (map_name accepted as an alias)."),
+      P("map_name", "str", None, "Alias of name."),
       P("map_type", "str", "MAP", "MAP or SCENE."),
       P("epsg", "int", None, "Optional coordinate system WKID, e.g. 32647."),
-      P("basemap", "str", None, "Optional basemap to add, e.g. 'Topographic'.")),
+      P("basemap", "str", "none",
+        "Basemap name, e.g. 'Topographic', or 'none' (default)."),
+      P("activate", "bool", False, "Open the map's view after creating it.")),
 
     T("remove_map", "Session",
       "Delete a map from the project.",
@@ -112,12 +127,14 @@ CATALOG: List[Tool] = [
       "Read the current arcpy geoprocessing environment settings."),
 
     T("set_environment", "Session",
-      "Set arcpy geoprocessing environment settings such as workspace, "
-      "outputCoordinateSystem, extent, mask, cellSize, overwriteOutput or "
-      "parallelProcessingFactor.",
+      "Set geoprocessing environment settings applied to later tool runs "
+      "(workspace, outputCoordinateSystem, extent, mask, cellSize, snapRaster, "
+      "overwriteOutput, parallelProcessingFactor, scratchWorkspace, "
+      "geographicTransformations, resamplingMethod). Unknown keys are stored "
+      "but reported as unsupported.",
       P("settings", "dict", REQUIRED,
         'Environment name/value pairs, e.g. {"overwriteOutput": true, '
-        '"workspace": "D:/data/project.gdb"}.')),
+        '"snapRaster": "E:/data/grid.tif", "workspace": "D:/data/project.gdb"}.')),
 
     # --- layers --------------------------------------------------------------
     T("get_layers", "Layers",
@@ -138,6 +155,12 @@ CATALOG: List[Tool] = [
       MAP_NAME,
       P("group_layer", "str", None, "Optional group layer to add it into."),
       P("position", "str", "AUTO_ARRANGE", "AUTO_ARRANGE, TOP or BOTTOM.")),
+
+    T("add_table", "Layers",
+      "Add a standalone table (geodatabase table or folder table) to a map.",
+      P("path", "str", REQUIRED, "Full path to the table."),
+      P("name", "str", None, "Display name; defaults to the dataset name."),
+      MAP_NAME),
 
     T("add_web_layer", "Layers",
       "Add a web service layer (Feature/Map/Image service, WMS, WMTS, vector "
@@ -246,7 +269,9 @@ CATALOG: List[Tool] = [
     # --- data ----------------------------------------------------------------
     T("get_features", "Data",
       "Read attribute rows from a layer, table or dataset path, with an "
-      "optional where clause, field subset, ordering and WKT geometry.",
+      "optional where clause, field subset, ordering and geometry. Pages "
+      "report truncated and next_offset; geometry can be a compact summary "
+      "or full WKT.",
       LAYER,
       P("where", "str", None, "SQL where clause."),
       P("fields", "list[str]", None, "Fields to return; default all."),
@@ -255,6 +280,10 @@ CATALOG: List[Tool] = [
       P("order_by", "str", None, 'ORDER BY clause, e.g. "POP DESC".'),
       P("include_geometry", "bool", False,
         "Add SHAPE@WKT geometry (can be very large)."),
+      P("geometry_summary", "bool", False,
+        "Add SHAPE@SUMMARY (type, extent, length, area) instead of WKT."),
+      P("geometry_precision", "int", None,
+        "Round WKT coordinates to this many decimals (with include_geometry)."),
       MAP_NAME),
 
     T("count_features", "Data",
@@ -445,7 +474,8 @@ CATALOG: List[Tool] = [
 
     T("create_feature_class", "Schema",
       "Create an empty feature class, by default in the project's default "
-      "geodatabase, and add it to the map.",
+      "geodatabase, and add it to the map. Requested fields are added after "
+      "creation and verified; a mismatch deletes the new dataset and fails.",
       P("name", "str", REQUIRED, "Feature class name."),
       P("geometry_type", "str", "POLYGON",
         "POINT, MULTIPOINT, POLYLINE or POLYGON."),
@@ -453,19 +483,20 @@ CATALOG: List[Tool] = [
       P("out_path", "str", None, "Target geodatabase or folder."),
       P("template", "str", None, "Dataset to copy the schema from."),
       P("fields", "list[dict]", None,
-        'Fields to create, e.g. [{"name": "NAME", "type": "TEXT", '
-        '"length": 50}].'),
+        'Fields to create and verify, e.g. [{"name": "NAME", "type": '
+        '"TEXT", "length": 50}].'),
       P("has_z", "str", "DISABLED", "ENABLED or DISABLED."),
       P("has_m", "str", "DISABLED", "ENABLED or DISABLED."),
       P("add_to_map", "bool", True, "Add the result to the map."),
       MAP_NAME),
 
     T("create_table", "Schema",
-      "Create an empty standalone table.",
+      "Create an empty standalone table. Requested fields are added after "
+      "creation and verified; a mismatch deletes the new table and fails.",
       P("name", "str", REQUIRED, "Table name."),
       P("out_path", "str", None, "Target geodatabase or folder."),
       P("template", "str", None, "Table to copy the schema from."),
-      P("fields", "list[dict]", None, "Fields to create."),
+      P("fields", "list[dict]", None, "Fields to create and verify."),
       P("add_to_map", "bool", True, "Add the result to the map."),
       MAP_NAME),
 
@@ -505,6 +536,9 @@ CATALOG: List[Tool] = [
         '"out_feature_class": "roads_buf", "buffer_distance_or_field": '
         '"500 Meters"}.'),
       P("args", "list", None, "Positional parameters instead of keywords."),
+      P("environment", "dict", None,
+        'Per-call environment overrides, e.g. {"snapRaster": "grid.tif", '
+        '"cellSize": 10}. These take precedence over set_environment values.'),
       P("add_to_map", "bool", False, "Add the tool's outputs to the map."),
       P("overwrite", "bool", None, "Temporarily allow overwriting outputs."),
       P("checkout_extension", "str", None,
@@ -528,18 +562,26 @@ CATALOG: List[Tool] = [
         'e.g. "analysis.Buffer" or "Buffer_analysis".')),
 
     T("run_python_toolbox_tool", "Geoprocessing",
-      "Run a tool from a custom .pyt / .atbx / .tbx toolbox on disk.",
-      P("toolbox_path", "str", REQUIRED, "Path to the toolbox."),
+      "Run a tool from a custom .pyt / .atbx / .tbx toolbox on disk. The "
+      "native add-in host takes positional values only; named parameters are "
+      "accepted by the Python bridge only.",
+      P("toolbox_path", "str", REQUIRED, "Path to the .pyt/.atbx/.tbx file."),
       P("tool_name", "str", REQUIRED, "Tool name inside the toolbox."),
       P("alias", "str", None, "Toolbox alias to import under."),
-      P("parameters", "dict", None, "Keyword parameters."),
-      P("args", "list", None, "Positional parameters.")),
+      P("parameters", "dict", None,
+        "Keyword parameters. The native add-in rejects these for disk "
+        "toolboxes; the Python bridge accepts them."),
+      P("args", "list", None,
+        "Positional parameters in the tool's own parameter order (required "
+        "by the native add-in; e.g. [script_file] for run-code toolboxes).")),
 
     T("check_extension", "Geoprocessing",
-      "Check, and optionally check out, an ArcGIS extension licence.",
+      "Report whether the add-in can inspect an extension licence. ArcGIS Pro "
+      "does not expose checkout to add-ins, so this answers inspectable:false; "
+      "run the tool itself to learn whether a licence is missing.",
       P("extension", "str", REQUIRED,
         '"Spatial", "3D", "Network", "ImageAnalyst", "GeoStats", ...'),
-      P("checkout", "bool", False, "Check the licence out if it is available.")),
+      P("checkout", "bool", False, "Ignored; kept for compatibility.")),
 
     T("get_messages", "Geoprocessing",
       "Messages from the most recent geoprocessing operation.",
@@ -650,7 +692,12 @@ CATALOG: List[Tool] = [
       P("height", "int", 800, "Image height in pixels."),
       P("dpi", "int", 96, "Resolution."),
       P("zoom_to_layer", "str", None, "Zoom to this layer before exporting."),
-      P("return_image", "bool", True, "Return the image inline."),
+      P("fit", "str", "preserve",
+        "preserve keeps the exact width/height; auto adjusts the output size to "
+        "the view extent ratio so there are no letterbox bands."),
+      P("return_image", "bool", True,
+        "Return the image inline. Inside run_batch this defaults to false "
+        "(file path, size and SHA-256 only) unless set true."),
       MAP_NAME, returns_image=True),
 
     T("list_bookmarks", "View",
@@ -800,14 +847,23 @@ CATALOG: List[Tool] = [
       P("output_path", "str", REQUIRED,
         "Output file; the format follows the extension."),
       P("dpi", "int", 200, "Export resolution."),
-      P("return_image", "bool", True, "Return PNG/JPEG output inline."),
+      P("return_image", "bool", True,
+        "Return PNG/JPEG output inline. Inside run_batch this defaults to "
+        "false (path, size and SHA-256 only) unless set true."),
       returns_image=True),
 
     T("preview_layout", "Layouts",
-      "Render a layout to a temporary image and return it, without writing a "
-      "file -- use it to visually check a layout while building it.",
+      "Render a layout to an image, without writing a project file unless "
+      "output_path is given -- use it to visually check a layout while "
+      "building it.",
       P("layout_name", "str", REQUIRED, "Layout name."),
-      P("dpi", "int", 100, "Render resolution."), returns_image=True),
+      P("dpi", "int", 100, "Render resolution."),
+      P("output_path", "str", None,
+        "Optional file to save to; omit for a temporary image."),
+      P("return_image", "bool", True,
+        "Return the image inline. Inside run_batch this defaults to false "
+        "(size and SHA-256 only) unless set true."),
+      returns_image=True),
 
     T("export_map_series", "Layouts",
       "Export a layout's map series (map book) to a multi-page PDF.",
@@ -831,6 +887,11 @@ CATALOG: List[Tool] = [
       P("break_count", "int", None, "Number of classes for classify."),
       P("classification_method", "str", None, "Classification method."),
       P("color_ramp", "str", None, 'Colour ramp name, e.g. "Elevation #1".'),
+      P("value_colors", "dict", None,
+        'Unique-value colours, e.g. {"1": [142,209,107,100], '
+        '"2": [255,235,92,100]}. RGBA 0-255, alpha 0-100.'),
+      P("value_labels", "dict", None,
+        'Unique-value labels, e.g. {"1": "gentle", "2": "moderate"}.'),
       P("transparency", "int", None, "Layer transparency 0-100."),
       MAP_NAME),
 
@@ -848,13 +909,19 @@ CATALOG: List[Tool] = [
       MAP_NAME),
 
     T("sample_raster_values", "Raster",
-      "Read raster cell values at map coordinates or at a point layer's features.",
+      "Read raster cell values at map coordinates or at a point layer's "
+      "features. Values come back inline; no table is written unless "
+      "write_table=true.",
       LAYER,
       P("points", "list[dict]", None,
-        'Coordinates to sample, e.g. [{"x": 100.5, "y": 13.7}].'),
-      P("point_layer", "str", None, "Point layer to sample at instead."),
-      P("band", "str", None, "Band to read for multiband rasters."),
-      P("limit", "int", 100, "Maximum points to sample from a layer."),
+        'Coordinates to sample, e.g. [{"x": 100.5, "y": 13.7}] or [[100.5, 13.7]].'),
+      P("point_layer", "str", None, "Point layer (or dataset path) to sample at instead."),
+      P("band", "int", 1, "Band to read for multiband rasters (1-based)."),
+      P("limit", "int", 1000, "Maximum points to sample from a layer."),
+      P("write_table", "bool", False,
+        "Write an sa.Sample output table instead of returning values inline."),
+      P("output_table", "str", None,
+        "Table path for write_table; default a unique table in the default geodatabase."),
       MAP_NAME),
 
     T("zonal_statistics", "Raster",
@@ -915,7 +982,9 @@ CATALOG: List[Tool] = [
       "arcpy.mp.ArcGISProject('CURRENT') is the open project. Variables "
       "persist between calls, print() output is captured, and the value of a "
       "final expression is returned. Use this whenever no dedicated tool "
-      "covers the task.",
+      "covers the task. Requires the Python bridge to be listening -- start "
+      "it in the ArcGIS Pro Python window; while it is down this command "
+      "fails with code BRIDGE_NOT_LISTENING.",
       P("code", "str", REQUIRED, "Python source to run."),
       P("reset_namespace", "bool", False,
         "Forget variables kept from earlier calls.")),
@@ -923,7 +992,10 @@ CATALOG: List[Tool] = [
     T("get_pump_status", "Utility",
       "Whether the main-thread dispatcher is installed. It is what lets "
       "commands reach the open ArcGIS Pro project; without it only path-based "
-      "work (geoprocessing, dataset inspection) runs."),
+      "work (geoprocessing, dataset inspection) runs. Answered by the Python "
+      "bridge, so the bridge must be listening; when it is down the native "
+      "host answers running:false, bridge_listening:false instead of an "
+      "error."),
 
     T("stop_pump", "Utility",
       "Remove the main-thread dispatcher. Live-project commands stop working "

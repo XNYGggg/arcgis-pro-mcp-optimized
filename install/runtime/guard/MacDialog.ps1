@@ -1,6 +1,6 @@
 ﻿#requires -Version 5.1
 <#
-macOS 风格弹窗库（2026-11-10，柳皓文要求）
+macOS 风格弹窗库（2026-11-10）
 - 统一样式：无边框圆角窗口、左上红黄绿三个圆点、TopMost、居中/右上角、底部 macOS 风格按钮。
 - 仅使用 Windows PowerShell 5.1 自带 WinForms，无第三方依赖。
 - 被其他脚本 dot-source 使用；本文件本身不执行任何逻辑。

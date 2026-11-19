@@ -60,10 +60,22 @@ namespace ArcGISProMCP.Bridge
         private readonly bool _hasElement;
 
         public Params(JsonElement element)
+            : this(element, false)
+        {
+        }
+
+        /// <summary>
+        /// inBatch is carried explicitly: an AsyncLocal set by run_batch does
+        /// not reliably reach handlers that execute on the MCT dispatcher.
+        /// </summary>
+        public Params(JsonElement element, bool inBatch)
         {
             _element = element;
             _hasElement = element.ValueKind == JsonValueKind.Object;
+            InBatch = inBatch;
         }
+
+        public bool InBatch { get; }
 
         public static Params Empty => new Params(default);
 

@@ -15,7 +15,7 @@ function Step($t) { Write-Host ''; Write-Host ('== ' + $t) -ForegroundColor Cyan
 $script:pass = 0; $script:warn = 0; $script:fail = 0
 $runtimeDst = Join-Path $env:LOCALAPPDATA 'ArcGIS Pro MCP'
 
-Write-Host 'ArcGIS Pro MCP 优化版 客户版 v1.1.4 · 自检'
+Write-Host 'ArcGIS Pro MCP 优化版 客户版 Customer 1.1.11（1.14 增强版） · 自检'
 
 Step 'ArcGIS Pro'
 $proExe = $null

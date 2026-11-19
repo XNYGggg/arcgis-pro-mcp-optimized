@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using ArcGIS.Core.Data;
 using ArcGIS.Core.Geometry;
 using ArcGIS.Desktop.Core;
@@ -72,17 +74,77 @@ namespace ArcGISProMCP.Commands
             var match = layers.FirstOrDefault(l => l.Name == name)
                         ?? layers.FirstOrDefault(
                             l => string.Equals(l.Name, name, StringComparison.OrdinalIgnoreCase));
-            if (match != null || !required) return match;
+            if (match != null) return match;
+
+            // A dataset path, as long as exactly one loaded layer points at
+            // it: the read commands accept paths, so layer property and
+            // symbology commands should too (I1/R1, live test 2026-11-18).
+            if (name.IndexOf('\\') >= 0 || name.IndexOf('/') >= 0)
+            {
+                var wanted = FullPath(name);
+                var matches = layers.Where(l =>
+                {
+                    var path = l.GetPath()?.LocalPath;
+                    return path != null && string.Equals(
+                        FullPath(path), wanted, StringComparison.OrdinalIgnoreCase);
+                }).ToList();
+
+                if (matches.Count == 1) return matches[0];
+                if (matches.Count > 1)
+                    throw new ArgumentException(
+                        $"'{name}' matches {matches.Count} loaded layers: "
+                        + string.Join(", ", matches.Select(l => l.Name))
+                        + ". Use the layer name instead.");
+            }
+
+            if (!required) return null;
 
             throw new ArgumentException(
                 $"Layer not found in map '{map.Name}': {name}. Layers present: "
                 + (layers.Count == 0 ? "(none)" : string.Join(", ", layers.Select(l => l.Name))));
         }
 
+        private static string FullPath(string path)
+        {
+            try { return Path.GetFullPath(path); }
+            catch { return path; }
+        }
+
         public static BasicFeatureLayer RequireFeatureLayer(Map map, string name)
         {
             if (FindLayer(map, name) is BasicFeatureLayer layer) return layer;
             throw new ArgumentException($"Layer '{name}' holds no features.");
+        }
+
+        /// <summary>
+        /// A layer's extent for zooming and framing: any layer type, group
+        /// layers by union of their contents, and null when nothing answers.
+        /// </summary>
+        public static Envelope ExtentOf(Layer layer, int depth = 0)
+        {
+            if (layer == null) return null;
+            try
+            {
+                var extent = layer.QueryExtent();
+                if (extent != null && !extent.IsEmpty) return extent;
+            }
+            catch
+            {
+                // Raster/TIN layers may not answer QueryExtent; fall through.
+            }
+
+            if (layer is GroupLayer group && depth < 10)
+            {
+                Envelope union = null;
+                foreach (var child in group.Layers)
+                {
+                    var extent = ExtentOf(child, depth + 1);
+                    if (extent == null) continue;
+                    union = union == null ? extent : union.Union(extent);
+                }
+                return union;
+            }
+            return null;
         }
 
         // --- serialisation ---------------------------------------------------
@@ -179,6 +241,43 @@ namespace ArcGISProMCP.Commands
         {
             if (geometry == null) return null;
             return GeometryEngine.Instance.ExportToWKT(WktExportFlags.WktExportDefaults, geometry);
+        }
+
+        /// <summary>SHA-256 of a file, upper-case hex; null when it cannot be read.</summary>
+        public static string Sha256(string path)
+        {
+            try
+            {
+                using (var stream = File.OpenRead(path))
+                using (var sha = SHA256.Create())
+                    return BitConverter.ToString(sha.ComputeHash(stream))
+                                       .Replace("-", string.Empty).ToUpperInvariant();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Wait briefly for an export to appear on disk. Pro's Export can
+        /// return before the file has been flushed, and a too-early
+        /// File.Exists check silently drops the inline image or its size.
+        /// </summary>
+        public static bool WaitForFile(string path, int timeoutMs = 2000)
+        {
+            var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMs);
+            while (DateTime.UtcNow < deadline)
+            {
+                try
+                {
+                    if (File.Exists(path) && new FileInfo(path).Length > 0)
+                        return true;
+                }
+                catch { }
+                System.Threading.Thread.Sleep(50);
+            }
+            try { return File.Exists(path); } catch { return false; }
         }
 
         /// <summary>Row values that survive JSON: dates and geometry need help.</summary>

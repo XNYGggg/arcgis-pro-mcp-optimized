@@ -152,7 +152,16 @@ namespace ArcGISProMCP.Commands
 
         private static object Describe(Params parameters)
         {
-            var path = ResolvePath(parameters.Require("path"));
+            return DescribeDataset(parameters.Require("path"));
+        }
+
+        /// <summary>
+        /// Describe one dataset by path. Shared with the create_* wrappers,
+        /// which read a new dataset back to verify its fields (D1, 2026-11-18).
+        /// </summary>
+        internal static Dictionary<string, object> DescribeDataset(string path)
+        {
+            path = ResolvePath(path);
             var workspace = Path.GetDirectoryName(path);
             var name = Path.GetFileName(path);
 
@@ -220,6 +229,10 @@ namespace ArcGISProMCP.Commands
 
             var matches = new List<Dictionary<string, object>>();
             var searched = new List<string>();
+            // The default roots can name the same geodatabase more than once
+            // (as a workspace and through its parent folder); search each
+            // workspace once so a dataset is not listed twice.
+            var seenWorkspaces = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             foreach (var root in roots.Distinct(StringComparer.OrdinalIgnoreCase))
             {
@@ -242,6 +255,7 @@ namespace ArcGISProMCP.Commands
                 foreach (var workspace in workspaces)
                 {
                     if (matches.Count >= limit) break;
+                    if (!seenWorkspaces.Add(workspace)) continue;
                     try
                     {
                         searched.Add(workspace);

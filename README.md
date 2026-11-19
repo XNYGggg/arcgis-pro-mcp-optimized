@@ -1,14 +1,34 @@
-[![English](https://img.shields.io/badge/Language-English-1f6feb?style=flat-square)](README.md) [![简体中文](https://img.shields.io/badge/Language-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-d1242f?style=flat-square)](README.zh-CN.md) [![日本語](https://img.shields.io/badge/Language-%E6%97%A5%E6%9C%AC%E8%AA%9E-bc002d?style=flat-square)](README.ja.md) [![한국어](https://img.shields.io/badge/Language-%ED%95%9C%EA%B5%AD%EC%96%B4-0047a0?style=flat-square)](README.ko.md) [![Version](https://img.shields.io/badge/Version-1.1.4%20(stable)-2ea44f?style=flat-square)](../../releases/tag/v1.1.4) [![Changelog](https://img.shields.io/badge/Docs-Changelog-6f42c1?style=flat-square)](docs/CHANGELOG.md) [![License: AGPL v3+](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue?style=flat-square)](LICENSE) [![ArcGIS Pro](https://img.shields.io/badge/ArcGIS%20Pro-3.7%2B-00a1e0?style=flat-square)](https://www.esri.com/en-us/arcgis/products/arcgis-pro/overview) [![Platform](https://img.shields.io/badge/Platform-Windows%2011%20x64-lightgrey?style=flat-square)]() [![Release](https://img.shields.io/github/v/release/XNYGggg/arcgis-pro-mcp-optimized?style=flat-square&label=release)](../../releases)
+[![English](https://img.shields.io/badge/Language-English-1f6feb?style=flat-square)](README.md) [![简体中文](https://img.shields.io/badge/Language-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-d1242f?style=flat-square)](README.zh-CN.md) [![日本語](https://img.shields.io/badge/Language-%E6%97%A5%E6%9C%AC%E8%AA%9E-bc002d?style=flat-square)](README.ja.md) [![한국어](https://img.shields.io/badge/Language-%ED%95%9C%EA%B5%AD%EC%96%B4-0047a0?style=flat-square)](README.ko.md) [![Version](https://img.shields.io/badge/Version-1.1.11%20(stable%2C%20recommended)-2ea44f?style=flat-square)](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/releases/tag/v1.1.11) [![Changelog](https://img.shields.io/badge/Docs-Changelog-6f42c1?style=flat-square)](docs/CHANGELOG.md) [![License: AGPL v3+](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue?style=flat-square)](LICENSE) [![ArcGIS Pro](https://img.shields.io/badge/ArcGIS%20Pro-3.7-00a1e0?style=flat-square)](https://www.esri.com/en-us/arcgis/products/arcgis-pro/overview) [![Platform](https://img.shields.io/badge/Platform-Windows%2011%20x64-lightgrey?style=flat-square)]()
 
-# 🗺️ ArcGIS Pro MCP (Optimized) · Customer Edition v1.1.4 · Stable (Recommended) 🎁
+# 🗺️ ArcGIS Pro MCP (Optimized) · Customer 1.1.11 (1.14 Enhanced Edition) · Official Release (tested and stable, recommended) 🎁
 
 One natural-language sentence lets your AI assistant drive the ArcGIS Pro project you already have open: add layers, change symbology, query attributes, run geoprocessing, export maps. Your data never leaves your machine — all traffic stays on `127.0.0.1` 🔒.
 
-> **📌 Version status (updated 2026-11-16)**: v1.1.4 (add-in 1.1.4, 113 tools) is the **stable · recommended** release. The other 2.0 line (v2.0.0 / v2.0.1) is a **testing** line: the optimization is unfinished, its GitHub Release assets and tags have been removed, and it is **not recommended** (NuGet 2.0.x downloads will fail); the 2.0 code now lives only on the `customer-v2.0.1` / `customer-v2.0.0` branches. See [BRANCHES.md](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/blob/main/BRANCHES.md) for the branch / tag / release map.
+> **✅ Official release — tested and stable, recommended download (2026-11-19)**: this is **Customer 1.1.11 (1.14 Enhanced Edition, build 1.1.11)**, stacking the fixes accumulated since 1.14 (v1.1.4) — 1.1.5 (F1–F10), 1.1.6 (V-1–V-7), the P0–P2 defects confirmed by the full live test on 2026-11-18 (1.1.7–1.1.9), 1.1.10's restart self-healing and 1.1.11's cleanup fixes — and it has passed the live regression on this machine. **This version is now the official stable release — tested and stable, recommended download**: the offline package `ArcGIS-Pro-MCP-1.1.11.zip` (with SHA256) is available in the GitHub Release [`v1.1.11`](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/releases/tag/v1.1.11) and the Gitee mirror release; v1.1.4 stays as the previous stable release for rollback.
 
-> **🙏 Upstream project & original author**: This customer edition is based on **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)** (original author **Pisut Nakmuenwai**, AGPL-3.0-or-later), with local patches accumulated up to **v1.1.4**. Full attribution and modification notices are in `NOTICE` and `source/SOURCE-NOTICE.md` at the package root.
+> **📌 Version note (2026-11-19)**: **the 1.1 line (v1.1.11, official release) is tested and stable — recommended download**; v1.1.4 is the previous stable release, available for rollback; **2.0 is a testing line** — its optimisation is unfinished, and its GitHub Release assets and tags have been removed, so it is not downloadable for now. 2.0 code lives only on the `customer-v2.0.1` / `customer-v2.0.0` branches. See [BRANCHES.md](https://github.com/XNYGggg/arcgis-pro-mcp-optimized/blob/main/BRANCHES.md) for the branch / tag / release map.
 
-This customer edition bundles **every component** needed to run. It works offline and **requires no Python, no pip, and no network access** — no dependencies beyond ArcGIS Pro itself. Batteries included 🔋
+> **🙏 Upstream project and original author**: this Customer Edition is based on **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)** (original author **Pisut Nakmuenwai**, AGPL-3.0-or-later), with local patches accumulated up to **v1.1.11**. Full attribution and modification notices are in `NOTICE` and `source/SOURCE-NOTICE.md`.
+
+This package bundles **every component** needed to run — fully offline, **no Python, no pip, no internet required**, and no dependency other than ArcGIS Pro itself. Batteries included 🔋
+
+---
+
+## 🆚 What is new versus 1.14 (v1.1.4)
+
+Everything below was merged after the v1.1.4 customer package. Tool count 113 → **115** (new `add_table` and `restart_pro`); the add-in binary is now `0ABB872F…6DF9` (469,634 bytes).
+
+| Build | Type | Highlights |
+|---|---|---|
+| **1.1.5** | F1–F10 | `set_environment` values now really reach GP (per-call overrides); `describe_geoprocessing_tool` returns enums and defaults; `create_map` adds no basemap by default (`project_default` restores the old behaviour); raster/TIN zoom and symbology reads; **new `add_table`**; `export_map_view` gains `fit:"auto"`; `set_raster_symbology` accepts explicit colours/labels; `set_map_properties` epsg takes effect; **new `restart_pro`** |
+| **1.1.6** | V-1–V-7 | Toolbox path typos get "Did you mean …" suggestions; named-argument errors list usable examples; `get_pump_status` returns a **structured down state** (`running:false, bridge_listening:false`) instead of a failure when the Python bridge is off; error codes (`BRIDGE_NOT_LISTENING / BRIDGE_ERROR / BRIDGE_CLOSED / BRIDGE_TIMEOUT / UNSUPPORTED`) with `last_error_code/at`; 5 s read timeout on status queries; `diagnose` actively probes port 6511 (`bridge_listening` / `probe_ms`); tool descriptions corrected (positional-only on the native host, bridge dependency noted); HTTP transport assertions hardened; bridge-down result cached for 5 s |
+| **1.1.7** | P0 | `create_feature_class` / `create_table` `fields` **now actually work** — each field is added with `AddField` after creation and verified via `describe_dataset` (name/type/length); a failed or rejected field deletes the half-built dataset. `run_batch` strips images to path/bytes/sha by default (no more base64 flooding the context). `get_features` pages (`truncated` / `next_offset`) and offers `geometry_summary` / `geometry_precision`. `preview_layout` accepts `output_path` / `return_image` |
+| **1.1.8** | P1 | `insert_features` / `update_features` / `delete_features` accept standalone tables and dataset paths (Table API for tables, edit session for layers). `sample_raster_values` samples pixels natively — `points` / `point_layer`, inline values, no `raster_samples` side-effect table (`write_table` keeps the old path). `create_map` SCENE fixed (`SceneLocal`). `add_join` survives GP re-registration (JoinRegistry + client-side join, with candidate suggestions). Layout element `x/y` unified to bottom-left origin, verified via `GetBounds`, out-of-range rejected. `run_batch` reports per-step milliseconds and serial execution. GP outputs added to the map wait and retry |
+| **1.1.9** | P2 | `get_layer_info` / `set_raster_symbology` / `repair_layer_source` accept dataset paths (unique match resolves, multiple matches list layer names). `repair_layer_source` gained a raster branch (`RasterDataset.ReplaceDataSource`). `search_data` de-duplicates. `check_extension` reports `inspectable:false` semantics (Pro does not expose checkout to add-ins). GP outputs filter empty strings. `get_features` suggests `get_raster_info` when given a raster layer name |
+| **1.1.10** | Restart self-healing | `restart_pro` probes the save dialog in a child process with a hard 15 s timeout (give up and log on timeout); button matching accepts localised `是(Y) / 否(N) / 取消(C)`; `restart.log` is UTF-8 with phase heartbeats; TCP connect has a 5 s timeout; it still never force-kills Pro. The restart scheduling flag expires after 10 minutes so a crashed assistant no longer blocks new restart requests. Deployment normalised to `scripts/update_installed.py` (positional, refuses hash mismatch) |
+| **1.1.11** | Cleanup fixes | Failure cleanup of `create_feature_class` / `create_table` now resolves the map layers and standalone tables that reference the half-created dataset *before* deleting it and removes them by object identity — an unrelated layer that merely shares the name is left alone; cleanup failures are appended to the tool error instead of being swallowed. `scripts/update_installed.py` no longer hardcodes machine paths, and the build maps source paths out of the shipped DLL/PDB |
+
+Verification on this machine (live, **ArcGIS Pro 3.7 only**): 1.1.7 regression 21/21 PASS; 1.1.8 two consecutive rounds with zero failures; 1.1.9 P2 10/10 plus a P1 re-run with zero failures; 1.1.10 handshake `1.1.10.0`; 1.1.11 handshake `1.1.11.0`, ping `command_count=112`, the D1 fields regression passes every assertion that applies to the current test project (four legacy assertions reference layers from a retired project), and `get_features` paging / summary / precision were re-verified live. Other Pro versions are not covered. Details are in `docs/CHANGELOG.md` and `RELEASE-NOTES.md`.
 
 ---
 
@@ -16,32 +36,32 @@ This customer edition bundles **every component** needed to run. It works offlin
 
 | Item | Requirement |
 |---|---|
-| 🪟 OS | **Windows 11 x64** (64-bit Home/Pro/Enterprise, officially supported by ArcGIS Pro 3.7). **Architecture: x64 (AMD64) only — ARM64 is not supported.** |
-| 🗺️ ArcGIS Pro | **3.7 or later** (this add-in is built against 3.7 / .NET 10) |
-| 🔑 Privileges | A standard user is enough; installing needs **no administrator** rights |
+| 🪟 OS | **Windows 11 x64** (64-bit Home / Pro / Enterprise; ArcGIS Pro 3.7 officially supported). **Architecture: x64 (AMD64) only — ARM64 is not supported** |
+| 🗺️ ArcGIS Pro | **3.7** (built against Pro 3.7 / .NET 10; live-verified on 3.7 only — later versions are untested) |
+| 🔑 Privileges | A normal user is enough; installation requires **no administrator** |
 | 📦 Other dependencies | None (PowerShell and .NET ship with Windows / Pro) |
 
 ---
 
-## 🚀 Quick start (5 minutes)
+## 🚀 Five-minute quick start
 
-1. 📂 **Extract** the package to any folder (e.g. `D:\ArcGIS-Pro-MCP-customer`).
-2. 🛠️ **Close ArcGIS Pro**, then double-click `install\00-install.cmd`. The script installs the add-in, deploys the runtime, and tries to configure Claude Desktop / Claude Code.
-3. 🖥️ **Open ArcGIS Pro**. If you see "add-in not trusted" on first load, click "Yes / Trust" (safe 😄). Find the **MCP tab** in Pro and confirm the status is **running** (port `127.0.0.1:6520`).
-4. 🔌 **Connect your AI client** (see "Configuration" below), then double-click `install\01-check.cmd` for a self-check; all `[OK]` means you're good to go (๑•̀ㅂ•́)و✧
+1. 📂 **Unzip** this package anywhere (e.g. `D:\ArcGIS-Pro-MCP-Customer`).
+2. 🛠️ **Close ArcGIS Pro**, then double-click `install\00-install.cmd`. The script installs the add-in, deploys the runtime and tries to configure Claude Desktop / Claude Code.
+3. 🖥️ **Open ArcGIS Pro**. If the first load asks whether to trust the add-in, click **Yes** (safe to do 😄). Find the **MCP tab** at the top of Pro and confirm the status says **running** (port `127.0.0.1:6520`).
+4. 🔌 **Connect your AI client** (see “Configuration” below), then double-click `install\01-check.cmd`; when every check reports `[OK]`, you are ready (๑•̀ㅂ•́)و✧
 
-> If ArcGIS Pro is not running during the self-check, the port check shows a warning — open Pro and run it again 👌
+> If Pro is not running during the check, the port test shows a warning — open Pro and run it again 👌
 
 ---
 
 ## 🎛️ Configuration — connect your AI client
 
-**Prerequisite**: ArcGIS Pro is open and the **MCP tab** shows **running**. All ports bind to localhost only:
+**Prerequisite**: ArcGIS Pro is open and the **MCP tab** shows **running**. Every port binds to this machine only:
 
 | Port | Purpose |
 |---|---|
 | `6520` | MCP over HTTP — every AI client connects here |
-| `6510` | Legacy TCP bridge (not used by modern clients) |
+| `6510` | Legacy TCP bridge (modern clients do not use it) |
 | `6511` | Optional in-Pro Python bridge (`execute_arcpy_code`) |
 
 ### 🟣 Claude Code
@@ -51,22 +71,22 @@ claude mcp add --transport http arcgis http://127.0.0.1:6520/mcp
 claude mcp list
 ```
 
-Manual equivalent configuration (`~/.claude.json`):
+Equivalent manual configuration (`~/.claude.json`):
 
 ```json
 { "mcpServers": { "arcgis": { "type": "http", "url": "http://127.0.0.1:6520/mcp" } } }
 ```
 
-To remove it, use `claude mcp remove arcgis`; to add it back, run the commands above.
+Remove with `claude mcp remove arcgis`; add it back with the command above.
 
-### 🖥️ Claude Desktop (uses the bundled stdio bridge)
+### 🖥️ Claude Desktop (with the bundled stdio bridge)
 
-Claude Desktop cannot connect over HTTP directly — it only launches local processes. Use the pure-PowerShell bridge bundled in the package (no Python needed):
+Claude Desktop cannot speak HTTP directly and can only launch a local process — use the pure-PowerShell bridge included in the package (no Python needed):
 
 1. **Fully quit Claude Desktop** (including the tray icon).
-2. Run `install\02-configure-claude.cmd`, or edit the configuration manually (back it up first).
-3. The configuration file lives in the first **existing** directory of:
-   `%APPDATA%\Claude`, `%APPDATA%\Claude-3p`, `%LOCALAPPDATA%\Claude-3p`, `%LOCALAPPDATA%\Claude` — file name `claude_desktop_config.json`.
+2. Run `install\02-configure-claude.cmd`, or edit the configuration by hand (back it up first).
+3. The configuration file is `claude_desktop_config.json` in the first of these that exists:
+   `%APPDATA%\Claude`, `%APPDATA%\Claude-3p`, `%LOCALAPPDATA%\Claude-3p`, `%LOCALAPPDATA%\Claude`.
 
 ```json
 {
@@ -74,24 +94,24 @@ Claude Desktop cannot connect over HTTP directly — it only launches local proc
     "arcgis": {
       "command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
       "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
-               "C:\\Users\\<your-username>\\AppData\\Local\\ArcGIS Pro MCP\\stdio-bridge.ps1"]
+               "C:\\Users\\<your-user-name>\\AppData\\Local\\ArcGIS Pro MCP\\stdio-bridge.ps1"]
     }
   }
 }
 ```
 
-4. Reopen Claude Desktop; once `arcgis` appears in the tool list, you're done.
+4. Reopen Claude Desktop; an `arcgis` entry in the tool list means success.
 
 ### 🟢 Codex
 
-Add the following to `~/.codex/config.toml` (if an old `arcgis` section exists, replace the whole section, including the old `env` sub-table):
+Add to `~/.codex/config.toml` (replace any old `arcgis` block entirely, including an old `env` sub-table):
 
 ```toml
 [mcp_servers.arcgis]
 url = "http://127.0.0.1:6520/mcp"
 ```
 
-Save and restart Codex.
+Restart Codex afterwards.
 
 ### 🔧 Other MCP clients
 
@@ -99,315 +119,318 @@ Connect over Streamable HTTP to `http://127.0.0.1:6520/mcp`, or use the generic 
 
 ### ✅ Verify the connection
 
-- `install\01-check.cmd` — checks the Pro version, add-in hash, runtime, ports, and client configuration.
-- `netstat -ano | findstr 6520` — confirms the port is listening.
+- `install\01-check.cmd` — checks the Pro version, add-in hash, runtime, ports and client configuration.
+- `netstat -ano | findstr 6520` — confirm the port is listening.
 - Log: `%LOCALAPPDATA%\ArcGIS-MCP\addin.log`.
 
 ---
 
 ## 🎯 How to use it
 
-**Basic loop**: open a project with data → say what you need → the assistant picks the tools → review the result (images come back inline) 🎨
+**The basic loop**: open a project with data → say what you want → the assistant picks the tools → look at the result (images come back inline) 🎨
 
 | You can say | What actually happens |
 |---|---|
-| "Graduated colors by area for the counties, light red to dark green" | `set_layer_renderer` (graduated colors) |
-| "Select counties with population above 500,000 and export them as a new feature class" | `select_features` → `export_features` |
-| "Buffer the roads by 500 meters" | `run_geoprocessing_tool` (Buffer) |
-| "Total cultivated land area per township" | `summarize_features` / `zonal_statistics` |
-| "Show me a screenshot of the current map view" | `export_map_view` (returns PNG) |
-| "Make an A3 portrait PDF with title, legend, scale bar, and north arrow" | `create_layout` → `add_map_frame` → `add_layout_*` → `export_layout` |
-| "Export 12 layers in batch with the same symbology" | `run_batch` or `execute_arcpy_code` |
+| “Classify the counties by area, light red to dark green” | `set_layer_renderer` (graduated colours) |
+| “Select counties with population over 500k and export them as a new feature class” | `select_features` → `export_features` |
+| “Buffer the roads by 500 metres” | `run_geoprocessing_tool` (Buffer) |
+| “Sum the farmland area per township” | `summarize_features` / `zonal_statistics` |
+| “Take a screenshot of the current map view” | `export_map_view` (returns a PNG) |
+| “Make an A3 portrait PDF with title, legend, scale bar and north arrow” | `create_layout` → `add_map_frame` → `add_layout_*` → `export_layout` |
+| “Export 12 layers with the same symbology in one go” | `run_batch` or `execute_arcpy_code` |
+| “Create an empty feature class with fields NAME, AREA_HA and CODE” | `create_feature_class` (fields are really created and verified) |
 
-**Call tools by name**: every tool in the tables below can be invoked directly by name. `run_batch` chains multiple commands in a single round trip; when no dedicated tool exists, fall back to `execute_arcpy_code`.
+**Call by tool name**: every tool below can be called by name by your client; `run_batch` strings several commands into one round trip; when no dedicated tool fits, fall back to `execute_arcpy_code`.
 
-**Edit rules**: edits stay pending until `save_edits` — while pending, the data is locked (delete/overwrite will fail); `discard_edits` throws pending edits away. `delete_features` / `delete_dataset` cannot be undone — ask the assistant to explain the impact before running them.
+**Editing rules**: edits stay pending until `save_edits`, and pending edits lock the data (deletes/overwrites fail); `discard_edits` throws them away. `delete_features` / `delete_dataset` cannot be undone — have the assistant explain the impact first.
 
-**Batch and speed**: for highly repetitive or large jobs, have the assistant write an idempotent arcpy script with RunCode and run it once; for big projects, process in chunks by extent/OID with checkpoints.
+**Batch and speed**: for repetitive or large work, ask the assistant to write an idempotent arcpy script for RunCode and run it once; for big projects, chunk by extent/OID with checkpoints. Inside `run_batch`, image results are automatically reduced to path/bytes/sha so they don't flood the conversation.
 
 ---
 
 ## 🧩 The three modules: what each does, how to use it, and how to ask
 
-This project follows a "one repo, three modules" design. Each module works on its own; in practice they take turns:
+The project is designed as “one repository, three modules”; each stands alone, and in practice they are used together:
 
-| Module | What it does (one line) | When to use it | In this edition |
+| Module | One-line purpose | When to use it | Status in this build |
 |---|---|---|---|
-| 🧩 **MCP add-in** | The only road between the AI and Pro: 113 native tools plus two arcpy channels — RunCode and the Python bridge | Everyday work; batch scripts; interactive sessions that need `CURRENT` | ✅ Installed and ready |
-| 🛡️ **Dialog guard** | Clicks the "third-party code library" trust dialog for you; if it can't, raises a topmost alarm with beeps | The first RunCode.pyt run; unattended batches | ✅ Standalone script `03-dialog-guard.cmd` |
-| 🧪 **Template distillation** | Turns one sample figure into a reusable layout template so batches share one layout | Many maps with the same layout; reproducing paper or report figures | ❌ Not in 1.1.4 — see V2.01 (v2.0.1) |
+| 🧩 **MCP add-in** | The only road between AI and Pro: 115 MCP tools plus two arcpy channels (RunCode / Python bridge) | All daily operations; batch scripts; interactive sessions that need `CURRENT` | ✅ Works out of the box |
+| 🛡️ **Dialog guard** | Clicks the “third-party code library” trust dialog for you; falls back to a topmost ringing reminder | The first RunCode.pyt run; unattended batch jobs | ✅ Standalone script `03-dialog-guard.cmd` |
+| 🧪 **Template distillation** | Distils a sample map image into a reusable layout template for consistent batch output | Many maps with one layout; reproducing paper/report figures | ❌ Not in this build; see V2.01 (v2.0.1) |
 
-### 🧩 Module 1: MCP add-in (the core)
+### 🧩 Module one: the MCP add-in (the core)
 
-- **What it does**: the only channel between the AI and Pro — adding layers, styling, geoprocessing, layout and export all go through it. Two arcpy channels: the **RunCode toolbox** for one-off or batch scripts, and the **Python bridge** for interactive sessions that keep variables across calls or need `CURRENT`.
+- **What it does**: the only channel between AI and Pro — layers, symbology, geoprocessing, map production all go through it. arcpy runs through two channels: **RunCode toolbox** for one-off / batch scripts; **Python bridge** for sessions that need persistent variables or `CURRENT`.
 - **How to use it**:
-  1. After installation, open Pro and confirm the **MCP tab** shows **running** (`127.0.0.1:6520`);
-  2. RunCode: ask the assistant to call `run_python_toolbox_tool` with the path `%LOCALAPPDATA%\ArcGIS Pro MCP\runcode\RunCode.pyt`;
-  3. Python bridge (optional): Pro menu **Analysis → Python**, paste the bridge bootstrap (port 6511; add `start_pump()` for `CURRENT` — see "RunCode and the Python bridge" below).
-- **How to word the prompt**: state **object + operation + output**; for batches add "do one first and show me".
-  - ✅ "Graduate `county_boundaries` by `AREA` into 5 natural-break classes, light red to dark green, legend bottom-right, export an A3 landscape PDF to `D:\out\` at 300 dpi."
-  - ✅ "Use RunCode to write an idempotent script: turn on labels for every layer, field `NAME`, size 10; skip layers already labeled."
-  - ✅ "This arcpy needs `CURRENT`: fill the bridge bootstrap with my username and send it to me — I'll paste it into Pro myself."
-  - ❌ "Handle my data." — no object, operation, or output; the assistant can only keep asking.
+  1. After installation, open Pro and confirm the **MCP tab** says **running** (`127.0.0.1:6520`);
+  2. RunCode: have the assistant call `run_python_toolbox_tool` with the path `%LOCALAPPDATA%\ArcGIS Pro MCP\runcode\RunCode.pyt`;
+  3. Python bridge (optional): Pro menu **Analysis → Python**, paste the bridge start-up code (port 6511; add `start_pump()` when you need `CURRENT` — see “RunCode and the Python bridge” below).
+- **How to ask**: state **object + operation + output**; for batch jobs add “do one first so I can confirm”.
+  - ✅ “Classify `counties` by `AREA` into 5 natural-break classes, light red to dark green, legend bottom-right, export an A3 landscape PDF to `D:\out\`, 300 dpi.”
+  - ✅ “Use RunCode with an idempotent script: turn on labels for every layer, field `NAME`, size 10; skip layers already labelled.”
+  - ✅ “This arcpy needs `CURRENT`: fill in the bridge start-up code with my user name and send it to me; I'll paste it into Pro myself.”
+  - ❌ “Process the data for me.” — no object, operation or output; the assistant can only keep asking.
 
-### 🛡️ Module 2: Dialog guard (only needed for RunCode)
+### 🛡️ Module two: the dialog guard (only needed for RunCode)
 
-- **What it does**: the first time Pro runs a third-party `.pyt`, it shows a "third-party code library" trust dialog, and unattended tasks stall on it. The guard clicks only this kind of "Yes(Y)"; if it can't, it raises a topmost alarm (at least 30 s, beeping every 10 s). Overwrite and delete confirmations are **never touched**.
-- **How to use it** (details in "Using the dialog guard" below):
+- **What it does**: the first time Pro runs a third-party `.pyt` it shows a “third-party code library” trust dialog; unattended jobs hang there. The guard clicks only that one “Yes(Y)”; if it cannot click it raises a topmost reminder (at least 30 s, ringing every 10 s); overwrite / delete and other confirmation dialogs are **never touched**.
+- **How to use it** (details in “Using the dialog guard” below):
   ```text
-  install\03-dialog-guard.cmd                    # 600 s by default
+  install\03-dialog-guard.cmd                    # 600 seconds by default
   install\03-dialog-guard.cmd -DurationSeconds 120
-  install\03-dialog-guard.cmd -AlertOnly         # alert only, no clicking
+  install\03-dialog-guard.cmd -AlertOnly         # remind only, do not click
   ```
-  Trust is asked once per Pro process; after a Pro restart, guard once more.
-- **How to word the prompt**: put "start the guard" and "what you're about to run" in one sentence.
-  - ✅ "I'm about to run RunCode.pyt: start the dialog guard in the background for 600 seconds, click Yes on the trust dialog, and if you can't, raise the topmost alarm with beeps."
-  - ✅ "Alert only this time, no auto-click."
-  - ❌ "Dismiss all dialogs for me." — the guard handles trust dialogs only; every other confirmation is your call.
+  Each Pro process asks once; restart Pro and you need the guard again.
+- **How to ask**: put “start the guard” and “what to run” in the same sentence.
+  - ✅ “I'm going to run RunCode.pyt: start the dialog guard in the background for 600 s, click Yes on the trust dialog, and ring a topmost reminder if you can't.”
+  - ✅ “This time remind only, do not click.”
+  - ❌ “Dismiss all dialogs for me.” — the guard handles trust dialogs only; other confirmations are yours to decide.
 
-### 🧪 Module 3: Template distillation (2.x feature)
+### 🧪 Module three: template distillation (2.x feature)
 
-- **What it does**: distills one sample figure into a reusable layout template; later batch exports apply the template, so many maps share one reproducible layout.
-- **How to use it**: 1.1.4 **does not include** this module (no `template_*` tools). On **V2.01 (v2.0.1)**, call the 10 `template_*` tools in the order `import → measure → patch → validate → preview → review → approve → apply`; the template library lives in `%LOCALAPPDATA%\ArcGIS Pro MCP\library` and survives upgrades.
-- **How to word the prompt**: name the template, and pin the flow plus the confirmation point.
-  - ✅ "Distill `D:\samples\fig3.png` into a template named Study Area Overview: import → measure → patch → validate → preview; show me the preview first, then review + approve after I confirm."
-  - ✅ "Use the Study Area Overview template to export every map in `maps` as an A3 PDF, titled after the map, into `D:\out\maps\`."
-  - ❌ "Copy this figure." — no template name, flow, or confirmation point; the layout can't be reproduced.
+- **What it does**: distils a sample finished map into a reusable layout template; later batch exports reuse the template for a consistent, reproducible look.
+- **How to use it**: this build **does not include** it (no `template_*` tools). After upgrading to **V2.01 (v2.0.1)**: call the 10 `template_*` tools in the flow `import → measure → patch → validate → preview → review → approve → apply`; the template library lives in `%LOCALAPPDATA%\ArcGIS Pro MCP\library`, and upgrades keep it.
+- **How to ask**: name the template and spell out the flow and confirmation points.
+  - ✅ “Distil `D:\samples\fig3.png` into a template named 'Study area overview': import → measure → patch → validate → preview; send me the preview first, then review + approve after I confirm.”
+  - ✅ “Use the 'Study area overview' template to export every map in `maps` as A3 PDF, title = map name, output to `D:\out\maps\`.”
+  - ❌ “Do it like this picture.” — no template name, flow or confirmation points; the layout cannot be reproduced.
 
-### 🧭 Prompt rules that apply to all three modules
+### 🧭 How to phrase prompts (applies to all three modules)
 
-1. **Name the module**: everyday work needs no naming (MCP is the default); say "use **RunCode**" for scripts, "use the **Python bridge**" for persistent sessions, "start the **dialog guard**" before unattended runs, "use the **template**" for a consistent layout.
-2. **Be specific about objects**: write layer names, field names, and paths verbatim in backticks — not "that layer" or "the data from earlier".
-3. **Pin the output**: format (PNG / PDF / new feature class), size or resolution, and save path.
-4. **Build in a checkpoint**: for batch, overwrite, or delete operations, ask for "one first" or "explain the impact first".
+1. **Name the module**: plain operations need no name (MCP by default); say “use **RunCode**” for scripts; “use the **Python bridge**” for persistent sessions; start the **dialog guard** first for unattended runs; say “use the **template**” for consistent layouts.
+2. **Be concrete about objects**: layer names, field names and paths in backticks, not “that layer” or “the data from earlier”.
+3. **Pin down the output**: format (PNG / PDF / new feature class), size or resolution, save path.
+4. **Leave a confirmation point**: for batch, overwrite or delete work, ask for “one first” or “explain the impact first”.
 
-> For the full four-element formula and templates for mapping prompts, see "Mapping and map production (prompt guide)" below.
+> For the full four elements and templates of map-production prompts, see the next section.
 
 ---
 
 ## 🎨 Mapping and map production (prompt guide)
 
-This section explains "how to talk to the AI": you don't need to remember tool names — just cover the four elements below and the assistant will break it down into MCP tool calls.
+This section explains “how to talk to the AI” in full: you don't need tool names — state the four elements and the assistant breaks it into MCP calls.
 
 ### Say four things and get it right the first time
 
 | Element | What to state | Example |
 |---|---|---|
-| Data | Layer name, data path, current selection | "the `county_boundaries` layer in the current map" |
-| Operation | Classification field/method, buffer distance, statistics definition | "5 classes on `AREA`, natural breaks" |
-| Style | Color scheme, font size, legend/scale-bar/north-arrow placement, basemap | "light red to dark green, legend in the lower right" |
-| Output | Image/PDF/new feature class, resolution, save path | "A3 landscape PDF, 300 dpi, save to `D:\out\`" |
+| Data | Layer names, data paths, current selection | “the `county boundaries` layer in the current map” |
+| Operation | Classification field/method, buffer distance, statistics | “5 natural-break classes on `AREA`” |
+| Style | Colours, font sizes, legend/scale-bar/north-arrow positions, basemap | “light red to dark green, legend bottom-right” |
+| Output | Image/PDF/new feature class, resolution, save path | “A3 landscape PDF, 300 dpi, to `D:\out\`” |
 
-**Good prompt vs. bad prompt**
-- ❌ "Make my map prettier" — no goal; the assistant can only guess.
-- ✅ "Symbolize `landuse` by unique values on `DLMC`, put the legend in the lower right, then export an A3 landscape PDF to `D:\out\landuse.pdf` at 300 dpi."
-- ❌ "Export a map" — no extent, layout, or output specified.
-- ✅ "Using the `study_area` layer as the extent, scale 1:10000, produce an A4 portrait PNG titled 'Study Area Land Use', with legend, scale bar, and north arrow; send me a preview first for confirmation."
+**Good prompts vs bad prompts**
+- ❌ “Beautify the map for me” — no goal; the assistant can only guess.
+- ✅ “Symbolise `land use` by unique values of `DLMC`, legend bottom-right, then export an A3 landscape PDF to `D:\out\landuse.pdf` at 300 dpi.”
+- ❌ “Make a map” — no extent, layout or output.
+- ✅ “Using the `study area` layer as the extent, scale 1:10000, produce an A4 portrait PNG titled 'Study area land use', with legend, scale bar and north arrow; send me a preview first.”
 
 ### Prompt cheat sheet by tool group
 
-| Module (tool group) | What you can say | Tools the assistant uses |
+| Module (tool group) | You could say | The assistant uses |
 |---|---|---|
-| Session & project | "Run `diagnose` first to check the connection and current project; then save the project as `D:\proj\result.aprx`" | diagnose / save_project |
-| Layers | "Move `roads` into the `basemap` group, set transparency 40%, show only at 1:50000 and closer; turn off the `POI` layer" | move_layer / set_layer_transparency / set_layer_scale_range / set_layer_visibility |
-| Data & attributes | "Read the first 20 rows of `parcels` sorted by area descending; summarize area by `DLMC`" | get_features / summarize_features |
-| Selection | "Select counties with `POP` above 500,000 and export them to `D:\out\counties_big.shp`; then select parcels within `study_area` by location" | select_features / select_by_location / export_features |
-| Fields & datasets | "Add a DOUBLE field `AREA_HA` to `parcels` and compute it with `!Shape_Area!/10000`; create a polygon feature class `result_2026` in EPSG:4547" | add_field / calculate_field / create_feature_class |
-| Geoprocessing | "Buffer the roads by 500 meters and dissolve; clip the land-use raster with the `study_area` mask" | run_geoprocessing_tool / run_batch |
-| Symbology | "5 classes by area, natural breaks, light red to dark green; or unique-value colors by `TYPE`" | set_layer_renderer |
-| Map view | "Zoom to `study_area`, scale 1:10000, and capture a 1600×900 PNG for me" | set_map_view / zoom_to_layer / export_map_view |
-| Layout & export | "Create an A3 landscape layout, title…, legend for only 3 layers, add scale bar and north arrow, export a 300 dpi PDF" | create_layout / add_layout_* / export_layout |
-| Raster | "Read the DEM's bands, cell size, and statistics; compute a vegetation index with the NDVI formula" | get_raster_info / raster_calculator / zonal_statistics |
-| Catalog & data discovery | "Search the project and folder connections for shapefiles whose name contains `2025`" | search_data / describe_dataset / list_folder |
-| Utilities | "In one go: hide the basemap → zoom to the counties → export a PNG; use arcpy to prefix all layer names" | run_batch / execute_arcpy_code |
+| Session & project | “Run `diagnose` first to see the connection and current project; then save the project to `D:\proj\result.aprx`” | diagnose / save_project |
+| Layers | “Move `roads` into the `base` group, transparency 40%, visible only beyond 1:50000; turn off `POI`” | move_layer / set_layer_transparency / set_layer_scale_range / set_layer_visibility |
+| Data & attributes | “Read the first 20 rows of `parcels` sorted by area descending; summarise `DLMC` area by class” | get_features / summarize_features |
+| Selection | “Select counties with `POP` over 500k and export them to `D:\out\counties_big.shp`; then select parcels inside `study area` by location” | select_features / select_by_location / export_features |
+| Fields & datasets | “Add a DOUBLE field `AREA_HA` to `parcels` and calculate `!Shape_Area!/10000`; create an EPSG:4547 polygon feature class `result_2026`” | add_field / calculate_field / create_feature_class |
+| Geoprocessing | “Buffer the roads by 500 m and dissolve; clip the land-use raster with the `study area` mask” | run_geoprocessing_tool / run_batch |
+| Symbology | “5 classes on area, natural breaks, light red to dark green; or unique values by `TYPE`” | set_layer_renderer |
+| Map view | “Zoom to `study area`, scale 1:10000, give me a 1600×900 PNG” | set_map_view / zoom_to_layer / export_map_view |
+| Layout & printing | “Create an A3 landscape layout, title …, legend with only 3 layers, scale bar and north arrow, export a 300 dpi PDF” | create_layout / add_layout_* / export_layout |
+| Raster | “Read the DEM's bands, cell size and statistics; compute NDVI” | get_raster_info / raster_calculator / zonal_statistics |
+| Catalog & discovery | “Search the project and folder connections for shapefiles with `2025` in the name” | search_data / describe_dataset / list_folder |
+| Utilities | “In one go: hide the basemap → zoom to the counties → export a PNG; prefix all layer names with arcpy” | run_batch / execute_arcpy_code |
 
-### Standard mapping prompt template (copy and use)
+### Standard map-production prompt template (copy and use)
 
 ```text
-Produce a map from the current project's <map name>:
-- Extent: <study-area layer/extent>, scale 1:<...>
-- Data: <layer1>, <layer2> (state fields and filters where needed)
-- Symbology: <graduated/unique-value/single color by field>, palette <ramp or hex>
+Produce a map from the <map name> in the current project:
+- Extent: <study area layer/extent>, scale 1:<...>
+- Data: <layer 1>, <layer 2> (fields and filters if needed)
+- Symbology: <graduated by field/unique values/single colour>, palette <ramp or hex>
 - Layout: <A3 landscape / A4 portrait>, title "<title>", legend <position>, scale bar <position>, north arrow <position>
 - Output: <PDF / PNG>, <300> dpi, save to <absolute path>
-- Process: check the layout first, send me a preview for confirmation, then export the final file.
+- Flow: check the layout first, send me the preview, export the final file after I confirm.
 ```
 
-### Batch mapping prompt
+### Batch map-production prompt
 
 ```text
-For each map in `maps`, export a PDF with the same A3 landscape layout template:
-use the map name as the title, keep visible layers in the legend, put the scale bar and north arrow in the lower right,
-output to `D:\out\maps\` at 300 dpi. Export the first one for me to review, then batch the rest after confirmation.
+For every map in `maps`, export a PDF with the same A3 landscape layout:
+title = map name, legend = visible layers, scale bar and north arrow bottom-right,
+output to `D:\out\maps\`, 300 dpi. Export the first one for review, then batch after I confirm.
 ```
 
 ### One-line fixes for common mishaps
 
-- "The legend is covering the main map" → the assistant adjusts the `legend` position or the layout.
-- "The page ratio is wrong / too much white space" → adjust the map frame vs. page ratio.
-- "The colors are too loud / not suitable for a paper" → give a palette, hex colors, or a reference image.
-- "Don't export yet, show me a preview" → the assistant runs `export_map_view` or a layout preview first.
+- “The legend covers the main map” → the assistant adjusts the `legend` coordinates or the layout.
+- “The page proportion is wrong / too much white space” → adjust the map frame vs page ratio.
+- “The colours are too loud / not paper-style” → give a ramp, hex values or a reference image.
+- “Don't export yet — show me a preview” → the assistant uses `export_map_view` or the layout preview first.
 
-**Effect**: state data, operation, style, and output all at once, and the assistant usually gets close to the final map in one round; afterwards just point out the differences ("move the legend right by 1 cm") instead of repeating everything.
+**Effect**: state data, operation, style and output in one go and the assistant usually gets close to the final figure in one round; later changes only need the difference (“move the legend right by 1 cm”).
 
 ---
 
 ## 🛡️ Using the dialog guard (1.x edition)
 
-**What it solves**: the first time ArcGIS Pro runs a third-party `.pyt` / Python tool (such as RunCode.pyt), it shows a "third-party code library" trust dialog; unattended tasks get stuck on it. 1.1.4 has no MCP guard tools — instead the package ships a **standalone guard script**: once started, it polls Pro windows, clicks only this kind of "Yes(Y)" dialog, and exits automatically after the configured duration.
+**What it solves**: the first time ArcGIS Pro runs a third-party `.pyt` / Python tool (such as RunCode.pyt) it shows a “third-party code library” trust dialog; unattended jobs hang. This build has no MCP guard tool; the package ships a **standalone guard script** instead: it polls Pro's windows, clicks only that “Yes(Y)”, and exits after the configured duration.
 
 **How to start it**
 
 ```text
 install\03-dialog-guard.cmd                    # 600 seconds by default
 install\03-dialog-guard.cmd -DurationSeconds 120
-install\03-dialog-guard.cmd -AlertOnly         # topmost alert only, no auto-click
-install\03-dialog-guard.cmd -NotifyTest        # test the alert window only (30 s)
+install\03-dialog-guard.cmd -AlertOnly         # topmost reminder only, no clicking
+install\03-dialog-guard.cmd -NotifyTest        # test the reminder window (30 s)
 ```
 
-You can also double-click `03-dialog-guard.cmd`, or have an AI assistant that can control a terminal start it in the background.
+You can also double-click `03-dialog-guard.cmd`, or have an AI assistant that can run terminal commands start it in the background.
 
 **Prompt examples**
 
 | You say | What the assistant does |
 |---|---|
-| "I'm going to run RunCode.pyt manually in Pro. Start the dialog guard for 600 seconds first; auto-click 'Yes' on the third-party code trust dialog, and if it can't click, show a topmost alert with a beep" | Runs `install\03-dialog-guard.cmd -DurationSeconds 600` in the background |
-| "This time only alert, don't auto-click" | Starts with `-AlertOnly` |
-| "Test whether the alert window pops up" | Starts with `-NotifyTest` (30 s) |
-| "Where is the guard log?" | `%LOCALAPPDATA%\ArcGIS Pro MCP\guard\watch_pro_dialog.log` |
+| “I'm going to run RunCode.pyt manually in Pro. Start the dialog guard for 600 s first; click Yes on the third-party trust dialog, and ring a topmost reminder if you can't” | runs `install\03-dialog-guard.cmd -DurationSeconds 600` in the background |
+| “This time remind only, do not click” | starts it with `-AlertOnly` |
+| “Test whether the reminder window can pop up” | starts `-NotifyTest` (30 s) |
+| “Where is the guard log?” | `%LOCALAPPDATA%\ArcGIS Pro MCP\guard\watch_pro_dialog.log` |
 
-**Boundaries and behavior**
-- It only handles trust dialogs whose context contains "third-party / code library / 第三方 / 代码库"; overwrite, delete, and other confirmation dialogs are never touched.
-- When it cannot click the button, the topmost alert window stays for at least 30 seconds and beeps every 10 seconds.
-- Each Pro process asks only once after trust is granted; it reappears after Pro restarts.
-- 2.x upgraded this into the `guard_summon` / `guard_status` tools with automatic arm/settle before RunCode calls; in 1.1.4 you start the script manually.
+**Boundaries and effects**
+- Only handles trust dialogs with “third-party / code library / 第三方 / 代码库” context; overwrite, delete and other confirmations are never touched.
+- When the button cannot be found, a topmost reminder stays at least 30 s and rings every 10 s.
+- Each Pro process asks once; you need the guard again after restarting Pro.
+- 2.x turned the same capability into `guard_summon` / `guard_status` with automatic arm/settle around RunCode calls; this 1.x build needs the script started manually.
 
 ---
 
 ## 🐍 RunCode and the Python bridge (prompt guide)
 
-The arcpy channels in 1.1.4 come in two tiers: the **RunCode toolbox** suits one-off / batch scripts; the **Python bridge** suits interactive sessions that need variables to persist across calls.
+The arcpy channels have two tiers: the **RunCode toolbox** for one-off/batch scripts; the **Python bridge** for interactive sessions that need persistent variables.
 
 ### RunCode toolbox
 
-Path: `%LOCALAPPDATA%\ArcGIS Pro MCP\runcode\RunCode.pyt`. Have the assistant pass this path to `run_python_toolbox_tool`; you can also add it yourself in Pro via "Insert → Toolbox → Add Toolbox".
+Path: `%LOCALAPPDATA%\ArcGIS Pro MCP\runcode\RunCode.pyt`. Have the assistant call `run_python_toolbox_tool` with that path; you can also add it yourself via “Insert → Toolbox → Add Toolbox” in Pro.
 
 **Prompt examples**
-- "Use RunCode.pyt to turn on labels for every layer in the current project, label field `NAME`, font size 10."
-- "Write an idempotent arcpy script and run it with RunCode to prefix every layer name with `LYR_`, skipping ones already prefixed."
-- "This script is going to run in RunCode.pyt — check the parameters and paths for me first, then execute."
+- “Use RunCode.pyt to turn on labels for every layer in the current project, field `NAME`, size 10.”
+- “Write an idempotent arcpy script and run it with RunCode to prefix every layer name with `LYR_`; skip ones already prefixed.”
+- “This script will run inside RunCode.pyt — check the parameters and paths first, then execute.”
 
-**First run** shows the "third-party code library" trust dialog: start the dialog guard above first, or click "Yes" once manually. Each Pro process needs trusting only once.
+**The first run** shows the “third-party code library” trust dialog: start the dialog guard above, or click Yes once yourself. One trust per Pro process.
 
 ### Python bridge (when you need `CURRENT` or persistent variables)
 
-1. Open the Python window from the Pro menu **Analysis → Python**;
-2. Paste and run (path as in the default install location):
+1. Open the Python window via **Analysis → Python** in Pro;
+2. Paste and run (path at the default install location):
 
 ```python
-import sys; sys.path.insert(0, r"C:\Users\<your-username>\AppData\Local\ArcGIS Pro MCP\plugin")
+import sys; sys.path.insert(0, r"C:\Users\<your-user-name>\AppData\Local\ArcGIS Pro MCP\plugin")
 import mcp_bridge; print(mcp_bridge.start_server(port=6511))
 ```
 
-3. When you need `CURRENT` (the open project), add one more line (must run on the main thread):
+3. Add one more line when you need `CURRENT` (the current project; must run on the main thread):
 
 ```python
 print(mcp_bridge.start_pump())
 ```
 
 **Prompt examples**
-- "The next arcpy work needs `CURRENT`. Remind me to paste the bridge startup code into Pro's Python window; then I'll run it via `execute_arcpy_code`."
-- "Fill in the bridge startup code with my username and copy it for me; I'll paste it into Pro myself."
-- "Check with `get_pump_status` first whether the pump is ready; if not, remind me to paste the code."
-- "Use a persistent session in three steps: read the layer, create the field, then compute — variables must persist across calls."
+- “The next arcpy needs `CURRENT`. Remind me to paste the bridge start-up code into Pro's Python window, then run it with `execute_arcpy_code`.”
+- “Fill in the bridge start-up code with my user name and copy it to me; I'll paste it into Pro.”
+- “Run `get_pump_status` to see whether the pump is ready; if not, remind me to paste.”
+- “Use a persistent session in three steps: read the layers, create the field, calculate — variables must survive across calls.”
 
-**Effect**: RunCode handles "run a batch script in one go"; the Python bridge handles "multi-step interaction needing the current project". Neither requires a separate Python installation.
+**Effect**: RunCode handles “one batch script in one go”; the Python bridge handles “multi-step interaction against the current project”; neither needs a separate Python installation.
 
 ---
 
 ## 🧪 About the distillation module (2.x feature)
 
-1.1.4 **does not include** template distillation: there are no `template_*` tools and no `guard_summon` / `guard_status`. If you want to turn a sample figure's layout into a reusable template and keep multiple maps consistent, upgrade to **V2.01 (v2.0.1)**:
+This build **does not include** template distillation: no `template_*` tools, no `guard_summon` / `guard_status`. If you want to turn a sample map's layout into a reusable template and keep many maps consistent, upgrade to **V2.01 (v2.0.1)**:
 
 - 2.x provides 10 `template_*` tools: import / measure / patch / validate / preview / review / approve / apply / list / get;
-- The template library lives in `%LOCALAPPDATA%\ArcGIS Pro MCP\library`, and upgrading preserves existing templates;
-- Typical usage: "Distill `D:\samples\fig3.png` into a template named Study Area Overview; follow the import → measure → patch → validate → preview flow, show me the preview for confirmation, then review + approve."
+- the template library lives in `%LOCALAPPDATA%\ArcGIS Pro MCP\library`; upgrades keep existing templates;
+- typical use: “Distil `D:\samples\fig3.png` into a template named Study-area overview; run import → measure → patch → validate → preview, show me the preview, then review + approve.”
 
-Capability comparison between 1.1.4 and 2.x:
+Capability comparison between 1.1.11 and 2.x:
 
-| Capability | 1.1.4 (this branch) | 2.0.1 (not recommended) |
+| Capability | 1.1.11 (this branch) | 2.0.1 (recommended upgrade) |
 |---|---|---|
-| Native MCP tools | 113 (12 groups) | 125 (14 groups) |
+| Native MCP tools | 115 (12 groups) | 125 (14 groups) |
 | RunCode / Python bridge | ✅ | ✅ |
-| Dialog guard | Standalone script `03-dialog-guard.cmd` | `guard_summon` / `guard_status` + automatic arm/settle before RunCode |
+| Dialog guard | Standalone script `03-dialog-guard.cmd` | `guard_summon` / `guard_status` + automatic arm/settle around RunCode |
 | Template distillation | ❌ | ✅ 10 `template_*` tools + schema v1.1 |
 
 ---
 
-## 🧰 All 113 MCP tools (12 groups)
+## 🧰 All 115 MCP tools (12 groups)
 
 Everything the assistant can do, listed by name. Click to expand 👇
 
 <details>
-<summary><b>📜 Full tool list — session 15 · layers 19 · data 11 · selection 6 · fields/datasets 11 · geoprocessing 7 · symbology 6 · view 7 · layout 16 · raster 5 · catalog 6 · utilities 4</b></summary>
+<summary><b>📜 Full tool catalogue — Session 16 · Layers 20 · Data 11 · Selection 6 · Fields/Datasets 11 · Geoprocessing 7 · Symbology 6 · View 7 · Layout 16 · Raster 5 · Catalog 6 · Utilities 4</b></summary>
 
-### Session & project (15)
+### Session and project (16)
 
 | Tool | Purpose |
 |---|---|
-| `ping` | Check bridge connectivity and return the connected project. |
-| `get_capabilities` | List every command the bridge supports (grouped by area), for discovering capabilities beyond the named tools. |
-| `get_queue_status` | Three-lane queue status: per-lane depth, the command running now, and recent completions; check it first when calls feel slow or queued. |
-| `diagnose` | Connection self-check: Pro version, license, open project, active map, map view, and write access; run it first when something is wrong. |
-| `get_arcgis_info` | ArcGIS Pro version, license level, available extensions, and the current project path. |
-| `get_project_info` | Project path, default geodatabase and toolbox, maps, layouts, folder and database connections. |
+| `ping` | Check that the bridge is reachable and return the project it is attached to. |
+| `get_capabilities` | List every command the bridge supports (grouped by area) to discover functionality beyond the named tools. |
+| `get_queue_status` | Three-lane queue status: per-lane depth, the command running now and recent completions; check it when calls feel slow or queued. |
+| `diagnose` | Connection self-check: Pro version, licence, open project, active map, map view and write access; also actively probes the Python bridge port (`bridge_listening` / `probe_ms`). Run it first when something is wrong. |
+| `get_arcgis_info` | ArcGIS Pro version, licence level, available extensions and the current project path. |
+| `get_project_info` | Project paths, default geodatabase and toolbox, maps, layouts, folder and database connections. |
 | `save_project` | Save the project (.aprx), or save a copy elsewhere. |
 | `list_maps` | List all maps and scenes with coordinate system and layer counts. |
-| `create_map` | Create a new map or scene in the project. |
+| `create_map` | Create a new map or scene in the project (no basemap by default; `project_default` restores one). |
 | `remove_map` | Delete a map from the project. |
-| `activate_map` | Open/activate a map's view in the Pro UI; required before camera commands and export_map_view. |
-| `set_map_properties` | Rename a map or change its coordinate system. |
-| `get_map_extent` | The combined extent of all data layers in a map. |
-| `get_environment` | Read the current arcpy geoprocessing environment settings. |
-| `set_environment` | Set arcpy environments (workspace, output coordinate system, extent, mask, cell size, overwrite output, parallel factor, etc.). |
+| `activate_map` | Open/activate a map view in the Pro UI; required before camera commands and export_map_view. |
+| `set_map_properties` | Rename a map or change its coordinate system (`epsg` takes effect). |
+| `get_map_extent` | Combined extent of every data layer in a map. |
+| `get_environment` | Read the current arcpy geoprocessing environments. |
+| `set_environment` | Set arcpy environments (workspace, output coordinate system, extent, mask, cell size, overwrite output, parallel factor, snap raster, …); values really reach GP and can be overridden per call. |
+| `restart_pro` | Restart ArcGIS Pro after saving and reopening the project — how a rebuilt add-in gets loaded without touching the desktop; the reply returns before Pro closes and clients reconnect when the bridge answers. |
 
-### Layers (19)
+### Layers (20)
 
 | Tool | Purpose |
 |---|---|
-| `get_layers` | List the map's layers (with draw order and group nesting) and standalone tables; start here to see what's in the project. |
-| `get_layer_info` | Full detail for one layer: data source, coordinate system, extent, fields, feature count, renderer, and label state. |
-| `add_layer` | Add data to a map by path or service URL: feature class, shapefile, raster, table, .lyrx layer file, or web service. |
+| `get_layers` | List layers (with draw order and group nesting) and standalone tables in a map; start here to see what a project holds. |
+| `get_layer_info` | Full detail for one layer: source, coordinate system, extent, fields, feature count, renderer and label state. Also accepts a dataset path (1.1.9+). |
+| `add_layer` | Add data to a map from a path or service URL: feature class, shapefile, raster, table, .lyrx layer file or web service. |
+| `add_table` | Add a standalone table (geodatabase table or folder table) to a map. |
 | `add_web_layer` | Add a web layer by URL (Feature/Map/Image service, WMS, WMTS, vector tiles). |
 | `remove_layer` | Remove a layer or standalone table from a map. |
 | `rename_layer` | Rename a layer in the table of contents. |
-| `duplicate_layer` | Copy a layer within the map so it can be symbolized differently. |
-| `set_layer_visibility` | Show or hide one layer, several layers, or every layer in the map. |
-| `set_layer_transparency` | Set layer transparency (0 opaque, 100 fully transparent). |
-| `set_layer_scale_range` | Limit the scale range a layer draws at. |
-| `set_definition_query` | Set a layer's definition query (SQL where); an empty string clears it. |
-| `move_layer` | Reorder a layer relative to another, or move it into a group layer. |
+| `duplicate_layer` | Copy a layer within the map so it can be symbolised differently. |
+| `set_layer_visibility` | Show or hide one layer, several layers or every layer in the map. |
+| `set_layer_transparency` | Set layer transparency (0 opaque, 100 invisible). |
+| `set_layer_scale_range` | Limit the scales a layer draws at. |
+| `set_definition_query` | Set a layer definition query (SQL where); an empty string clears it. |
+| `move_layer` | Reorder a layer, or move it into a group layer. |
 | `create_group_layer` | Create a group layer, optionally moving existing layers into it. |
 | `zoom_to_layer` | Zoom the map view to a layer's extent. |
-| `set_basemap` | Set the basemap: Topographic, Imagery, Imagery Hybrid, Streets, Navigation, Light Gray Canvas, Dark Gray Canvas, Terrain, Oceans, OpenStreetMap, National Geographic, and more. |
-| `get_broken_layers` | List layers in all maps whose data sources are missing. |
-| `repair_layer_source` | Repoint a layer at a new workspace or dataset to fix a broken source. |
-| `add_join` | Join a table to a layer on a common field. |
-| `remove_join` | Remove a layer's join. |
+| `set_basemap` | Set the basemap: Topographic, Imagery, Imagery Hybrid, Streets, Navigation, Light Gray Canvas, Dark Gray Canvas, Terrain, Oceans, OpenStreetMap, National Geographic, … |
+| `get_broken_layers` | List layers across all maps whose data source is missing. |
+| `repair_layer_source` | Repoint a layer at a new workspace or dataset to fix a broken source (including raster layers, 1.1.9+). |
+| `add_join` | Join a table to a layer on a common field (client-side join registry; survives GP re-registration). |
+| `remove_join` | Remove a join from a layer. |
 
-### Data & attributes (11)
+### Data and attributes (11)
 
 | Tool | Purpose |
 |---|---|
-| `get_features` | Read attribute rows from a layer, table, or dataset path, with where, field subset, ordering, and WKT geometry. |
+| `get_features` | Read attribute rows from a layer, table or dataset path, with where, field subset, ordering and geometry. Pages report `truncated` and `next_offset`; geometry can be a compact summary or full WKT with a precision. |
 | `count_features` | Count features, optionally with a where clause. |
-| `get_unique_values` | Distinct values of a field with the count of rows for each. |
-| `get_field_statistics` | min/max/mean/median/sum/standard deviation of a numeric field. |
-| `summarize_features` | Group by one or more fields and aggregate — the quick way to answer "how much per category" without geoprocessing. |
-| `insert_features` | Insert new rows into a layer or table. |
-| `update_features` | Update attributes and/or geometry of rows matching a where clause. |
-| `delete_features` | Delete rows matching a where clause. |
-| `save_edits` | Commit pending edits; unsaved edits lock the data, so delete or overwrite operations fail until then. |
+| `get_unique_values` | Distinct values of a field with the row count for each. |
+| `get_field_statistics` | min / max / mean / median / sum / standard deviation of a numeric field. |
+| `summarize_features` | Group rows by one or more fields and aggregate — the quick way to answer “how many / how much per category” without GP. |
+| `insert_features` | Insert new rows into a layer, standalone table or dataset path. |
+| `update_features` | Update attributes and/or geometry of rows matching a where clause (layers and standalone tables). |
+| `delete_features` | Delete rows matching a where clause (layers and standalone tables). |
+| `save_edits` | Commit pending edits; unsaved edits lock the data so deletes or overwrites fail. |
 | `discard_edits` | Throw away pending edits. |
 | `calculate_field` | Calculate a field, e.g. the expression "!Shape_Area! / 10000". |
 
@@ -417,47 +440,47 @@ Everything the assistant can do, listed by name. Click to expand 👇
 |---|---|
 | `select_features` | Select features by SQL where clause. |
 | `select_by_location` | Select features by spatial relationship to another layer. |
-| `get_selection` | Report the current selection (per layer, with ObjectIDs and optionally attribute rows). |
+| `get_selection` | Report the current selection per layer (ObjectIDs and optional attribute rows). |
 | `set_selection` | Select specific features by ObjectID. |
-| `clear_selection` | Clear the selection on one layer, or on every layer in the map. |
-| `zoom_to_selection` | Zoom the map view to the currently selected features. |
+| `clear_selection` | Clear the selection on one layer or the whole map. |
+| `zoom_to_selection` | Zoom the map view to the selected features. |
 
-### Fields & datasets (11)
+### Fields and datasets (11)
 
 | Tool | Purpose |
 |---|---|
-| `list_fields` | List a layer's fields with type, alias, length, and domain. |
+| `list_fields` | List a layer's fields with type, alias, length and domain. |
 | `add_field` | Add a field to a layer or table. |
 | `add_fields` | Add several fields in one call. |
 | `delete_field` | Delete one or more fields. |
-| `alter_field` | Rename a field, or change its alias/length. |
-| `create_feature_class` | Create an empty feature class (in the project's default geodatabase by default) and add it to the map. |
-| `create_table` | Create an empty standalone table. |
+| `alter_field` | Rename a field or change its alias/length. |
+| `create_feature_class` | Create an empty feature class (project default geodatabase by default) and add it to the map; requested fields are added after creation and verified — a mismatch deletes the new dataset and fails. |
+| `create_table` | Create an empty standalone table; requested fields are added after creation and verified — a mismatch deletes the new table and fails. |
 | `create_file_geodatabase` | Create a new file geodatabase. |
 | `truncate_table` | Delete every row of a table or feature class, keeping the schema. |
 | `delete_dataset` | Delete a dataset from disk or a geodatabase; cannot be undone. |
-| `export_features` | Export a layer to a new dataset, honoring the current selection and definition query. |
+| `export_features` | Export a layer honouring its selection and definition query to a new dataset. |
 
 ### Geoprocessing (7)
 
 | Tool | Purpose |
 |---|---|
-| `run_geoprocessing_tool` | Run any arcpy geoprocessing tool — the universal analysis channel; layer names resolve to live layers so selections and definition queries apply. Call describe_geoprocessing_tool first when parameter names are unknown. |
-| `list_geoprocessing_tools` | Search available geoprocessing tools by name. |
-| `list_toolboxes` | List arcpy toolbox modules and the project's toolboxes. |
-| `describe_geoprocessing_tool` | Query a tool's parameters, data types, defaults, and usage text before running it. |
-| `run_python_toolbox_tool` | Run a tool from a custom .pyt / .atbx / .tbx toolbox on disk. |
-| `check_extension` | Check and optionally check out an ArcGIS extension license. |
+| `run_geoprocessing_tool` | Run any arcpy geoprocessing tool — the universal channel for analysis; layer names resolve to live layers so selections and definition queries apply. Call describe_geoprocessing_tool first when parameter names are unknown. |
+| `list_geoprocessing_tools` | Search the available geoprocessing tools by name. |
+| `list_toolboxes` | List the arcpy toolbox modules and any toolboxes in the project. |
+| `describe_geoprocessing_tool` | Get a tool's parameters, data types, defaults, enums and usage text before running it. |
+| `run_python_toolbox_tool` | Run a tool from a custom .pyt / .atbx / .tbx toolbox on disk; the native host takes positional parameters only. A mistyped path gets a “Did you mean …” suggestion. |
+| `check_extension` | Report whether the add-in can inspect an extension licence (`inspectable:false` on Pro — run the tool itself to learn whether a licence is missing). |
 | `get_messages` | Messages from the most recent geoprocessing operation. |
 
 ### Symbology (6)
 
 | Tool | Purpose |
 |---|---|
-| `set_layer_renderer` | Change a layer's symbology: single symbol, unique values by category, or graduated/continuous color scheme by numeric field. |
-| `get_layer_symbology` | Inspect a layer's current renderer, class breaks, unique values, and label settings. |
-| `list_color_ramps` | List the color ramps available in the project. |
-| `set_layer_labeling` | Turn labels on/off and set the expression, font, and halo. |
+| `set_layer_renderer` | Change a layer's symbology: single symbol, unique values by category, or graduated/continuous colour by a numeric field. |
+| `get_layer_symbology` | Inspect a layer's renderer, class breaks, unique values and label settings. |
+| `list_color_ramps` | List the colour ramps available in the project. |
+| `set_layer_labeling` | Turn labels on or off and set the expression, font and halo. |
 | `apply_symbology_from_layer` | Copy symbology from a .lyrx file or another layer. |
 | `save_layer_file` | Save a layer with its symbology to a .lyrx file for reuse. |
 
@@ -465,15 +488,15 @@ Everything the assistant can do, listed by name. Click to expand 👇
 
 | Tool | Purpose |
 |---|---|
-| `get_map_view` | Current camera position: center, scale, rotation, and visible extent; requires the map tab to be open in Pro. |
-| `set_map_view` | Move the map view: set an extent, center point, scale, and/or rotation. |
-| `export_map_view` | Render the map view to PNG and return the image for visual checking; requires the map tab to be open. |
+| `get_map_view` | Current camera position: centre, scale, rotation and visible extent; needs the map tab open in Pro. |
+| `set_map_view` | Move the map view: set an extent, centre, scale and/or rotation. |
+| `export_map_view` | Render the map view to PNG and return the image for a visual check; needs the map tab open. Supports `fit:"auto"` to match the view's aspect ratio. |
 | `list_bookmarks` | List the spatial bookmarks defined on a map. |
 | `create_bookmark` | Save the current view, or a given extent, as a named bookmark. |
 | `apply_bookmark` | Zoom the map view to a bookmark. |
-| `delete_bookmark` | Delete a bookmark from a map. |
+| `delete_bookmark` | Delete a map bookmark. |
 
-### Layout & export (16)
+### Layout and printing (16)
 
 | Tool | Purpose |
 |---|---|
@@ -481,125 +504,125 @@ Everything the assistant can do, listed by name. Click to expand 👇
 | `get_layout_info` | Inspect a layout: page setup and every element with position and size. |
 | `create_layout` | Create a new layout page (by default with a map frame filling it). |
 | `delete_layout` | Delete a layout from the project. |
-| `add_map_frame` | Add a map frame to a layout at a page position. |
-| `set_map_frame_extent` | Point a layout's map frame at a layer, an extent, or a scale. |
-| `add_layout_text` | Add text elements such as a title or credits to a layout. |
+| `add_map_frame` | Add a map frame at a page position. |
+| `set_map_frame_extent` | Point a layout's map frame at a layer, an extent or a scale. |
+| `add_layout_text` | Add a text element such as a title or credits. |
 | `add_layout_legend` | Add a legend tied to a layout's map frame. |
-| `add_layout_scale_bar` | Add a scale bar tied to a map frame. |
-| `add_layout_north_arrow` | Add a north arrow tied to a map frame. |
-| `add_layout_picture` | Place an image such as a logo on a layout. |
-| `set_layout_element` | Move, resize, rename, hide, or change the text of any layout element. |
+| `add_layout_scale_bar` | Add a scale bar tied to the map frame. |
+| `add_layout_north_arrow` | Add a north arrow tied to the map frame. |
+| `add_layout_picture` | Place an image (such as a logo) on a layout. |
+| `set_layout_element` | Move, resize, rename, hide or retext any layout element (page coordinates use the bottom-left origin; out-of-range positions are rejected). |
 | `delete_layout_element` | Remove an element from a layout. |
-| `export_layout` | Export a layout to PDF / PNG / JPEG / SVG / TIFF; PNG/JPEG come back inline as images for checking. |
-| `preview_layout` | Render a layout to a temporary image without writing a file — check it while building. |
+| `export_layout` | Export a layout to PDF / PNG / JPEG / SVG / TIFF; PNG/JPEG come back inline for checking. |
+| `preview_layout` | Render a layout to a temporary image (nothing written unless `output_path` is given) so you can check while building. |
 | `export_map_series` | Export a layout's map series (map book) to a multi-page PDF. |
 
 ### Raster (5)
 
 | Tool | Purpose |
 |---|---|
-| `get_raster_info` | Raster detail: bands, size, cell size, pixel type, statistics, and coordinate system. |
-| `set_raster_symbology` | Set a raster layer's colorizer and color ramp. |
-| `raster_calculator` | Map algebra: bind rasters to short aliases, then write a Python expression; requires the Spatial Analyst extension. |
-| `sample_raster_values` | Read raster cell values at map coordinates or at a point layer's features. |
-| `zonal_statistics` | Summarize raster values inside zone polygons and return a table; requires the Spatial Analyst extension. |
+| `get_raster_info` | Raster detail: bands, size, cell size, pixel type, statistics and coordinate system. |
+| `set_raster_symbology` | Set a raster layer's colorizer and colour ramp; accepts explicit colours and labels. |
+| `raster_calculator` | Map algebra: bind rasters to short aliases, then write a Python expression; needs Spatial Analyst. |
+| `sample_raster_values` | Read raster cell values at map coordinates (`points`) or a point layer's features — inline, with no side-effect table unless `write_table=true`. |
+| `zonal_statistics` | Summarise raster values inside zone polygons and return the table; needs Spatial Analyst. |
 
-### Catalog & data discovery (6)
+### Catalog and data discovery (6)
 
 | Tool | Purpose |
 |---|---|
 | `list_workspace_contents` | List the datasets inside a geodatabase or folder; defaults to the project's default geodatabase. |
-| `list_folder` | List GIS files and subfolders on disk; defaults to the project's home folder. |
-| `describe_dataset` | Describe any dataset by path: type, geometry, coordinate system, extent, fields, and row count (without adding it to a map). |
-| `search_data` | Find datasets by name across the project's geodatabase, home folder, and folder connections — the fastest way to locate data before adding it. |
-| `get_project_items` | Folder connections, database connections, and toolboxes registered in the project. |
+| `list_folder` | List GIS files and subfolders on disk; defaults to the project home folder. |
+| `describe_dataset` | Describe any dataset by path — type, geometry, coordinate system, extent, fields and row count — without adding it to a map. |
+| `search_data` | Find datasets by name across the project geodatabase, home folder and folder connections — the fastest way to locate data before adding it; results are de-duplicated. |
+| `get_project_items` | Folder connections, database connections and toolboxes registered in the project. |
 | `add_folder_connection` | Register a folder with the project so its data is easy to browse. |
 
 ### Utilities (4)
 
 | Tool | Purpose |
 |---|---|
-| `execute_arcpy_code` | Run Python inside ArcGIS Pro: arcpy is already imported, arcpy.mp.ArcGISProject('CURRENT') is the open project, variables persist across calls, print output is captured, and the final expression's value is returned. Use it when no dedicated tool fits. |
-| `get_pump_status` | Whether the main-thread dispatcher is installed; it decides whether commands can reach the open Pro project — without it only path-based work runs. |
+| `execute_arcpy_code` | Run Python inside ArcGIS Pro: arcpy is already imported, arcpy.mp.ArcGISProject('CURRENT') is the open project, variables persist between calls, print output is captured and a final expression's value is returned. Use it when no dedicated tool fits. Answered by the Python bridge (port 6511). |
+| `get_pump_status` | Whether the main-thread dispatcher is installed. When the Python bridge is not running it returns a structured down state (`running:false, bridge_listening:false`) with a code and hint instead of an error. |
 | `stop_pump` | Remove the main-thread dispatcher; live-project commands stop working until the user installs it again. |
-| `run_batch` | Run several commands in one round trip — much faster for multi-step workflows. |
+| `run_batch` | Run several commands in one round trip — much faster for multi-step workflows. Image results are reduced to path/bytes/sha by default, and each step reports its milliseconds. |
 
 </details>
 
 ---
 
-## 📦 What's in the package
+## 📦 What is in the package
 
-| Path | Contents | Notes |
+| Path | Content | Notes |
 |---|---|---|
-| `install\ArcGISProMCP.esriAddinX` | 🧩 add-in v1.1.4 | 113 native tools + all GP tools; HTTP MCP 6520 / legacy TCP 6510 |
-| `install\runtime\stdio-bridge.ps1` | 🌉 stdio bridge | Bridges clients that can only launch local processes (such as Claude Desktop) to 6520; pure PowerShell, no Python needed |
-| `install\runtime\runcode\RunCode.pyt` | 🐍 RunCode toolbox | For frequent execution of arbitrary arcpy; the first run shows a trust dialog once |
-| `install\runtime\guard\` | 🛡️ Dialog guard | Auto-clicks the "third-party code library" trust dialog; shows a topmost alert on failure (≥30 s, with beeps) |
-| `install\runtime\plugin\` | 🔌 Python bridge (optional) | Started in Pro's Python window; provides persistent `execute_arcpy_code` sessions (port 6511) |
-| `install\*.cmd / *.ps1` | 🛠️ Install & self-check | Install / self-check / configure Claude / dialog guard / uninstall |
-| `clients\` | 📁 Client setup docs | Claude Code, Claude Desktop, Codex, generic JSON |
+| `install\ArcGISProMCP.esriAddinX` | 🧩 add-in v1.1.11 | 115 MCP tools + all GP tools; HTTP MCP 6520 / legacy TCP 6510 |
+| `install\runtime\stdio-bridge.ps1` | 🌉 stdio bridge | For clients that can only launch a local process (e.g. Claude Desktop); pure PowerShell, no Python |
+| `install\runtime\runcode\RunCode.pyt` | 🐍 RunCode toolbox | For frequent arbitrary arcpy; asks for trust once on first run |
+| `install\runtime\guard\` | 🛡️ Dialog guard | Clicks the “third-party code library” trust dialog; topmost reminder (≥30 s, ringing) on failure |
+| `install\runtime\plugin\` | 🔌 Python bridge (optional) | Started in Pro's Python window; provides the `execute_arcpy_code` persistent session (port 6511) |
+| `install\*.cmd / *.ps1` | 🛠️ Install & self-check | Install / check / configure Claude / dialog guard / uninstall |
+| `clients\` | 📁 Client setup notes | Claude Code, Claude Desktop, Codex, generic JSON |
 | `docs\` | 📖 Usage guide, troubleshooting, work rules, changelog | Start with the usage guide |
-| `source\` | 📜 Full source snapshot | Source corresponding to this package's binaries (an AGPL-3.0 compliance requirement), including the upstream LICENSE / NOTICE |
+| `source\` | 📜 Full source snapshot | The source behind these binaries (AGPL-3.0 compliance), with upstream LICENSE / NOTICE and the build products in `source\dist\` |
 
-### 🔍 Dependency audit (why "fully bundled")
+### 🔍 Dependency audit (why “fully bundled” holds)
 
-- 🧩 add-in: a self-contained C# assembly that runs on the .NET Desktop Runtime 10 x64 included with Pro 3.7's supported environment — no separate .NET install needed.
-- 🌉 stdio bridge, 🛡️ dialog guard: PowerShell 5.1 + WinForms, included with Windows — nothing extra to install.
-- 🐍 RunCode toolbox, Python bridge: run on the Python (arcpy) that ships with ArcGIS Pro — no separate Python installation.
-- ✅ **So this package has no external dependency requiring pip or network access.** "Works offline" refers to the package's own install and run path; ArcGIS Pro 3.7's installation prerequisites (.NET Desktop Runtime 10 x64, WebView2 ≥132) are provided by Pro's own installer.
+- 🧩 add-in: a self-contained C# assembly running on the .NET Desktop Runtime 10 x64 that ArcGIS Pro 3.7's supported environment provides — nothing extra to install.
+- 🌉 stdio bridge, 🛡️ dialog guard: Windows' built-in PowerShell 5.1 + WinForms — nothing extra to install.
+- 🐍 RunCode toolbox, Python bridge: run inside ArcGIS Pro's own Python (arcpy) — no separate Python needed.
+- ✅ **So the package has no external dependency that needs pip or internet.** “Works offline” refers to this package's own install and run chain; ArcGIS Pro 3.7's own prerequisites (.NET Desktop Runtime 10 x64, WebView2 ≥132) come with Pro's installer.
 
 ---
 
 ## 🧪 Using the optional components
 
-**🐍 RunCode toolbox** (for frequent arcpy work)
+**🐍 RunCode toolbox** (frequent arcpy)
 - Path: `%LOCALAPPDATA%\ArcGIS Pro MCP\runcode\RunCode.pyt`
-- Have the AI pass this path to `run_python_toolbox_tool`; or add it in Pro via "Insert → Toolbox → Add Toolbox".
-- The first run in each Pro session shows the "third-party code library" trust dialog: run `03-dialog-guard.cmd` first and the guard clicks "Yes" for you ✨.
+- Have the AI call `run_python_toolbox_tool` with that path; or add it in Pro via “Insert → Toolbox → Add Toolbox”.
+- Each Pro session asks for trust on first run: run `03-dialog-guard.cmd` first and the guard clicks Yes for you ✨.
 
-**🔌 Python bridge** (when an arcpy session must persist across calls)
-1. Open the Python window from the ArcGIS Pro menu **Analysis → Python**;
-2. Paste and run (the path is already written for the default install location):
+**🔌 Python bridge** (when arcpy state must survive across calls)
+1. Open the Python window via **Analysis → Python** in ArcGIS Pro;
+2. Paste and run (path at the default install location):
    ```python
-   import sys; sys.path.insert(0, r"C:\Users\<your-username>\AppData\Local\ArcGIS Pro MCP\plugin")
+   import sys; sys.path.insert(0, r"C:\Users\<your-user-name>\AppData\Local\ArcGIS Pro MCP\plugin")
    import mcp_bridge; print(mcp_bridge.start_server(port=6511))
    ```
-3. When you need `CURRENT` (the open project), add one more line (must run on the main thread):
+3. Add one more line when you need `CURRENT` (must run on the main thread):
    ```python
    print(mcp_bridge.start_pump())
    ```
 
-**🛡️ Dialog guard** (recommended before running RunCode / ENVI→Pro joint workflows)
+**🛡️ Dialog guard** (recommended before RunCode / ENVI→Pro joint workflows)
 ```
-03-dialog-guard.cmd                 # 600-second guard
+03-dialog-guard.cmd                 # 600 s guard
 03-dialog-guard.cmd -DurationSeconds 120
-03-dialog-guard.cmd -NotifyTest     # test the alert window only (30 s)
-03-dialog-guard.cmd -AlertOnly      # alert only, no auto-click
+03-dialog-guard.cmd -NotifyTest     # test the reminder window (30 s)
+03-dialog-guard.cmd -AlertOnly      # remind only, do not click
 ```
-Safety boundary: it only handles trust dialogs whose context contains "third-party / code library / 第三方 / 代码库"; it **never touches overwrite, delete, or other confirmation dialogs** 🙅. The log is at `%LOCALAPPDATA%\ArcGIS Pro MCP\guard\watch_pro_dialog.log`.
+Safety boundary: handles only trust dialogs with “third-party / code library / 第三方 / 代码库” context; **never touches overwrite, delete or other confirmations** 🙅. Log: `%LOCALAPPDATA%\ArcGIS Pro MCP\guard\watch_pro_dialog.log`.
 
 ---
 
 ## 🔒 Security notes
 
 - 🏠 The add-in and all bridge services listen on `127.0.0.1` only; other machines on the LAN cannot connect.
-- ⚖️ This software provides local services on `127.0.0.1` only and does not serve third parties over a network; if you modify it to serve others over a network, the AGPL-3.0 §13 source-offer obligation applies.
-- 🔏 The add-in is an unsigned build: ArcGIS Pro asks you to confirm trust on first load — this is the normal flow; verify `SHA256SUMS.txt` in this package.
+- ⚖️ This software serves only this machine on `127.0.0.1` and provides no network service to third parties; if you modify it to serve others over a network, the AGPL-3.0 §13 source-offer obligation applies.
+- 🔏 The add-in is an unsigned build: ArcGIS Pro asks you to confirm trust on first load, which is the normal flow; verify the package against `SHA256SUMS.txt`.
 - 🕵️ This package contains no telemetry and no network reporting.
-- 🧹 Uninstall: `99-uninstall.cmd` (optionally keeping client configuration).
+- 🧹 Uninstall: `99-uninstall.cmd` (you may keep the client configuration).
 
 ---
 
-## 📜 Version & license
+## 📜 Version and licence
 
-- 🏷️ Version: **1.1.4** (build date in `VERSION.json`; 113 tools)
+- 🏷️ Version: **1.1.11** (Customer 1.1.11, 1.14 Enhanced Edition; build date in `VERSION.json`; 115 tools)
 - 👤 Maintainer: **Law** ([@XNYGggg](https://github.com/XNYGggg))
-- 🙏 Upstream project & original author: **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)** by **Pisut Nakmuenwai** (AGPL-3.0-or-later). This package accumulates patches on top of it up to 1.1.4 (changes are listed in `docs\CHANGELOG.md` and `RELEASE-NOTES.md`).
-- ⚖️ License: **AGPL-3.0-or-later** (the package includes a full source snapshot and the upstream NOTICE)
-- 🏷️ Trademark: "ArcGIS" is a trademark of Esri; this project is a third-party tool and is not affiliated with Esri.
+- 🙏 Upstream project and original author: **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**, author **Pisut Nakmuenwai** (AGPL-3.0-or-later). This package accumulates local patches up to 1.1.11 (see `docs\CHANGELOG.md` and `RELEASE-NOTES.md`).
+- ⚖️ Licence: **AGPL-3.0-or-later** (the package ships the full source snapshot and upstream NOTICE)
+- 🏷️ Trademarks: “ArcGIS” is a trademark of Esri; this project is a third-party tool and is not affiliated with Esri.
 
-🆘 FAQ in `docs\排障手册.md`; advanced usage in `docs\使用指南.md`. Happy mapping 🎨 (｀・ω・´)ゞ
+🆘 Troubleshooting: `docs\排障手册.md`; advanced usage: `docs\使用指南.md`. Happy mapping 🎨 (｀・ω・´)ゞ
 
 ---
 
@@ -608,21 +631,21 @@ Safety boundary: it only handles trust dialogs whose context contains "third-par
 <h2 align="center">🙏 Acknowledgements</h2>
 
 <p align="center">
-  This project is supported by <strong>Ludong University</strong>. We sincerely thank the university for its support.
+  This project's research and development was supported by <strong>Ludong University</strong> (鲁东大学), to which we extend our sincere thanks.
 </p>
 
 <p align="center">
   <a href="https://www.ldu.edu.cn/"><img src="assets/ldu-emblem.png" width="104" alt="Ludong University emblem"></a>
 </p>
 
-<h3 align="center">Ludong University</h3>
+<h3 align="center">鲁东大学 · Ludong University</h3>
 
-> Founded in 1930 and located in Yantai, Shandong, Ludong University is a provincial comprehensive university that focuses on applied talent cultivation and pursues coordinated development across engineering, agriculture, science and the humanities. The university has 26 colleges, and six disciplines — including Engineering, Chemistry and Materials Science — rank among the global top 1% in ESI. Its motto is “Great Virtue, Broad Learning, Daily Renewal, Earnest Practice” (厚德、博学、日新、笃行).
+> Ludong University, founded in 1930 and located in Yantai, Shandong, is a provincial comprehensive university centred on applied talent development with coordinated development of engineering, agriculture, science and liberal arts. It now has 26 colleges; six disciplines including Engineering, Chemistry and Materials Science rank in the global ESI top 1%, and it upholds the motto “厚德、博学、日新、笃行” (virtue, broad learning, daily renewal, earnest practice).
 
 <p align="center">
-  📍 No. 186 Hongqi Middle Road, Zhifu District, Yantai, Shandong 264025, China<br>
-  🌐 <a href="https://www.ldu.edu.cn/">Official Website</a> ·
-  <a href="https://jwc.ldu.edu.cn/">Academic Affairs Office</a> ·
+  📍 186 Hongqi Middle Road, Zhifu District, Yantai, Shandong 264025, China<br>
+  🌐 <a href="https://www.ldu.edu.cn/">University site</a> ·
+  <a href="https://jwc.ldu.edu.cn/">Academic affairs</a> ·
   <a href="https://lib.ldu.edu.cn/">Library</a> ·
-  <a href="https://ehall.ldu.edu.cn/">Student Portal</a>
+  <a href="https://ehall.ldu.edu.cn/">Online services</a>
 </p>

@@ -32,7 +32,7 @@ namespace ArcGISProMCP.Commands
 
         // --- helpers ---------------------------------------------------------
 
-        private static CIMColor ToColor(int[] rgba)
+        internal static CIMColor ToColor(int[] rgba)
         {
             // Alpha arrives 0-100 to match the Python side; the CIM wants 0-255.
             return ColorFactory.Instance.CreateRGBColor(
@@ -241,49 +241,126 @@ namespace ArcGISProMCP.Commands
         private static object GetSymbology(Params parameters)
         {
             var map = MapHelpers.ResolveMap(parameters);
-            var layer = MapHelpers.RequireFeatureLayer(map, parameters.Require("layer_name"))
-                        as FeatureLayer;
-            if (layer == null) throw new ArgumentException("Not a feature layer.");
-
-            var info = new Dictionary<string, object> { ["layer"] = layer.Name };
-            var renderer = layer.GetRenderer();
-            info["renderer"] = renderer?.GetType().Name;
-
-            if (renderer is CIMClassBreaksRenderer breaks)
+            var layer = MapHelpers.FindLayer(map, parameters.Require("layer_name"));
+            var info = new Dictionary<string, object>
             {
-                info["classification_field"] = breaks.Field;
-                info["class_breaks"] = breaks.Breaks?.Select(b =>
+                ["layer"] = layer.Name,
+                ["layer_type"] = layer.GetType().Name,
+            };
+
+            if (layer is FeatureLayer feature)
+            {
+                var renderer = feature.GetRenderer();
+                info["renderer"] = renderer?.GetType().Name;
+
+                if (renderer is CIMClassBreaksRenderer breaks)
+                {
+                    info["classification_field"] = breaks.Field;
+                    info["class_breaks"] = breaks.Breaks?.Select(b =>
+                        new Dictionary<string, object>
+                        {
+                            ["upper_bound"] = b.UpperBound,
+                            ["label"] = b.Label,
+                        }).ToList();
+                }
+                else if (renderer is CIMUniqueValueRenderer unique)
+                {
+                    info["fields"] = unique.Fields;
+                    info["unique_values"] = unique.Groups?
+                        .SelectMany(g => g.Classes ?? new CIMUniqueValueClass[0])
+                        .Select(c => new Dictionary<string, object>
+                        {
+                            ["label"] = c.Label,
+                            ["values"] = c.Values?.SelectMany(v => v.FieldValues ?? new string[0])
+                                                  .ToList(),
+                        }).Take(200).ToList();
+                }
+
+                var definition = feature.GetDefinition() as CIMFeatureLayer;
+                info["labels_visible"] = definition?.LabelVisibility;
+                info["label_classes"] = definition?.LabelClasses?.Select(labelClass =>
                     new Dictionary<string, object>
                     {
-                        ["upper_bound"] = b.UpperBound,
-                        ["label"] = b.Label,
+                        ["name"] = labelClass.Name,
+                        ["expression"] = labelClass.Expression,
+                        ["engine"] = labelClass.ExpressionEngine.ToString(),
+                        ["visible"] = labelClass.Visibility,
                     }).ToList();
             }
-            else if (renderer is CIMUniqueValueRenderer unique)
+            else if (layer is BasicRasterLayer raster)
             {
-                info["fields"] = unique.Fields;
-                info["unique_values"] = unique.Groups?
-                    .SelectMany(g => g.Classes ?? new CIMUniqueValueClass[0])
-                    .Select(c => new Dictionary<string, object>
+                info["transparency"] = raster.Transparency;
+                try
+                {
+                    var colorizer = raster.GetColorizer();
+                    info["renderer"] = colorizer?.GetType().Name;
+                    switch (colorizer)
                     {
-                        ["label"] = c.Label,
-                        ["values"] = c.Values?.SelectMany(v => v.FieldValues ?? new string[0])
-                                              .ToList(),
-                    }).Take(200).ToList();
+                        case CIMRasterUniqueValueColorizer unique:
+                            info["field"] = unique.FieldName;
+                            info["unique_values"] = unique.Groups?
+                                .SelectMany(g => g.Classes
+                                    ?? Array.Empty<CIMRasterUniqueValueClass>())
+                                .Select(c => new Dictionary<string, object>
+                                {
+                                    ["values"] = c.Values,
+                                    ["label"] = c.Label,
+                                    ["color"] = DescribeColor(c.Color),
+                                }).Take(200).ToList();
+                            break;
+                        case CIMRasterClassifyColorizer classify:
+                            info["field"] = classify.Field;
+                            info["class_breaks"] = classify.ClassBreaks?.Select(b =>
+                                new Dictionary<string, object>
+                                {
+                                    ["upper_bound"] = b.UpperBound,
+                                    ["label"] = b.Label,
+                                    ["color"] = DescribeColor(b.Color),
+                                }).ToList();
+                            break;
+                        case CIMRasterStretchColorizer stretch:
+                            info["colorizer"] = "stretch";
+                            info["color_ramp_type"] = stretch.ColorRamp?.GetType().Name;
+                            break;
+                        case null:
+                            info["note"] = "This raster layer reports no colorizer.";
+                            break;
+                    }
+                }
+                catch (Exception exception)
+                {
+                    info["symbology_warning"] = exception.Message;
+                }
+            }
+            else if (layer is TinLayer tin)
+            {
+                var definition = tin.GetDefinition() as CIMTinLayer;
+                var renderers = definition?.Renderers;
+                info["renderer"] = renderers?.FirstOrDefault()?.GetType().Name;
+                info["renderer_count"] = renderers?.Length ?? 0;
+                if (renderers == null || renderers.Length == 0)
+                    info["note"] = "This TIN layer reports no renderers.";
+            }
+            else
+            {
+                info["note"] = "Symbology detail is available for feature layers and "
+                    + "basic raster layers; this layer type reports only name and type.";
             }
 
-            var definition = layer.GetDefinition() as CIMFeatureLayer;
-            info["labels_visible"] = definition?.LabelVisibility;
-            info["label_classes"] = definition?.LabelClasses?.Select(labelClass =>
-                new Dictionary<string, object>
-                {
-                    ["name"] = labelClass.Name,
-                    ["expression"] = labelClass.Expression,
-                    ["engine"] = labelClass.ExpressionEngine.ToString(),
-                    ["visible"] = labelClass.Visibility,
-                }).ToList();
-
             return info;
+        }
+
+        private static object DescribeColor(CIMColor color)
+        {
+            if (color is CIMRGBColor rgb)
+                return new[]
+                {
+                    (int)Math.Round(rgb.R),
+                    (int)Math.Round(rgb.G),
+                    (int)Math.Round(rgb.B),
+                    (int)Math.Round(rgb.Alpha),
+                };
+            return color == null ? null : color.GetType().Name;
         }
 
         private static object ListColorRamps(Params parameters)

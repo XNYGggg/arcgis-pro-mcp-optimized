@@ -28,7 +28,7 @@ $addinsDir  = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'ArcGIS\Ad
 $runtimeDst = Join-Path $env:LOCALAPPDATA 'ArcGIS Pro MCP'
 $stamp      = Get-Date -Format 'yyyyMMdd-HHmmss'
 
-Write-Host 'ArcGIS Pro MCP 优化版 · 客户版 v1.1.4' -ForegroundColor White
+Write-Host 'ArcGIS Pro MCP 优化版 · 客户版 Customer 1.1.11（1.14 增强版）' -ForegroundColor White
 Write-Host '组件：add-in + stdio 桥 + RunCode + 弹窗守护 + Python 桥'
 
 if ($Rest -and $Rest.Count -gt 0) {
@@ -36,7 +36,7 @@ if ($Rest -and $Rest.Count -gt 0) {
 }
 
 # ---------- 1. 检查 ArcGIS Pro ----------
-Step '检查 ArcGIS Pro（需要 3.7 或更高版本）'
+Step '检查 ArcGIS Pro（需要 3.7；仅 3.7 经实机验证）'
 $proExe = $null
 try {
     $dir = (Get-ItemProperty 'HKLM:\SOFTWARE\ESRI\ArcGISPro' -ErrorAction SilentlyContinue).InstallDir
@@ -54,15 +54,18 @@ if (-not $proExe) {
     }
 }
 if (-not $proExe) {
-    Fail '未找到 ArcGIS Pro。请先安装 ArcGIS Pro 3.7+，再运行本安装程序。'
+    Fail '未找到 ArcGIS Pro。请先安装 ArcGIS Pro 3.7，再运行本安装程序。'
     exit 2
 }
 $verText = (Get-Item $proExe).VersionInfo.ProductVersion
 $ver = [version]($verText.Split(' ')[0])
 Ok ('ArcGIS Pro ' + $ver + '  (' + $proExe + ')')
 if ($ver -lt [version]'3.7') {
-    Fail '本客户版的 add-in 基于 ArcGIS Pro 3.7 / .NET 10 构建，需要 3.7 或更高版本。'
+    Fail '本客户版的 add-in 基于 ArcGIS Pro 3.7 / .NET 10 构建，需要 3.7 或更高；本版仅在 3.7 上实机验证。'
     exit 2
+}
+if ($ver.Major -gt 3 -or ($ver.Major -eq 3 -and $ver.Minor -gt 7)) {
+    Warn '本客户版仅在 ArcGIS Pro 3.7 上实机验证；当前版本高于 3.7，属未验证组合，请自行评估。'
 }
 
 # ---------- 2. .NET Desktop Runtime 10（Pro 3.7 的受支持环境自带） ----------
@@ -186,7 +189,7 @@ Ok ('运行时目录：' + $runtimeDst)
 
 $marker = [ordered]@{
     package       = 'ArcGIS Pro MCP 优化版（客户版）'
-    version       = '1.1.4'
+    version       = '1.1.11'
     installed_at  = (Get-Date).ToString('s')
     addin_sha256  = $srcHash
     package_root  = $pkgRoot

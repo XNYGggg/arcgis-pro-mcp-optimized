@@ -16,6 +16,10 @@ from arcgis_pro_mcp.catalog import BY_NAME  # noqa: E402
 # Commands that exist on the bridge but are deliberately not exposed as tools.
 INTERNAL_ONLY = {"get_last_traceback"}
 
+# Tools the add-in answers in C# itself with no Python handler by design --
+# restarting ArcGIS Pro only makes sense from inside it.
+CSHARP_ONLY = {"restart_pro"}
+
 
 def bridge_commands():
     names = set()
@@ -32,7 +36,7 @@ def bridge_commands():
 
 
 def test_every_tool_has_a_handler():
-    missing = sorted(set(BY_NAME) - bridge_commands())
+    missing = sorted(set(BY_NAME) - bridge_commands() - CSHARP_ONLY)
     assert not missing, f"Tools with no bridge handler: {missing}"
 
 

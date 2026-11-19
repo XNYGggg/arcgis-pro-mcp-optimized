@@ -106,6 +106,104 @@ namespace ArcGISProMCP.Commands
             return EnvelopeBuilderEx.CreateEnvelope(x, y, x + width, y + height);
         }
 
+        /// <summary>
+        /// The element's page-space box, lower-left anchored, from the engine
+        /// itself. GetX/GetY are not used: for a map surround or a picture
+        /// they report the top edge, while SetX/SetY take the lower-left
+        /// (L1, live test 2026-11-18).
+        /// </summary>
+        private static Dictionary<string, object> BoxOf(Element element)
+        {
+            try
+            {
+                var bounds = element.GetBounds(true);
+                if (bounds == null || bounds.IsEmpty) return null;
+                return new Dictionary<string, object>
+                {
+                    ["x"] = bounds.XMin,
+                    ["y"] = bounds.YMin,
+                    ["width"] = bounds.Width,
+                    ["height"] = bounds.Height,
+                };
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static bool IsTextElement(Element element) =>
+            element is GraphicElement graphic && graphic.GetGraphic() is CIMTextGraphic;
+
+        private const double PlacementTolerance = 0.02;   // page units
+
+        /// <summary>
+        /// Put an element's lower-left corner at the requested x/y. The
+        /// engine adjusts a surround's or picture's size to its content, and
+        /// SetY takes the top edge, so the height must be read first.
+        /// </summary>
+        private static void AnchorLowerLeft(Element element, Params parameters)
+        {
+            if (IsTextElement(element)) return;
+            try
+            {
+                element.SetX(parameters.GetDouble("x", 0.5));
+                element.SetY(parameters.GetDouble("y", 0.5) + element.GetHeight());
+            }
+            catch
+            {
+                // Elements that refuse one of the moves are reported by
+                // VerifyPlacement instead of failing the whole call here.
+            }
+        }
+
+        /// <summary>
+        /// Check that an element landed where the request said, and that it
+        /// stayed on the page. Text keeps its anchor semantics and is skipped.
+        /// </summary>
+        private static void VerifyPlacement(Layout layout, Element element, Params parameters,
+                                            bool checkX, bool checkY)
+        {
+            if (IsTextElement(element)) return;
+            var box = BoxOf(element);
+            if (box == null) return;
+
+            var x = (double)box["x"];
+            var y = (double)box["y"];
+            var width = (double)box["width"];
+            var height = (double)box["height"];
+
+            var page = layout.GetPage();
+            if (page != null)
+            {
+                if (x + width > page.Width + PlacementTolerance
+                    || y + height > page.Height + PlacementTolerance)
+                {
+                    throw new ArgumentException(
+                        $"Element '{element.Name}' extends beyond the page: bounds "
+                        + $"x={x:0.###}, y={y:0.###}, w={width:0.###}, h={height:0.###}; "
+                        + $"page {page.Width:0.###} x {page.Height:0.###}.");
+                }
+            }
+
+            if (checkX)
+            {
+                var wanted = parameters.GetDouble("x", 0.5);
+                if (Math.Abs(x - wanted) > PlacementTolerance)
+                    throw new ArgumentException(
+                        $"Element '{element.Name}' landed at x={x:0.###}, "
+                        + $"not the requested x={wanted:0.###}.");
+            }
+            if (checkY)
+            {
+                var wanted = parameters.GetDouble("y", 0.5);
+                if (Math.Abs(y - wanted) > PlacementTolerance)
+                    throw new ArgumentException(
+                        $"Element '{element.Name}' landed at y={y:0.###} "
+                        + $"(lower-left), not the requested y={wanted:0.###}.");
+            }
+        }
+
         private static Dictionary<string, object> Describe(Element element)
         {
             var info = new Dictionary<string, object>
@@ -114,14 +212,27 @@ namespace ArcGISProMCP.Commands
                 ["type"] = element.GetType().Name,
                 ["visible"] = element.IsVisible,
             };
-            try
+            var box = IsTextElement(element) ? null : BoxOf(element);
+            if (box != null)
             {
-                info["x"] = element.GetX();
-                info["y"] = element.GetY();
-                info["width"] = element.GetWidth();
-                info["height"] = element.GetHeight();
+                info["x"] = box["x"];
+                info["y"] = box["y"];
+                info["width"] = box["width"];
+                info["height"] = box["height"];
+                info["bounds_semantics"] = "lower-left, page units";
             }
-            catch { /* some elements have no box */ }
+            else
+            {
+                try
+                {
+                    info["x"] = element.GetX();
+                    info["y"] = element.GetY();
+                    info["width"] = element.GetWidth();
+                    info["height"] = element.GetHeight();
+                    info["bounds_semantics"] = "anchor";
+                }
+                catch { /* some elements have no box */ }
+            }
 
             if (element is MapFrame frame)
             {
@@ -335,12 +446,17 @@ namespace ArcGISProMCP.Commands
                 layout, PageBox(parameters, 2.5, 1.5), info,
                 parameters.GetString("name", defaultName));
 
-            return new Dictionary<string, object>
+            AnchorLowerLeft(element, parameters);
+            VerifyPlacement(layout, element, parameters, true, true);
+            var result = new Dictionary<string, object>
             {
                 ["layout"] = layout.Name,
                 [resultKey] = element.Name,
                 ["map_frame"] = frame.Name,
             };
+            var box = BoxOf(element);
+            if (box != null) result["bounds"] = box;
+            return result;
         }
 
         private static object AddLegend(Params parameters)
@@ -353,12 +469,17 @@ namespace ArcGISProMCP.Commands
                 layout, PageBox(parameters, 2.5, 2.0), info,
                 parameters.GetString("name", "Legend"));
 
-            return new Dictionary<string, object>
+            AnchorLowerLeft(element, parameters);
+            VerifyPlacement(layout, element, parameters, true, true);
+            var result = new Dictionary<string, object>
             {
                 ["layout"] = layout.Name,
                 ["legend"] = element.Name,
                 ["map_frame"] = frame.Name,
             };
+            var box = BoxOf(element);
+            if (box != null) result["bounds"] = box;
+            return result;
         }
 
         private static object AddScaleBar(Params parameters) =>
@@ -378,12 +499,17 @@ namespace ArcGISProMCP.Commands
                 layout, PageBox(parameters, 1.5, 1.0), path,
                 parameters.GetString("name", "Picture"));
 
-            return new Dictionary<string, object>
+            AnchorLowerLeft(element, parameters);
+            VerifyPlacement(layout, element, parameters, true, true);
+            var result = new Dictionary<string, object>
             {
                 ["layout"] = layout.Name,
                 ["picture"] = element.Name,
                 ["source"] = path,
             };
+            var box = BoxOf(element);
+            if (box != null) result["bounds"] = box;
+            return result;
         }
 
         private static object SetElement(Params parameters)
@@ -392,10 +518,22 @@ namespace ArcGISProMCP.Commands
             var element = FindElement(layout, parameters.Require("element_name"));
             var applied = new Dictionary<string, object>();
 
-            if (parameters.Has("x")) { element.SetX(parameters.GetDouble("x")); applied["x"] = element.GetX(); }
-            if (parameters.Has("y")) { element.SetY(parameters.GetDouble("y")); applied["y"] = element.GetY(); }
             if (parameters.Has("width")) { element.SetWidth(parameters.GetDouble("width")); applied["width"] = element.GetWidth(); }
             if (parameters.Has("height")) { element.SetHeight(parameters.GetDouble("height")); applied["height"] = element.GetHeight(); }
+            if (parameters.Has("x"))
+            {
+                var x = parameters.GetDouble("x");
+                element.SetX(x);
+                applied["x"] = x;
+            }
+            if (parameters.Has("y"))
+            {
+                var y = parameters.GetDouble("y");
+                // y is the lower-left edge; SetY takes the top for surrounds
+                // and pictures (L1, live test 2026-11-18).
+                element.SetY(IsTextElement(element) ? y : y + element.GetHeight());
+                applied["y"] = y;
+            }
             if (parameters.Has("visible"))
             {
                 element.SetVisible(parameters.GetBool("visible"));
@@ -414,12 +552,20 @@ namespace ArcGISProMCP.Commands
                 applied["text"] = textGraphic.Text;
             }
 
-            return new Dictionary<string, object>
+            var checkX = parameters.Has("x");
+            var checkY = parameters.Has("y");
+            if (checkX || checkY)
+                VerifyPlacement(layout, element, parameters, checkX, checkY);
+
+            var result = new Dictionary<string, object>
             {
                 ["layout"] = layout.Name,
                 ["element"] = element.Name,
                 ["applied"] = applied,
             };
+            var bounds = BoxOf(element);
+            if (bounds != null) result["bounds"] = bounds;
+            return result;
         }
 
         private static object DeleteElement(Params parameters)
@@ -474,12 +620,22 @@ namespace ArcGISProMCP.Commands
                 ["dpi"] = dpi,
             };
             var extension = Path.GetExtension(path).ToLowerInvariant();
-            if (parameters.GetBool("return_image", true)
+            // Inside run_batch the picture stays on disk unless asked for.
+            var returnImage = parameters.Has("return_image")
+                ? parameters.GetBool("return_image")
+                : !parameters.InBatch;
+            var fileReady = MapHelpers.WaitForFile(path);
+            if (returnImage
                 && (extension == ".png" || extension == ".jpg" || extension == ".jpeg")
-                && File.Exists(path))
+                && fileReady)
             {
                 result["image_base64"] = Convert.ToBase64String(File.ReadAllBytes(path));
                 result["image_format"] = extension == ".png" ? "png" : "jpeg";
+            }
+            else if (fileReady)
+            {
+                result["exported_bytes"] = new FileInfo(path).Length;
+                result["exported_sha256"] = MapHelpers.Sha256(path);
             }
             return result;
         }
@@ -535,26 +691,45 @@ namespace ArcGISProMCP.Commands
         private static object PreviewLayout(Params parameters)
         {
             var layout = FindLayout(parameters);
-            var path = Path.Combine(Path.GetTempPath(), $"arcgis_mcp_layout_{Guid.NewGuid():N}.png");
+            var requested = parameters.GetString("output_path");
+            var temporary = string.IsNullOrWhiteSpace(requested);
+            var path = temporary
+                ? Path.Combine(Path.GetTempPath(),
+                               $"arcgis_mcp_layout_{Guid.NewGuid():N}.png")
+                : requested;
+            var directory = Path.GetDirectoryName(path);
+            if (!string.IsNullOrEmpty(directory)) Directory.CreateDirectory(directory);
+
             var format = new PNGFormat
             {
                 OutputFileName = path,
                 Resolution = parameters.GetInt("dpi", 100),
             };
             layout.Export(format);
-            try
+
+            var returnImage = parameters.Has("return_image")
+                ? parameters.GetBool("return_image")
+                : !parameters.InBatch;
+
+            var result = new Dictionary<string, object> { ["layout"] = layout.Name };
+            if (!temporary) result["exported"] = path;
+            var fileReady = MapHelpers.WaitForFile(path);
+            if (returnImage && fileReady)
             {
-                return new Dictionary<string, object>
-                {
-                    ["layout"] = layout.Name,
-                    ["image_base64"] = Convert.ToBase64String(File.ReadAllBytes(path)),
-                    ["image_format"] = "png",
-                };
+                result["image_base64"] = Convert.ToBase64String(File.ReadAllBytes(path));
+                result["image_format"] = "png";
             }
-            finally
+            else if (fileReady)
+            {
+                result["exported_bytes"] = new FileInfo(path).Length;
+                result["exported_sha256"] = MapHelpers.Sha256(path);
+            }
+
+            if (temporary)
             {
                 try { File.Delete(path); } catch { /* a temp file */ }
             }
+            return result;
         }
     }
 }

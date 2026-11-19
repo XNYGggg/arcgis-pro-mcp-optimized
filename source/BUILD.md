@@ -96,7 +96,32 @@ restarting and prefer a disposable test project for release validation.
 
 `restart_pro.ps1` closes Pro, answering its "save changes?" prompt with *Don't
 Save*, reopens the same project, and waits until the bridge answers. Pass
-`-Save` to keep the changes instead.
+`-Save` to keep the changes instead. The save-prompt probe runs in a child
+process and is abandoned after `-UiTimeoutSeconds`, so a busy Pro cannot wedge
+the restart; every step is timestamped in
+`%LOCALAPPDATA%\ArcGIS-MCP\restart.log`.
+
+### Recording a local upgrade
+
+Deploy with `scripts\install_addin.ps1` (or `dotnet build -p:DeployAddIn=true`),
+then record the installed build with the one parameterised script — do not
+write a new one-off script per version.
+
+From a normal shell, pass the values on the command line:
+
+```
+update_installed.py <version> <expected_sha256> [note]
+```
+
+RunCode.pyt executes the file with `__name__ == "__mcprun__"` and passes no
+argv, so inside Pro either set `MCP_UPDATE_ARGS` to
+`"<version> <expected_sha256> [note]"`, or use a two-line wrapper that sets
+`sys.argv` and `runpy`-runs `update_installed.py`; the script handles both
+entry names.
+
+It refuses to record unless the installed add-in's SHA-256 matches. Set
+`MCP_ADDIN_PATH`, `MCP_INSTALLED_JSON` or `MCP_PACKAGE_ROOT` to point it at
+another machine.
 
 > On a machine with add-in security turned on, every build has to be signed
 > before Pro will load it:

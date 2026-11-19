@@ -107,6 +107,18 @@ def add_layer(params):
     return {"added": getattr(result, "name", str(result)), "map": m.name}
 
 
+@command("add_table", GROUP)
+def add_table(params):
+    """Add a standalone table (geodatabase or folder) to a map."""
+    m = get_map(map_name=params.get("map_name"))
+    path = params["path"]
+    name = params.get("name")
+    table = m.addTable(path)
+    if name:
+        table.name = name
+    return {"added": table.name, "map": m.name, "source": path}
+
+
 @command("add_web_layer", GROUP)
 def add_web_layer(params):
     """Add a web service layer (Feature/Map/Image/WMS/WMTS/vector tile URL)."""

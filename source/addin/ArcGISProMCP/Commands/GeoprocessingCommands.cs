@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -22,9 +23,13 @@ namespace ArcGISProMCP.Commands
     {
         private const string Group = "geoprocessing";
         private const string ParameterResource = "ArcGISProMCP.Resources.gp-parameters.json";
+        private const string DetailResource = "ArcGISProMCP.Resources.gp-parameter-details.json";
 
         private static readonly Lazy<Dictionary<string, string[]>> ParameterOrder =
             new Lazy<Dictionary<string, string[]>>(LoadParameterOrder);
+
+        private static readonly Lazy<JsonDocument> ParameterDetails =
+            new Lazy<JsonDocument>(LoadParameterDetails);
 
         public static void Register()
         {
@@ -101,6 +106,123 @@ namespace ArcGISProMCP.Commands
             return null;
         }
 
+        // --- parameter details (types, enums, defaults) ----------------------
+
+        /// <summary>
+        /// Types, value-list enumerations and defaults captured from arcpy at
+        /// build time. Optional: without the resource (or with a damaged one)
+        /// describe_geoprocessing_tool still answers with names and order.
+        /// </summary>
+        private static JsonDocument LoadParameterDetails()
+        {
+            try
+            {
+                var assembly = typeof(GeoprocessingCommands).Assembly;
+                using var stream = assembly.GetManifestResourceStream(DetailResource);
+                if (stream == null) return null;
+                using var reader = new StreamReader(stream);
+                return JsonDocument.Parse(reader.ReadToEnd());
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static JsonElement? DetailFor(string toolName)
+        {
+            var document = ParameterDetails.Value;
+            if (document == null) return null;
+            if (!document.RootElement.TryGetProperty("tools", out var tools)
+                || tools.ValueKind != JsonValueKind.Object)
+                return null;
+
+            if (tools.TryGetProperty(toolName, out var detail)) return detail;
+            if (toolName.Contains("."))
+            {
+                var parts = toolName.Split('.');
+                var flipped = $"{parts[parts.Length - 1]}_{parts[parts.Length - 2]}";
+                if (tools.TryGetProperty(flipped, out detail)) return detail;
+            }
+            else if (toolName.Contains("_"))
+            {
+                var index = toolName.LastIndexOf('_');
+                var flipped = $"{toolName.Substring(index + 1)}.{toolName.Substring(0, index)}";
+                if (tools.TryGetProperty(flipped, out detail)) return detail;
+            }
+            return null;
+        }
+
+        // --- environments ----------------------------------------------------
+
+        /// <summary>
+        /// The environment list handed to every tool run. Keys are mapped to
+        /// their GP names through MapCommands.GpEnvironmentNames, so a key the
+        /// bridge does not know is never silently forwarded as something else.
+        /// Per-call values override the stored ones.
+        /// </summary>
+        private static IReadOnlyList<KeyValuePair<string, string>> BuildEnvironment(
+            IDictionary<string, object> extra)
+        {
+            var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var pair in MapCommands.Environment)
+            {
+                if (!MapCommands.GpEnvironmentNames.TryGetValue(pair.Key, out var gpName)) continue;
+                var text = EnvironmentText(pair.Value);
+                if (text != null) values[gpName] = text;
+            }
+            if (extra != null)
+            {
+                foreach (var pair in extra)
+                {
+                    if (!MapCommands.GpEnvironmentNames.TryGetValue(pair.Key, out var gpName))
+                        continue;
+                    var text = EnvironmentText(pair.Value);
+                    if (text != null) values[gpName] = text;
+                }
+            }
+            return values.Count == 0
+                ? null
+                : values.Select(pair => new KeyValuePair<string, string>(pair.Key, pair.Value))
+                        .ToList();
+        }
+
+        private static string EnvironmentText(object value)
+        {
+            switch (value)
+            {
+                case null: return null;
+                case bool flag: return flag ? "true" : "false";
+                case double number:
+                    return number.ToString("R", CultureInfo.InvariantCulture);
+                case float number:
+                    return number.ToString("R", CultureInfo.InvariantCulture);
+                case int number:
+                    return number.ToString(CultureInfo.InvariantCulture);
+                default:
+                    return Convert.ToString(value, CultureInfo.InvariantCulture);
+            }
+        }
+
+        /// <summary>The per-call "environment" object, or null when absent.</summary>
+        private static Dictionary<string, object> ReadPerCallEnvironment(Params parameters)
+        {
+            var raw = parameters.GetObject("environment");
+            if (raw == null || raw.Count == 0) return null;
+
+            var values = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            foreach (var pair in raw)
+            {
+                values[pair.Key] = pair.Value.ValueKind switch
+                {
+                    JsonValueKind.Object => MapCommands.EnvironmentExtentText(pair.Value)
+                                            ?? pair.Value.GetRawText(),
+                    _ => ValueOf(pair.Value),
+                };
+            }
+            return values;
+        }
+
         // --- running ---------------------------------------------------------
 
         private static object ValueOf(JsonElement element)
@@ -167,21 +289,14 @@ namespace ArcGISProMCP.Commands
 
             var flags = FlagsFor(parameters.GetBool("add_to_map"));
 
-            var environments = MapCommands.Environment.Count > 0
-                ? Geoprocessing.MakeEnvironmentArray(
-                    workspace: MapCommands.Environment.TryGetValue("workspace", out var ws) ? ws : null,
-                    outputCoordinateSystem: MapCommands.Environment.TryGetValue(
-                        "outputCoordinateSystem", out var cs) ? cs : null,
-                    extent: MapCommands.Environment.TryGetValue("extent", out var ex) ? ex : null,
-                    mask: MapCommands.Environment.TryGetValue("mask", out var mask) ? mask : null,
-                    cellSize: MapCommands.Environment.TryGetValue("cellSize", out var cell) ? cell : null,
-                    overwriteoutput: parameters.Has("overwrite")
-                        ? parameters.GetBool("overwrite")
-                        : (bool?)null)
-                : (parameters.Has("overwrite")
-                    ? Geoprocessing.MakeEnvironmentArray(
-                        overwriteoutput: parameters.GetBool("overwrite"))
-                    : null);
+            var extraEnvironment = ReadPerCallEnvironment(parameters);
+            if (parameters.Has("overwrite"))
+            {
+                extraEnvironment ??= new Dictionary<string, object>(
+                    StringComparer.OrdinalIgnoreCase);
+                extraEnvironment["overwriteOutput"] = parameters.GetBool("overwrite");
+            }
+            var environments = BuildEnvironment(extraEnvironment);
 
             var started = DateTime.Now;
             var result = await Geoprocessing.ExecuteToolAsync(
@@ -220,7 +335,17 @@ namespace ArcGISProMCP.Commands
             var toolName = parameters.Require("tool_name");
 
             if (!File.Exists(toolboxPath) && !Directory.Exists(toolboxPath))
-                throw new ArgumentException($"No toolbox at {toolboxPath}");
+            {
+                // Keep the original sentence (clients and logs match on it)
+                // and append where the path probably meant to point. A typo
+                // in one directory segment is the usual cause.
+                var message = $"No toolbox at {toolboxPath}";
+                var suggestion = SuggestSimilarPath(toolboxPath);
+                if (!string.IsNullOrEmpty(suggestion))
+                    message += $". Did you mean {suggestion}?";
+                message += " Pass the full path to a .pyt, .atbx or .tbx toolbox.";
+                throw new ArgumentException(message);
+            }
 
             var positional = parameters.Raw("args");
             var values = new List<object>();
@@ -239,14 +364,18 @@ namespace ArcGISProMCP.Commands
                         "Tools from a toolbox on disk take positional values: pass "
                         + "args as a list in the tool's own parameter order. Named "
                         + "parameters work only for the built-in tools, whose order "
-                        + "is known.");
+                        + "is known. Example: toolbox_path=\"" + toolboxPath + "\", "
+                        + "tool_name=\"" + toolName + "\", "
+                        + "args=[\"<first parameter>\", \"<second parameter>\"]. "
+                        + "The script file goes first in args for run-code style "
+                        + "toolboxes.");
             }
 
             var started = DateTime.Now;
             var result = await Geoprocessing.ExecuteToolAsync(
                 Path.Combine(toolboxPath, toolName),
                 Geoprocessing.MakeValueArray(values.ToArray()),
-                null, null, null,
+                BuildEnvironment(ReadPerCallEnvironment(parameters)), null, null,
                 FlagsFor(parameters.GetBool("add_to_map"))).ConfigureAwait(false);
             LastResult = result;
 
@@ -320,7 +449,7 @@ namespace ArcGISProMCP.Commands
             var result = await Geoprocessing.ExecuteToolAsync(
                 toolName,
                 Geoprocessing.MakeValueArray(slots.Take(lastUsed + 1).ToArray()),
-                null, null, null, flags).ConfigureAwait(false);
+                BuildEnvironment(null), null, null, flags).ConfigureAwait(false);
             LastResult = result;
             return result;
         }
@@ -359,18 +488,71 @@ namespace ArcGISProMCP.Commands
                 throw new ArgumentException(
                     $"Tool not found: {toolName}. Search with list_geoprocessing_tools.");
 
-            return new Dictionary<string, object>
+            // Detail rows, when the build carried them: datatype, ValueList
+            // enumerations and short defaults captured from arcpy.
+            Dictionary<string, JsonElement> detailByName = null;
+            var detail = DetailFor(toolName);
+            if (detail.HasValue
+                && detail.Value.TryGetProperty("parameters", out var detailParameters)
+                && detailParameters.ValueKind == JsonValueKind.Array)
             {
-                ["tool"] = toolName,
-                ["parameters"] = order.Select((name, index) => new Dictionary<string, object>
+                detailByName = new Dictionary<string, JsonElement>(
+                    StringComparer.OrdinalIgnoreCase);
+                foreach (var row in detailParameters.EnumerateArray())
+                {
+                    if (row.TryGetProperty("name", out var rowName)
+                        && rowName.ValueKind == JsonValueKind.String)
+                        detailByName[rowName.GetString()] = row;
+                }
+            }
+
+            var rows = new List<Dictionary<string, object>>();
+            for (var index = 0; index < order.Length; index++)
+            {
+                var name = order[index];
+                var row = new Dictionary<string, object>
                 {
                     ["name"] = name,
                     ["position"] = index,
-                }).ToList(),
+                };
+                if (detailByName != null && detailByName.TryGetValue(name, out var extra))
+                {
+                    if (extra.TryGetProperty("datatype", out var datatype)
+                        && datatype.ValueKind == JsonValueKind.String)
+                        row["datatype"] = datatype.GetString();
+                    if (extra.TryGetProperty("default", out var def))
+                        row["default"] = def.ValueKind == JsonValueKind.String
+                            ? def.GetString()
+                            : def.ToString();
+                    if (extra.TryGetProperty("filter", out var filter)
+                        && filter.ValueKind == JsonValueKind.Object
+                        && filter.TryGetProperty("list", out var list)
+                        && list.ValueKind == JsonValueKind.Array)
+                    {
+                        row["filter_list"] = list.EnumerateArray()
+                            .Select(v => v.GetString()).ToList();
+                    }
+                }
+                rows.Add(row);
+            }
+
+            var result = new Dictionary<string, object>
+            {
+                ["tool"] = toolName,
+                ["parameters"] = rows,
                 ["usage"] = $"{toolName}({string.Join(", ", order)})",
+                ["details_available"] = detailByName != null,
                 ["note"] = "Names and order come from arcpy, captured when the add-in was "
-                         + "built. Pass them as named parameters.",
+                         + "built. Pass them as named parameters. filter_list entries are "
+                         + "the tool's accepted values (localised); the tool decides what "
+                         + "a value means.",
             };
+            var document = ParameterDetails.Value;
+            if (document != null
+                && document.RootElement.TryGetProperty("generated_at", out var generated)
+                && generated.ValueKind == JsonValueKind.String)
+                result["details_generated_at"] = generated.GetString();
+            return result;
         }
 
         private static object ListToolboxes(Params parameters)
@@ -392,14 +574,17 @@ namespace ArcGISProMCP.Commands
         private static object CheckExtension(Params parameters)
         {
             var name = parameters.Require("extension");
-            // Extension licensing is not exposed to add-ins the way arcpy exposes
-            // it; the tools themselves fail with a clear message when unlicensed.
+            // Extension licensing is not exposed to add-ins the way arcpy
+            // exposes it. Say that plainly instead of a bare "unknown", which
+            // reads like a licence state (observation cleanup, 2026-11-18).
             return new Dictionary<string, object>
             {
                 ["extension"] = name,
-                ["status"] = "unknown",
-                ["note"] = "ArcGIS Pro does not expose extension checkout to add-ins. "
-                         + "Run the tool: it reports clearly if the licence is missing.",
+                ["status"] = "not_inspectable",
+                ["inspectable"] = false,
+                ["note"] = "ArcGIS Pro does not expose extension checkout to add-ins, "
+                         + "so this is not a licence state. Run the tool: it reports "
+                         + "clearly if the licence is missing.",
             };
         }
 
@@ -419,6 +604,112 @@ namespace ArcGISProMCP.Commands
                 ["messages"] = filtered,
                 ["failed"] = LastResult.IsFailed,
             };
+        }
+
+        /// <summary>
+        /// Walks a path from its first existing ancestor and, at the first
+        /// segment that does not exist, offers the closest sibling name --
+        /// enough to catch a typo such as "claude code app" for
+        /// "claude code_app" (spaces and underscores are ignored when
+        /// comparing, which is exactly how that one happened).
+        /// </summary>
+        private static string SuggestSimilarPath(string path)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(path)) return null;
+                string full;
+                try { full = Path.GetFullPath(path.Trim().Trim('"')); }
+                catch { return null; }
+                var root = Path.GetPathRoot(full);
+                if (string.IsNullOrEmpty(root)) return null;
+                var parts = full.Substring(root.Length)
+                    .Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar },
+                           StringSplitOptions.RemoveEmptyEntries);
+                var current = root;
+                for (var i = 0; i < parts.Length; i++)
+                {
+                    var candidate = Path.Combine(current, parts[i]);
+                    if (File.Exists(candidate) || Directory.Exists(candidate))
+                    {
+                        current = candidate;
+                        continue;
+                    }
+                    var best = BestSibling(current, parts[i]);
+                    if (best == null) return null;
+                    var rebuilt = Path.Combine(current, best);
+                    for (var j = i + 1; j < parts.Length; j++)
+                        rebuilt = Path.Combine(rebuilt, parts[j]);
+                    return rebuilt;
+                }
+                return null;   // everything exists -- the failure was elsewhere
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static string BestSibling(string directory, string name)
+        {
+            try
+            {
+                if (!Directory.Exists(directory)) return null;
+                string best = null;
+                var bestScore = 0.0;
+                var target = NormalizeName(name);
+                foreach (var entry in Directory.EnumerateFileSystemEntries(directory))
+                {
+                    var candidate = Path.GetFileName(entry);
+                    var score = Similarity(target, NormalizeName(candidate));
+                    if (score > bestScore)
+                    {
+                        bestScore = score;
+                        best = candidate;
+                    }
+                }
+                return bestScore >= 0.6 ? best : null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static string NormalizeName(string value)
+        {
+            return new string((value ?? string.Empty).ToLowerInvariant()
+                .Where(c => c != ' ' && c != '_' && c != '-').ToArray());
+        }
+
+        private static double Similarity(string a, string b)
+        {
+            if (a.Length == 0 && b.Length == 0) return 1;
+            if (a.Length == 0 || b.Length == 0) return 0;
+            var distance = Levenshtein(a, b);
+            return 1.0 - (double)distance / Math.Max(a.Length, b.Length);
+        }
+
+        private static int Levenshtein(string a, string b)
+        {
+            var previous = new int[b.Length + 1];
+            var current = new int[b.Length + 1];
+            for (var j = 0; j <= b.Length; j++) previous[j] = j;
+            for (var i = 1; i <= a.Length; i++)
+            {
+                current[0] = i;
+                for (var j = 1; j <= b.Length; j++)
+                {
+                    var cost = a[i - 1] == b[j - 1] ? 0 : 1;
+                    current[j] = Math.Min(
+                        Math.Min(current[j - 1] + 1, previous[j] + 1),
+                        previous[j - 1] + cost);
+                }
+                var swap = previous;
+                previous = current;
+                current = swap;
+            }
+            return previous[b.Length];
         }
     }
 }

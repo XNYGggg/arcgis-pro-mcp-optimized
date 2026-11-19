@@ -33,10 +33,13 @@
 
     <PackageType>addin</PackageType>
     <PlatformTarget>x64</PlatformTarget>
-    <Version>1.1.4</Version>
+    <Version>1.1.11</Version>
     <Company>ArcGIS Pro MCP</Company>
     <Product>ArcGIS Pro MCP</Product>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <!-- Keep build-machine paths out of the shipped DLL/PDB: compiler debug
+         info records this project's sources under a neutral root instead. -->
+    <PathMap>$(MSBuildProjectDirectory)=/_/src</PathMap>
   </PropertyGroup>
 
   <Target Name="ValidateProTarget" BeforeTargets="ResolveAssemblyReferences">
@@ -113,6 +116,8 @@
     -->
     <EmbeddedResource Include="Resources\gp-parameters.json"
                       Condition="Exists('Resources\gp-parameters.json')" />
+    <EmbeddedResource Include="Resources\gp-parameter-details.json"
+                      Condition="Exists('Resources\gp-parameter-details.json')" />
     <!--
       MCP tool schemas, exported from catalog.py by
       scripts/export_tool_schemas.py so the add-in serves the same tools the
@@ -120,6 +125,13 @@
     -->
     <EmbeddedResource Include="Resources\tools.json"
                       Condition="Exists('Resources\tools.json')" />
+    <!--
+      The self-restart helper behind the restart_pro command. Embedded so the
+      add-in can drop a known copy into %LOCALAPPDATA%\ArcGIS-MCP\runtime and
+      run it, whatever state the source tree is in.
+    -->
+    <EmbeddedResource Include="Resources\restart_pro.ps1"
+                      Condition="Exists('Resources\restart_pro.ps1')" />
   </ItemGroup>
 
   <!--

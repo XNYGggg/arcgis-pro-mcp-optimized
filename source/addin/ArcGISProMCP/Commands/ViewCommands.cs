@@ -107,9 +107,57 @@ namespace ArcGISProMCP.Commands
             var zoomTo = parameters.GetString("zoom_to_layer");
             if (!string.IsNullOrWhiteSpace(zoomTo))
             {
-                var layer = MapHelpers.RequireFeatureLayer(map, zoomTo);
-                var extent = layer.QueryExtent();
-                if (extent != null && !extent.IsEmpty) view.ZoomTo(extent);
+                var layer = MapHelpers.FindLayer(map, zoomTo);
+                var extent = MapHelpers.ExtentOf(layer)
+                    ?? throw new InvalidOperationException(
+                        $"Layer '{layer.Name}' has no extent to zoom to.");
+                view.ZoomTo(extent);
+            }
+
+            // fit:"auto" resizes the output to the view's own aspect ratio so
+            // the export has no letterbox bands. The default keeps the exact
+            // requested size, as 1.1.4 did.
+            var fit = (parameters.GetString("fit", "preserve") ?? "preserve")
+                .ToLowerInvariant();
+            var requestedWidth = width;
+            var requestedHeight = height;
+            var fitApplied = false;
+            string fitNote = null;
+            if (fit == "auto")
+            {
+                var extent = view.Extent;
+                if (extent != null && !extent.IsEmpty
+                    && extent.Width > 0 && extent.Height > 0)
+                {
+                    var target = extent.Width / extent.Height;
+                    var current = (double)width / height;
+                    if (Math.Abs(current - target) / target > 0.01)
+                    {
+                        var byHeight = (int)Math.Round(width / target);
+                        var byWidth = (int)Math.Round(height * target);
+                        if (byHeight >= 1
+                            && Math.Abs(byHeight - height) / (double)height <= 0.25)
+                        {
+                            height = byHeight;
+                            fitApplied = true;
+                            fitNote = "adjusted height to match the view extent";
+                        }
+                        else if (byWidth >= 1
+                                 && Math.Abs(byWidth - width) / (double)width <= 0.25)
+                        {
+                            width = byWidth;
+                            fitApplied = true;
+                            fitNote = "adjusted width to match the view extent";
+                        }
+                        else
+                        {
+                            throw new ArgumentException(
+                                "fit=auto would change the requested size by more than "
+                                + "25%; pass a size that matches the view extent, or "
+                                + "fit=preserve.");
+                        }
+                    }
+                }
             }
 
             var requested = parameters.GetString("output_path");
@@ -139,14 +187,30 @@ namespace ArcGISProMCP.Commands
                 ["map"] = map.Name,
                 ["width"] = width,
                 ["height"] = height,
+                ["requested_size"] = new[] { requestedWidth, requestedHeight },
+                ["actual_size"] = new[] { width, height },
+                ["fit_applied"] = fitApplied,
                 ["scale"] = view.Camera?.Scale,
             };
+            if (fitNote != null) result["fit_note"] = fitNote;
             if (!temporary) result["exported"] = outputPath;
 
-            if (parameters.GetBool("return_image", true) && File.Exists(outputPath))
+            // Inside run_batch the picture stays on disk unless asked for;
+            // callers that want bytes set return_image=true explicitly.
+            var returnImage = parameters.Has("return_image")
+                ? parameters.GetBool("return_image")
+                : !parameters.InBatch;
+            var fileReady = MapHelpers.WaitForFile(outputPath);
+            if (returnImage && fileReady)
             {
                 result["image_base64"] = Convert.ToBase64String(File.ReadAllBytes(outputPath));
                 result["image_format"] = "png";
+            }
+            else if (!temporary && fileReady)
+            {
+                var info = new FileInfo(outputPath);
+                result["exported_bytes"] = info.Length;
+                result["exported_sha256"] = MapHelpers.Sha256(outputPath);
             }
 
             if (temporary)

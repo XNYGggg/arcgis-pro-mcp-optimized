@@ -121,7 +121,11 @@ namespace ArcGISProMCP.Commands
 
         private static object InsertFeatures(Params parameters)
         {
-            var layer = Layer(parameters);
+            using var source = DataSource.Resolve(parameters);
+            if (source.Layer == null)
+                return InsertIntoSingleTable(parameters, source);
+
+            var layer = source.Layer;
             var features = parameters.GetObjectList("features").ToList();
             if (features.Count == 0)
                 throw new ArgumentException(
@@ -176,7 +180,11 @@ namespace ArcGISProMCP.Commands
 
         private static object UpdateFeatures(Params parameters)
         {
-            var layer = Layer(parameters);
+            using var source = DataSource.Resolve(parameters);
+            if (source.Layer == null)
+                return UpdateSingleTable(parameters, source);
+
+            var layer = source.Layer;
             var where = parameters.GetString("where");
             var attributes = AttributesFrom(new Params(parameters.Root));
 
@@ -231,7 +239,11 @@ namespace ArcGISProMCP.Commands
 
         private static object DeleteFeatures(Params parameters)
         {
-            var layer = Layer(parameters);
+            using var source = DataSource.Resolve(parameters);
+            if (source.Layer == null)
+                return DeleteFromSingleTable(parameters, source);
+
+            var layer = source.Layer;
             var where = parameters.GetString("where");
             if (string.IsNullOrWhiteSpace(where) && !parameters.GetBool("allow_delete_all"))
                 throw new ArgumentException(
@@ -293,6 +305,162 @@ namespace ArcGISProMCP.Commands
             };
         }
 
+        // --- standalone tables and dataset paths (D2, live test 2026-11-18) --
+        //
+        // EditOperation is layer-shaped. A standalone table (or a table opened
+        // by path) has no layer to hang an edit session on, so these rows are
+        // written through the Table API. They are immediate: there is no
+        // pending edit to undo, and the result says so.
+
+        private static List<long> TableObjectIds(DataSource source, string where, int limit)
+        {
+            var oidField = source.Definition.GetObjectIDField();
+            var filter = new QueryFilter { SubFields = oidField };
+            if (!string.IsNullOrWhiteSpace(where)) filter.WhereClause = where;
+
+            var oids = new List<long>();
+            using var cursor = source.Search(filter);
+            while (cursor.MoveNext())
+            {
+                using var row = cursor.Current;
+                oids.Add(row.GetObjectID());
+                if (limit > 0 && oids.Count >= limit) break;
+            }
+            return oids;
+        }
+
+        private static Dictionary<string, object> AttributeValues(Params parameters)
+        {
+            var values = new Dictionary<string, object>();
+            var updates = parameters.GetObject("attributes");
+            if (updates == null) return values;
+            foreach (var pair in updates)
+            {
+                values[pair.Key] = pair.Value.ValueKind switch
+                {
+                    System.Text.Json.JsonValueKind.String => pair.Value.GetString(),
+                    System.Text.Json.JsonValueKind.Number => (object)pair.Value.GetDouble(),
+                    System.Text.Json.JsonValueKind.True => true,
+                    System.Text.Json.JsonValueKind.False => false,
+                    System.Text.Json.JsonValueKind.Null => null,
+                    _ => pair.Value.GetRawText(),
+                };
+            }
+            return values;
+        }
+
+        private static object InsertIntoSingleTable(Params parameters, DataSource source)
+        {
+            var features = parameters.GetObjectList("features").ToList();
+            if (features.Count == 0)
+                throw new ArgumentException(
+                    "features is required: a list of {attributes, geometry}.");
+
+            var reference = source.SpatialReference;
+            var table = source.Table;
+            var inserted = 0;
+            foreach (var feature in features)
+            {
+                var attributes = AttributesFrom(feature);
+                if (table is FeatureClass)
+                {
+                    var geometry = GeometryFrom(feature, reference);
+                    if (geometry != null) attributes["SHAPE"] = geometry;
+                }
+                if (attributes.Count == 0)
+                    throw new ArgumentException(
+                        $"Feature {inserted + 1} needs attributes"
+                        + (table is FeatureClass ? " or geometry." : "."));
+
+                using var buffer = table.CreateRowBuffer();
+                foreach (var pair in attributes) buffer[pair.Key] = pair.Value;
+                using var row = table.CreateRow(buffer);
+                row.Store();
+                inserted++;
+            }
+
+            return new Dictionary<string, object>
+            {
+                ["layer"] = source.Name,
+                ["inserted"] = inserted,
+                ["target"] = "table",
+                ["edits_saved"] = true,
+                ["note"] = "table rows are written directly; there is no edit session to undo",
+            };
+        }
+
+        private static object UpdateSingleTable(Params parameters, DataSource source)
+        {
+            var where = parameters.GetString("where");
+            var values = AttributeValues(parameters);
+            if (parameters.Has("geometry"))
+                values["SHAPE"] = GeometryFrom(parameters, source.SpatialReference);
+            if (values.Count == 0)
+                throw new ArgumentException("Provide attributes and/or geometry to update.");
+            if (string.IsNullOrWhiteSpace(where) && !parameters.GetBool("allow_update_all"))
+                throw new ArgumentException(
+                    "Refusing to update every row: pass a where clause, or set "
+                    + "allow_update_all=true to confirm.");
+
+            var oids = TableObjectIds(source, where, parameters.GetInt("limit"));
+            var oidField = source.Definition.GetObjectIDField();
+            var updated = 0;
+            foreach (var oid in oids)
+            {
+                using var cursor = source.Search(new QueryFilter
+                {
+                    WhereClause = $"{oidField} = {oid}",
+                });
+                if (!cursor.MoveNext()) continue;
+                using var row = cursor.Current;
+                foreach (var pair in values) row[pair.Key] = pair.Value;
+                row.Store();
+                updated++;
+            }
+
+            return new Dictionary<string, object>
+            {
+                ["layer"] = source.Name,
+                ["updated"] = updated,
+                ["where"] = where,
+                ["target"] = "table",
+                ["edits_saved"] = true,
+            };
+        }
+
+        private static object DeleteFromSingleTable(Params parameters, DataSource source)
+        {
+            var where = parameters.GetString("where");
+            if (string.IsNullOrWhiteSpace(where) && !parameters.GetBool("allow_delete_all"))
+                throw new ArgumentException(
+                    "Refusing to delete every row: pass a where clause, or set "
+                    + "allow_delete_all=true to confirm.");
+
+            var oids = TableObjectIds(source, where, 0);
+            var oidField = source.Definition.GetObjectIDField();
+            var deleted = 0;
+            foreach (var oid in oids)
+            {
+                using var cursor = source.Search(new QueryFilter
+                {
+                    WhereClause = $"{oidField} = {oid}",
+                });
+                if (!cursor.MoveNext()) continue;
+                using var row = cursor.Current;
+                row.Delete();
+                deleted++;
+            }
+
+            return new Dictionary<string, object>
+            {
+                ["layer"] = source.Name,
+                ["deleted"] = deleted,
+                ["where"] = where,
+                ["target"] = "table",
+                ["edits_saved"] = true,
+            };
+        }
+
         /// <summary>Commit straight away when the caller asked for it.</summary>
         private static async Task MaybeSaveEditsAsync(Params parameters)
         {
@@ -306,11 +474,50 @@ namespace ArcGISProMCP.Commands
         {
             using var source = DataSource.Resolve(parameters);
             var wildcard = parameters.GetString("wildcard")?.Trim('*');
-            var fields = source.Definition.GetFields()
-                .Where(field => string.IsNullOrEmpty(wildcard)
-                                || field.Name.IndexOf(
-                                    wildcard, StringComparison.OrdinalIgnoreCase) >= 0)
-                .Select(MapHelpers.Describe).ToList();
+
+            List<Dictionary<string, object>> fields;
+            try
+            {
+                fields = source.Definition.GetFields()
+                    .Where(field => string.IsNullOrEmpty(wildcard)
+                                    || field.Name.IndexOf(
+                                        wildcard, StringComparison.OrdinalIgnoreCase) >= 0)
+                    .Select(MapHelpers.Describe).ToList();
+            }
+            catch (Exception) when (source.Layer != null
+                                    && JoinRegistry.HasJoins(source.Layer.Name))
+            {
+                // A joined layer's table view fails .NET validation; describe
+                // the base dataset by path and append the joined names (J1/J2).
+                using var baseSource = DataCommands.OpenByName(
+                    source.Layer.GetPath()?.LocalPath);
+                if (baseSource == null) throw;
+
+                fields = baseSource.Definition.GetFields()
+                    .Where(field => string.IsNullOrEmpty(wildcard)
+                                    || field.Name.IndexOf(
+                                        wildcard, StringComparison.OrdinalIgnoreCase) >= 0)
+                    .Select(MapHelpers.Describe).ToList();
+
+                foreach (var join in JoinRegistry.Snapshot(source.Layer.Name))
+                {
+                    foreach (var name in join.Fields)
+                    {
+                        if (!string.IsNullOrEmpty(wildcard)
+                            && name.IndexOf(wildcard, StringComparison.OrdinalIgnoreCase) < 0)
+                            continue;
+                        fields.Add(new Dictionary<string, object>
+                        {
+                            ["name"] = join.Table + "." + name,
+                            ["alias"] = name,
+                            ["type"] = "Joined",
+                            ["length"] = 0,
+                            ["nullable"] = true,
+                            ["editable"] = false,
+                        });
+                    }
+                }
+            }
 
             return new Dictionary<string, object>
             {

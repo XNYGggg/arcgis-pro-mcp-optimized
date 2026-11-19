@@ -1,10 +1,76 @@
-# 发布说明 · 客户版 v1.1.4（2026-11-16）
+# 发布说明 · Customer 1.1.11（1.14 增强版，构建号 1.1.11）· 正式版 · 经测试稳定，推荐下载（2026-11-19）
+
+> **✅ 发布定位：正式版 · 经测试稳定，推荐下载**（2026-11-19）。本包是 **Customer 1.1.11（1.14 增强版）**，在 v1.1.4 之上累计合入 1.1.5–1.1.11 的修复与增强，重点是把 2026-11-18 实机全量测试确认的 P0–P2 缺陷全部修掉，并按发布前三方评审修正了失败清理与文档口径；已完成本机实机回归（见下方「验证」）。**本版已作为正式版正式发行**：tag `v1.1.11`，GitHub Release 与 Gitee 发行版均提供离线包 `ArcGIS-Pro-MCP-1.1.11.zip`（含 SHA256 校验文件）。v1.1.4 保留为上一稳定版，随时可回滚。
+
+## 变更摘要（相对 v1.1.4）
+
+**1.1.5（F1–F10）**：环境注入贯通（`set_environment` 的 snapRaster 等真正传给 GP，支持每调用覆盖）；`describe_geoprocessing_tool` 返回枚举与默认值；`create_map` 默认无底图（`project_default` 恢复旧行为）；栅格/TIN 的缩放与符号读取；新增 `add_table`；`export_map_view` 新增 `fit:"auto"`；`set_raster_symbology` 支持显式配色/标签；`set_map_properties` 的 epsg 生效；新增 `restart_pro` 自重启命令。
+
+**1.1.6（V-1–V-7，工具链修复）**：toolbox 路径笔误给出 "Did you mean …" 提示、命名参数报错附带可用示例；`get_pump_status` 在 Python 桥未启动时**返回结构化状态**（`running:false, bridge_listening:false`）而不再以 Failed 呈现（执行类命令仍严格报错）；错误分级（`BRIDGE_NOT_LISTENING / BRIDGE_ERROR / BRIDGE_CLOSED / BRIDGE_TIMEOUT / UNSUPPORTED`）与 `last_error_code/at`，状态查询加 5 秒读超时；`diagnose` 主动探测桥端口（`bridge_listening/probe_ms`）；工具描述修正（原生端只收位置参数、桥依赖标注）；HTTP 传输测试断言改为"去重 + 必备子集"；桥 down 结果缓存 5 秒。
+
+**1.1.7（P0，实机测试缺陷修复）**：`create_feature_class` / `create_table` 的 `fields` 参数真正生效——创建后逐个 `AddField` 并 `describe_dataset` 回读校验（名称/类型/长度），失败即删除半成品；`run_batch` 批量执行时图片结果默认剥离为 path/bytes/sha（不再把 base64 塞进上下文）；`get_features` 新增分页（`truncated` / `next_offset`）与 `geometry_summary` / `geometry_precision`；`preview_layout` 支持 `output_path` / `return_image`。
+
+**1.1.8（P1，实机测试缺陷修复）**：`insert_features` / `update_features` / `delete_features` 支持独立表与数据集路径（表走 Table API，图层仍走编辑会话）；`sample_raster_values` 改为原生像素采样——支持 `points` / `point_layer`、内联返回、不再产生 `raster_samples` 副作用表（`write_table` 保留旧路径）；`create_map` 的 SCENE 类型修复（`SceneLocal`）；`add_join` 修复 GP 连接后图层视图失效（JoinRegistry + 客户端连接，含候选错误提示）；布局元素 `x/y` 统一为左下角原点并通过 `GetBounds` 回读校验、越界拒绝；`run_batch` 每步带耗时与串行标注；GP 结果入图改为等待 + 重试。
+
+**1.1.9（P2，实机测试缺陷修复）**：`get_layer_info` / `set_raster_symbology` / `repair_layer_source` 等接受数据集路径（唯一匹配自动解析，多匹配列出图层名）；`repair_layer_source` 新增栅格分支（`RasterDataset.ReplaceDataSource`）；`search_data` 结果去重；`check_extension` 语义改为 `inspectable:false`（Pro 不向 add-in 暴露检出）；GP 输出过滤空串；`get_features` 对栅格图层名给出 `get_raster_info` 提示。
+
+**1.1.10（重启自愈与工程化收尾）**：`restart_pro` 超时自愈——保存框探测改为子进程 + 15 秒硬超时（超时放弃并记日志）、按钮匹配支持本地化 `是(Y)/否(N)/取消(C)`、restart.log 改 UTF-8 并加阶段心跳、TCP 连接 5 秒超时，仍保持"不强杀 Pro"；重启调度标志带时间戳，10 分钟后可接管（助手挂掉不再永久拒绝新请求）；部署脚本归一（`scripts/update_installed.py` 位置参数版，哈希不符拒写）；9 个实机回归脚本支持 `MCP_TEST_SCRATCH` 等环境变量覆盖。
+
+**1.1.11（发布前评审修正）**：`create_feature_class` / `create_table` 的失败清理改为**按对象身份**——删除数据集前先按数据源解析引用它的图层与独立表，删除后从**捕获时所属的地图**移除（切换视图不会漏清），同名但异源的图层不再被误删；数据源读取异常、删除失败、移除失败逐条收集并随工具错误报告（`Cleanup problems: …`），删除失败时错误文案不再声称「已删除」；`scripts/update_installed.py` 去除本机路径硬编码，且可在 RunCode 的 `__mcprun__` 入口下运行（`MCP_UPDATE_ARGS` 或 wrapper），BUILD.md 记录两种调用方式；清理本地一次性部署脚本与历史文档中的本机路径；构建加入 `PathMap`，DLL/PDB 不再含构建机源码路径；兼容口径统一为「仅实机验证 Pro 3.7」（VERSION.json、四语徽标、安装器提示）。**第 3 轮终审补充**：清理对象在字段处理开始前即捕获（字段新增期间切换视图也不会漏清），`AddField` 抛异常同样进入清理并上报；`install.ps1` 的「高于 3.7」提示改按主/次版本判断（`3.7.0.1901` 不再误触发）；`live_verify_115/116` 的本机路径参数化（`MCP_VERIFY_GDB` / `MCP_VERIFY_SNAP`），旧一次性部署脚本移出源码树；`update_installed.py` 优先读取 `MCP_UPDATE_ARGS`，备注不再被首个空格截断。**第 4 轮终审补充**：失败清理改为扫描工程内**全部地图**并把每个图层/独立表绑定到其所属地图——清理不再依赖活动视图（实测：命令激活图与 GP 入图不一致时，失败仍能准确移除并删除半成品）；未通过的字段请求在添加前校验的行为不变。
+
+## 验证（本机实机，2026-11-18 / 11-19）
+
+- 构建期：client-registration、installer、http-transport（net8.0 + net10.0）全部通过。
+- 1.1.7：P0 回归 21/21 PASS；1.1.8：P1 连续两轮回归 0 失败；1.1.9：P2 回归 10/10、P1 重跑 0 失败。
+- 1.1.10：构建全过，安装后握手 `1.1.10.0`、ping `command_count=112`、工程路径正确。
+- 1.1.11：构建全过；安装后握手 `1.1.11.0`、ping `command_count=112`；D1 字段回归（p0_regression_117）对当前测试工程适用的断言全部 PASS（4 条历史断言引用已退役 MyProject_05 工程的图层名，属测试脚本环境差异），其中「重复字段失败→半成品删除」路径实测通过；`get_features` 分页/摘要/精度在现工程图层上实机复验通过。**仅验证 ArcGIS Pro 3.7，其他 Pro 版本未覆盖。**
+- 规模：112 命令 / 115 工具；add-in SHA256 `0ABB872FBCD6FB65AA12F118501216F2BD3F305A9C6C68537870A5EDDF306DF9`（469,634 字节）。
+
+## 发布前三方评审（2026-11-19）
+
+Codex 结论「修正后可以发布」：完整性/版本一致性/哈希口径通过；四项修正意见已落实（行尾与清单、1.1.4 措辞、失败清理身份与异常报告、脚本与二进制路径）。DeepSeek 首轮 600 秒超时未回，第二轮复核见归档。评审材料与收敛稿见 `agent_bridge/docs/customer-v1.1.11客户包发布前评审-*`。
+
+## 本包的定位与边界
+
+- 面向客户端的完整离线包（安装脚本、运行时、客户端接入、文档、源码快照与构建产物），与 v1.1.4 客户版同构。
+- **已正式发行**：tag `v1.1.11`；GitHub Release（Latest）与 Gitee 发行版提供 `ArcGIS-Pro-MCP-1.1.11.zip` + `.sha256`；仓库默认分支 `main` 同步为本版内容。
+- 遇问题可回滚到 v1.1.4（上一稳定版），并按 `docs/排障手册.md` 反馈。
+
+---
+
+## 历史：Customer 1.1.10（1.14 增强版，构建号 1.1.10）发布说明（2026-11-19，未单独发布）
+
+> 1.1.10 的变更已包含在上面的 1.1.11 中（1.1.11 = 1.1.10 + 发布前评审修正），未单独成包发布。add-in 构建 SHA256 `767D53D75DA6D2BCDF440BBA6E7BDE731F96092602EA8CAFE578AB2B1698F1A7`（467,650 字节）。
+
+---
+
+## 历史：Customer 1.16（1.14 增强版，构建号 1.1.6）发布说明（2026-11-18）
+
+> **🚀 发布定位**：本包是 **Customer 1.16（1.14 增强版）**，在 v1.1.4 之上合入 1.1.5 / 1.1.6 的修复与增强；**1.1.4 正式发布仍在准备中，敬请期待**。本分支不创建 GitHub Release / Gitee 发行版、不上传发行资产、不打 tag；安装包仅随仓库提供（`install/`）。可随时回滚到 v1.1.4。
+
+### 变更摘要（相对 v1.1.4）
+
+**1.1.5（F1–F10）**：环境注入贯通（`set_environment` 的 snapRaster 等真正传给 GP，支持每调用覆盖）；`describe_geoprocessing_tool` 返回枚举与默认值；`create_map` 默认无底图（`project_default` 恢复旧行为）；栅格/TIN 的缩放与符号读取；新增 `add_table`；`export_map_view` 新增 `fit:"auto"`；`set_raster_symbology` 支持显式配色/标签；`set_map_properties` 的 epsg 生效；新增 `restart_pro` 自重启命令。
+
+**1.1.6（V-1–V-7，工具链修复）**：toolbox 路径笔误给出 "Did you mean …" 提示、命名参数报错附带可用示例；`get_pump_status` 在 Python 桥未启动时**返回结构化状态**（`running:false, bridge_listening:false`）而不再以 Failed 呈现（执行类命令仍严格报错）；错误分级（`BRIDGE_NOT_LISTENING / BRIDGE_ERROR / BRIDGE_CLOSED / BRIDGE_TIMEOUT / UNSUPPORTED`）与 `last_error_code/at`，状态查询加 5 秒读超时；`diagnose` 主动探测桥端口（`bridge_listening/probe_ms`）；工具描述修正（原生端只收位置参数、桥依赖标注）；HTTP 传输测试断言改为"去重 + 必备子集"；桥 down 结果缓存 5 秒。
+
+### 验证（本机实机，2026-11-18）
+
+- 构建期：client-registration、installer、http-transport（net8.0 + net10.0）全部通过。
+- 实机：全量回归 26/26；专项 10/10；桥状态桩 4/4；真实 Python 桥三态（桥停 / 桥起泵停 / 桥泵全起）全部通过。
+- 规模：112 命令 / 115 工具；add-in SHA256 `96C7829E2A26E16C270722A84605F9945DA2348DFCF202C658A64EA9E012E625`（444,124 字节）。
+
+### 本包的定位与边界
+
+- 面向客户端的完整离线包（安装脚本、运行时、客户端接入、文档、源码快照与构建产物），与 v1.1.4 客户版同构。
+- 不创建 Release、不上传发行资产、不打 tag；默认分支保持 v1.1.4。
+- 作为 1.14 增强版使用；遇问题可回滚 1.1.4，并按 `docs/排障手册.md` 反馈。
+
+---
+
+## 历史：客户版 v1.1.4 发布说明（2026-11-16）
 
 > **📌 文档修订（2026-11-16 晚）**：系统要求更新为 **Windows 11 x64（仅 x64 / AMD64，不支持 ARM64）**；本包二进制与运行脚本零改动，仅文档（README / 本说明 / VERSION.json）与包内 `SHA256SUMS.txt` 更新。
-
-> **📚 完整版本变更**：见 [docs/CHANGELOG.md](docs/CHANGELOG.md) 的 `[1.1.4]` 条目（Keep a Changelog 格式）；本文件保留发布时的说明与三方评审记录。
-
-> **🔐 校验口径**：仓库根 `SHA256SUMS.txt` 对应 v1.1.4 发布包快照；仓库内后续文档修订（README/docs）不回写该清单，`install\01-check.cmd` 只校验 `install/addin.sha256`，自检不受影响。
 
 ## 三方会谈评审结论
 
