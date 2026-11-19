@@ -7,7 +7,7 @@
   "requirements": {
     "os": "Windows 11 x64 (AMD64); ARM64 not supported",
     "arcgis_pro": "3.7 (built and live-verified on 3.7; later versions untested)",
-    "external_deps": "none (PowerShell/.NET provided by Windows and ArcGIS Pro)"
+    "external_deps": "none for this package; ArcGIS Pro 3.7 system requirements (Microsoft .NET Desktop Runtime 10 x64, WebView2) are Esri prerequisites - install per Esri docs if missing"
   },
   "addin": {
     "file": "install/ArcGISProMCP.esriAddinX",

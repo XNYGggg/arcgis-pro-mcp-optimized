@@ -37,7 +37,7 @@ $addinsDir  = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'ArcGIS\Ad
 $runtimeDst = Join-Path $env:LOCALAPPDATA 'ArcGIS Pro MCP'
 $stamp      = Get-Date -Format 'yyyyMMdd-HHmmss'
 
-Write-Host 'ArcGIS Pro MCP 优化版 · 客户版 Customer 1.1.13（1.14 增强版 + 模板蒸馏）' -ForegroundColor White
+Write-Host 'ArcGIS Pro MCP 优化版 · 客户版 Customer 1.1.13（1.14 增强版 + 模板蒸馏 + 模板删除）' -ForegroundColor White
 Write-Host '组件：add-in + stdio 桥 + RunCode + 弹窗守护 + Python 桥 + 模板蒸馏（arcgis-distill）'
 
 if ($Rest -and $Rest.Count -gt 0) {
@@ -94,7 +94,7 @@ if ($desktop10.Count -eq 0) {
 if ($desktop10.Count -gt 0) {
     Ok ('已检测到：' + ($desktop10 -join '; '))
 } else {
-    Warn '未自动检测到 .NET Desktop Runtime 10。它属于 ArcGIS Pro 3.7 的系统要求（Esri 文档）；若缺失，请按 Esri 系统要求安装该运行时，或运行 Pro 安装器检查前置组件。'
+    Warn '未自动检测到 .NET Desktop Runtime 10。它属于 ArcGIS Pro 3.7 的系统要求（Esri 文档，WebView2 同属 Pro 前置条件）；若缺失，请按 Esri 系统要求安装对应组件，或运行 Pro 安装器检查前置组件。'
 }
 
 # ---------- 3. 端口占用（仅提示，不阻塞） ----------

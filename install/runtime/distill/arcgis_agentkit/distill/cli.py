@@ -38,7 +38,7 @@ from ..common.runtime import (
     ok,
     write_json_atomic,
 )
-from .library import TemplateLibrary
+from .library import TemplateLibrary, valid_template_id
 from .validate import validate_spec
 
 PROTECTED_PATCH_KEYS = {"id", "image_sha256", "measured", "source_image", "schema_version"}
@@ -397,6 +397,10 @@ def _apply(args, as_json: bool) -> int:
 
 
 def _delete(args, as_json: bool) -> int:
+    if not valid_template_id(args.template_id):
+        return fail(f"invalid template id: {args.template_id!r} (letters, digits, "
+                    "'.', '_' and '-' only; it becomes a file name)",
+                    "invalid_input", exit_code=EXIT_RUNTIME, as_json=as_json)
     library = _library(args)
     try:
         spec = _load_spec(library, args.template_id)
@@ -412,10 +416,14 @@ def _delete(args, as_json: bool) -> int:
     result = library.delete(args.template_id, force=args.force)
     removed = result["removed"]
     errors = result.get("errors") or []
-    if not removed["spec"] and not removed["index_entry"]:
-        return fail(f"could not delete '{result['template_id']}': "
-                    + ("; ".join(errors) or "nothing was removed"),
-                    "delete_failed", exit_code=EXIT_RUNTIME, as_json=as_json)
+    record_removed = removed["index_entry"] or not result.get("entry_present", True)
+    if errors or not record_removed:
+        # Leftovers keep the index entry, so a retry can finish the job; that
+        # must not be reported as a successful delete.
+        detail = "; ".join(errors) or "index entry could not be removed"
+        return fail(f"delete of '{result['template_id']}' incomplete: {detail} "
+                    "(the template record was kept so a retry can finish)",
+                    "delete_incomplete", exit_code=EXIT_RUNTIME, as_json=as_json)
     if removed["image"]:
         image_note = f"image removed: {removed['image']}"
     elif removed["image_kept_for"]:
@@ -425,11 +433,9 @@ def _delete(args, as_json: bool) -> int:
     payload = ok(template_id=result["template_id"], deleted=True,
                  was_status=result["status"], removed=removed,
                  errors=errors, library=str(library.root))
-    human = (f"deleted {result['template_id']} (was {result['status']}); "
-             f"{image_note}")
-    for message in errors:
-        human += f"\n  WARN leftover: {message}"
-    emit(payload, as_json, human=human)
+    emit(payload, as_json,
+         human=f"deleted {result['template_id']} (was {result['status']}); "
+               f"{image_note}")
     return EXIT_OK
 
 

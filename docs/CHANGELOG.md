@@ -5,11 +5,10 @@
 - 相对 1.1.12：模板库补齐**删除命令** `template_delete`（`arcgis-distill delete <id> [--force]`）。
   - 删除内容：spec、index 条目、作业单，以及不再被其他模板引用的去重样本图（共享图片保留，返回 `removed.image_kept_for`）。
   - 安全语义：删除不存在的 id 返回 `not_found`（退出码 3），重复删除安全；`ready`（已批准）模板需 `--force`（否则退出码 5）；`inbox` 不受影响。
-  - C# 薄封装 `template_delete`（TemplateCommands.cs）+ catalog Template 组条目；`tests/test_distill.py` 13/13（6 个删除用例）、`tests/test_catalog_matches_bridge.py` 4/4；工具数 125→126、命令 122→123。
+  - C# 薄封装 `template_delete`（TemplateCommands.cs）+ catalog Template 组条目；`tests/test_distill.py` 14/14（7 个删除用例）、`tests/test_catalog_matches_bridge.py` 4/4；工具数 125→126、命令 122→123。
   - 文档：`docs/distill.md`、`skills/template-distill/SKILL.md` 增加删除一节；四语 README、`docs/使用指南.md`、`VERSION.json` 同步。
   - 构建：全过；add-in 432,751 字节 SHA256 `669E1B74…8E99`；自安装包 600,555 字节 SHA256 `A11C7C74…3F16`。
   - 验证：pytest 全绿；`tools.json` 与 `catalog.py` 全等价（126 工具）；SHA256SUMS 重新生成并全量校验。
-  - 实机（2026-11-19，Pro 3.7，真实终端）：握手 `1.1.13.0`、`ping` 123、`tools/list` 126（含 `template_delete`）；import → measure → delete 全链路通过（重复删除 not_found/exit 3）；自检 22 通过 / 0 失败。
   - 实机（2026-11-19，Pro 3.7，真实终端）：握手 `1.1.13.0`、`ping` 123、`tools/list` 126（含 `template_delete`）；import → measure → delete 全链路通过（重复删除 not_found/exit 3）；自检 22 通过 / 0 失败。
 
 ## Customer 1.1.12（1.14 增强版 + 模板蒸馏，构建号 1.1.12，2026-11-19）

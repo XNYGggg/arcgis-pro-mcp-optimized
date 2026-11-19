@@ -57,9 +57,15 @@ def _slug(text: str, fallback_prefix: str = "tpl") -> str:
 _TEMPLATE_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$")
 
 
-def _valid_template_id(template_id: str) -> bool:
-    """Ids become file names; anything with a path separator or '..' is out."""
-    return bool(_TEMPLATE_ID.fullmatch(template_id or ""))
+def valid_template_id(template_id: str) -> bool:
+    """Ids become file names; path separators and '..' components are out."""
+    if not template_id or ".." in template_id:
+        return False
+    return bool(_TEMPLATE_ID.fullmatch(template_id))
+
+
+# Kept for the original private spelling used by older callers.
+_valid_template_id = valid_template_id
 
 
 class TemplateLibrary:
@@ -230,14 +236,17 @@ class TemplateLibrary:
                             "reason": "image_sha256 already imported"}
 
             template_id = template_id or _slug(name)
-            if not _valid_template_id(template_id):
+            if not valid_template_id(template_id):
                 raise ValueError(
                     f"invalid template id: {template_id!r} (letters, digits, "
                     "'.', '_' and '-' only; it becomes a file name)")
             if self.spec_path(template_id).exists():
-                template_id = f"{template_id}-{secrets.token_hex(2)}"
+                # Truncate before suffixing: the result must still satisfy the
+                # same 80-character rule, or the template could never be deleted.
+                base = template_id[:75]
+                template_id = f"{base}-{secrets.token_hex(2)}"
                 while self.spec_path(template_id).exists():
-                    template_id = f"{template_id}-{secrets.token_hex(2)}"
+                    template_id = f"{base}-{secrets.token_hex(2)}"
 
             extension = image_path.suffix.lower() or ".png"
             stored_name = digest[:16] + extension
@@ -302,7 +311,7 @@ class TemplateLibrary:
         ``force`` - the same gate ``approve`` uses in reverse.
         """
         with self._lock():
-            if not _valid_template_id(template_id):
+            if not valid_template_id(template_id):
                 raise ValueError(
                     f"invalid template id: {template_id!r} (letters, digits, "
                     "'.', '_' and '-' only; it becomes a file name)")
@@ -390,7 +399,7 @@ class TemplateLibrary:
                 except OSError as exc:
                     errors.append(f"spec {template_id}.json: {exc}")
             removed_entry = False
-            if removed_spec or not path.is_file():
+            if not errors and (removed_spec or not path.is_file()):
                 data["templates"] = remaining
                 self._write_index(data)
                 removed_entry = entry is not None
@@ -398,6 +407,7 @@ class TemplateLibrary:
             return {
                 "template_id": template_id,
                 "status": status,
+                "entry_present": entry is not None,
                 "removed": {
                     "index_entry": removed_entry,
                     "spec": removed_spec,
@@ -462,31 +472,39 @@ class TemplateLibrary:
             if not spec_name:
                 raise ValueError("bundle has no specs/*.json")
             spec = json.loads(archive.read(spec_name).decode("utf-8-sig"))
-            declared = str(spec.get("id") or "")
-            template_id = (declared if _valid_template_id(declared)
-                           else _slug(declared or bundle_path.stem))
-            target_id = template_id
-            if self.spec_path(target_id).exists():
-                target_id = f"{target_id}-{secrets.token_hex(2)}"
-            spec["id"] = target_id
-            digest = spec.get("image_sha256")
-            source_image = spec.get("source_image", "")
-            stored_name = Path(source_image).name
-            if not stored_name:
-                stored_name = (digest or target_id)[:16] + ".png"
-            if not (self.images / stored_name).exists():
-                image_name = next((name for name in names
-                                   if name.startswith("images/")), None)
-                if not image_name:
-                    raise ValueError("bundle has no images/* file")
-                with archive.open(image_name) as source:
-                    data = source.read()
-                (self.images / stored_name).write_bytes(data)
-                if not digest:
-                    digest = hashlib.sha256(data).hexdigest()
-            spec["source_image"] = f"images/{stored_name}"
-            spec["image_sha256"] = digest
-            self.save(spec)
+            # Id allocation, image reuse/write, spec write and index commit all
+            # under one lock: a concurrent delete must not see the image as
+            # unreferenced between the existence check and the spec commit.
+            with self._lock():
+                declared = str(spec.get("id") or "")
+                template_id = (declared if valid_template_id(declared)
+                               else _slug(declared or bundle_path.stem))
+                target_id = template_id
+                if self.spec_path(target_id).exists():
+                    base = target_id[:75]
+                    target_id = f"{base}-{secrets.token_hex(2)}"
+                    while self.spec_path(target_id).exists():
+                        target_id = f"{base}-{secrets.token_hex(2)}"
+                spec["id"] = target_id
+                digest = spec.get("image_sha256")
+                source_image = spec.get("source_image", "")
+                stored_name = Path(source_image).name
+                if not stored_name:
+                    stored_name = (digest or target_id)[:16] + ".png"
+                if not (self.images / stored_name).exists():
+                    image_name = next((name for name in names
+                                       if name.startswith("images/")), None)
+                    if not image_name:
+                        raise ValueError("bundle has no images/* file")
+                    with archive.open(image_name) as source:
+                        data = source.read()
+                    (self.images / stored_name).write_bytes(data)
+                    if not digest:
+                        digest = hashlib.sha256(data).hexdigest()
+                spec["source_image"] = f"images/{stored_name}"
+                spec["image_sha256"] = digest
+                write_json_atomic(self.spec_path(spec["id"]), spec)
+                self._apply_upsert(self.index(), spec)
         return {"spec": spec, "imported": True}
 
     def inbox_images(self) -> list[Path]:
