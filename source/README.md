@@ -217,14 +217,16 @@ connected, and the last error.
 
 <!-- TOOLS:START -->
 
-**112 tools.** Anything not listed is still reachable through `run_geoprocessing_tool` or `execute_arcpy_code`.
+**125 tools.** Anything not listed is still reachable through `run_geoprocessing_tool` or `execute_arcpy_code`.
 
-### Session and project (14)
+### Session and project (16)
 
 | Tool | What it does |
 |---|---|
 | `ping` | Check that the ArcGIS Pro bridge is reachable and see which project it is attached to |
 | `get_capabilities` | List every command the connected bridge supports, grouped by area |
+| `get_queue_status` | Queue status for the bridge: per-lane depth, the command running now, and recent completion history |
+| `restart_pro` ⚠️ | Restart ArcGIS Pro, saving and reopening the project first -- how a rebuilt add-in gets loaded without touching the desktop |
 | `diagnose` | Self-check the connection: ArcGIS Pro version, licence, open project, active map, open map view and write access |
 | `get_arcgis_info` | ArcGIS Pro version, licence level, available extensions and the current project path |
 | `get_project_info` | Project paths, default geodatabase and toolbox, maps, layouts, folder and database connections |
@@ -236,15 +238,16 @@ connected, and the last error.
 | `set_map_properties` | Rename a map or change its coordinate system |
 | `get_map_extent` | The combined extent of all data layers in a map |
 | `get_environment` | Read the current arcpy geoprocessing environment settings |
-| `set_environment` | Set arcpy geoprocessing environment settings such as workspace, outputCoordinateSystem, extent, mask, cellSize, overwriteOutput or parallelProcessingFactor |
+| `set_environment` | Set geoprocessing environment settings applied to later tool runs (workspace, outputCoordinateSystem, extent, mask, cellSize, snapRaster, overwriteOutput, parallelProcessingFactor, scratchWorkspace, geographicTransformations, resamplingMethod) |
 
-### Layer (19)
+### Layer (20)
 
 | Tool | What it does |
 |---|---|
 | `get_layers` | List the layers (with draw order and group nesting) and standalone tables in a map |
 | `get_layer_info` | Full detail for one layer: data source, coordinate system, extent, fields, feature count, renderer and label state |
 | `add_layer` | Add data to a map from a path or service URL: feature class, shapefile, raster, table, .lyrx layer file or web service |
+| `add_table` | Add a standalone table (geodatabase table or folder table) to a map |
 | `add_web_layer` | Add a web service layer (Feature/Map/Image service, WMS, WMTS, vector tile) by URL |
 | `remove_layer` ⚠️ | Remove a layer or standalone table from a map |
 | `rename_layer` | Rename a layer in the table of contents |
@@ -266,7 +269,7 @@ connected, and the last error.
 
 | Tool | What it does |
 |---|---|
-| `get_features` | Read attribute rows from a layer, table or dataset path, with an optional where clause, field subset, ordering and WKT geometry |
+| `get_features` | Read attribute rows from a layer, table or dataset path, with an optional where clause, field subset, ordering and geometry |
 | `count_features` | Count features, optionally matching a where clause |
 | `get_unique_values` | Distinct values of a field with the count of rows for each |
 | `get_field_statistics` | min / max / mean / median / sum / standard deviation of a numeric field |
@@ -314,7 +317,7 @@ connected, and the last error.
 | `list_toolboxes` | List the arcpy toolbox modules and any toolboxes in the project |
 | `describe_geoprocessing_tool` | Get a tool's parameters, data types, defaults and usage text before running it |
 | `run_python_toolbox_tool` | Run a tool from a custom .pyt / .atbx / .tbx toolbox on disk |
-| `check_extension` | Check, and optionally check out, an ArcGIS extension licence |
+| `check_extension` | Report whether the add-in can inspect an extension licence |
 | `get_messages` | Messages from the most recent geoprocessing operation |
 
 ### Symbology and labels (6)
@@ -358,7 +361,7 @@ connected, and the last error.
 | `set_layout_element` | Move, resize, rename, hide or change the text of any layout element |
 | `delete_layout_element` ⚠️ | Remove an element from a layout |
 | `export_layout` 🖼️ | Export a layout to PDF / PNG / JPEG / SVG / TIFF |
-| `preview_layout` 🖼️ | Render a layout to a temporary image and return it, without writing a file -- use it to visually check a layout while building it |
+| `preview_layout` 🖼️ | Render a layout to an image, without writing a project file unless output_path is given -- use it to visually check a layout while building it |
 | `export_map_series` | Export a layout's map series (map book) to a multi-page PDF |
 
 ### Raster (5)
@@ -390,6 +393,21 @@ connected, and the last error.
 | `get_pump_status` | Whether the main-thread dispatcher is installed |
 | `stop_pump` | Remove the main-thread dispatcher |
 | `run_batch` | Run several commands in one round trip -- much faster for multi-step workflows |
+
+### Template distillation (10)
+
+| Tool | What it does |
+|---|---|
+| `template_list` | List distilled layout templates in the local library, optionally filtered by status or tag |
+| `template_get` | Read one distilled template spec (layout geometry, palette, typography, regions, pitfalls and review record) |
+| `template_import` | Import a sample map figure into the template library as a draft |
+| `template_measure` | Measure a template's sample figure: figure bbox, aspect, strong frame lines, palette and DPI |
+| `template_patch` | Submit semantic fields (regions, legend, typography, palette, pitfalls) as a validated merge |
+| `template_validate` | Run schema and geometric consistency checks (frame/regions inside the canvas, measured tolerance <= 3%, typography order, colours, pitfalls) |
+| `template_review` | Record a human review decision for a validated template |
+| `template_approve` | Approve a reviewed, validated template so it becomes ready to apply |
+| `template_preview` 🖼️ | Render the template as a wireframe PNG next to the sample figure and return the image so it can be checked visually |
+| `template_apply` | Write a ready template into a mapping context JSON file (layout, palette, typography) for the assistant to follow while composing a map |
 
 ⚠️ = changes or deletes real data &nbsp;&nbsp; 🖼️ = returns an image the AI can look at
 

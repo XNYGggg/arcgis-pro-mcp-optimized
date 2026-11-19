@@ -15,7 +15,7 @@ function Step($t) { Write-Host ''; Write-Host ('== ' + $t) -ForegroundColor Cyan
 $script:pass = 0; $script:warn = 0; $script:fail = 0
 $runtimeDst = Join-Path $env:LOCALAPPDATA 'ArcGIS Pro MCP'
 
-Write-Host 'ArcGIS Pro MCP 优化版 客户版 Customer 1.1.11（1.14 增强版） · 自检'
+Write-Host 'ArcGIS Pro MCP 优化版 客户版 Customer 1.1.12（1.14 增强版 + 模板蒸馏） · 自检'
 
 Step 'ArcGIS Pro'
 $proExe = $null
@@ -97,8 +97,49 @@ foreach ($item in @(
     @{ p = (Join-Path $runtimeDst 'stdio-bridge.ps1'); n = 'stdio 桥' },
     @{ p = (Join-Path $runtimeDst 'runcode\RunCode.pyt'); n = 'RunCode 工具箱' },
     @{ p = (Join-Path $runtimeDst 'guard\watch_pro_dialog.ps1'); n = '弹窗守护' },
-    @{ p = (Join-Path $runtimeDst 'plugin\mcp_bridge.py'); n = 'Python 桥' })) {
+    @{ p = (Join-Path $runtimeDst 'plugin\mcp_bridge.py'); n = 'Python 桥' },
+    @{ p = (Join-Path $runtimeDst 'distill\run-distill.ps1'); n = '模板蒸馏启动器' },
+    @{ p = (Join-Path $runtimeDst 'distill\arcgis_agentkit\distill\cli.py'); n = '模板蒸馏模块' })) {
     if (Test-Path -LiteralPath $item.p) { Ok $item.n } else { Fail ('缺少 ' + $item.n + '：' + $item.p) }
+}
+
+Step '模板蒸馏组件（1.1.12 起）'
+$proPy = $null
+try {
+    $proDir = (Get-ItemProperty 'HKLM:\SOFTWARE\ESRI\ArcGISPro' -ErrorAction SilentlyContinue).InstallDir
+    if ($proDir) { $c = Join-Path $proDir 'bin\Python\envs\arcgispro-py3\python.exe'; if (Test-Path -LiteralPath $c) { $proPy = $c } }
+} catch { }
+if (-not $proPy) {
+    foreach ($c in @("$env:ProgramW6432\ArcGIS\Pro\bin\Python\envs\arcgispro-py3\python.exe",
+                     "$env:ProgramFiles\ArcGIS\Pro\bin\Python\envs\arcgispro-py3\python.exe")) {
+        if ($c -and (Test-Path -LiteralPath $c)) { $proPy = $c; break }
+    }
+}
+if ($proPy) {
+    try {
+        $pil = (& $proPy -c "import PIL; print(PIL.__version__)" 2>$null | Select-Object -Last 1)
+        if ($LASTEXITCODE -eq 0 -and $pil) { Ok ('Pro 自带 Python：' + $pil + '（Pillow）') } else { Fail 'Pro 自带 Python 无法导入 Pillow（模板蒸馏不可用）' }
+    } catch { Fail ('Pillow 探测失败：' + $_.Exception.Message) }
+} else {
+    Fail '未找到 ArcGIS Pro 自带 Python（arcgispro-py3），模板蒸馏不可用'
+}
+$launcher = Join-Path $runtimeDst 'distill\run-distill.ps1'
+if (Test-Path -LiteralPath $launcher) {
+    try {
+        $docText = (& powershell -NoProfile -ExecutionPolicy Bypass -File $launcher doctor --json 2>$null | Select-Object -Last 1)
+        $docExit = $LASTEXITCODE
+        $doc = $docText | ConvertFrom-Json
+        $libDetail = ($doc.checks | Where-Object { $_.check -eq 'library' } | Select-Object -First 1).detail
+        # doctor keeps ok=true even when a critical check fails; status and the
+        # exit code are what actually say whether the module is usable.
+        if ($docExit -eq 0 -and $doc.status -eq 'ready' -and $doc.ok) {
+            Ok ('distill doctor：ready（' + $doc.version + '，库 ' + $libDetail + '）')
+        } else {
+            Fail ('distill doctor 未就绪（exit=' + $docExit + '，status=' + $doc.status + '）：' + $docText)
+        }
+    } catch { Fail ('distill doctor 探测失败：' + $_.Exception.Message) }
+} else {
+    Fail ('缺少模板蒸馏启动器：' + $launcher)
 }
 
 Step 'MCP 桥接端口 127.0.0.1:6520'

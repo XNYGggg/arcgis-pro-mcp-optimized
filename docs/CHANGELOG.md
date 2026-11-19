@@ -1,5 +1,16 @@
 # 更新日志
 
+## Customer 1.1.12（1.14 增强版 + 模板蒸馏，构建号 1.1.12，2026-11-19）
+
+- 相对 1.1.11：**整体并入 2.x（v2.0.2）模板蒸馏模块**（1.1.x 客户线首次具备）。
+  - 新增 `arcgis_agentkit.distill` Python 包（仅依赖 Pillow，用 Pro 自带 Python 运行）+ 运行时 `distill\` 目录与 `run-distill.ps1` 启动器；模板库 `%LOCALAPPDATA%\ArcGIS Pro MCP\library`（升级保留）。
+  - 新增 10 个 MCP 工具：`template_list / get / import / measure / patch / validate / review / approve / preview / apply`（C# 薄封装 arcgis-distill CLI）；工具数 115→125、命令 112→122。
+  - 新增 `skills/template-distill/SKILL.md`、`docs/distill.md`、`tests/test_distill.py`；`test_catalog_matches_bridge.py` 将 template_* 记为 C# 原生实现。
+  - 2.x 的 `guard_summon / guard_status` 不并入；弹窗守护仍为独立脚本 `03-dialog-guard.cmd`。
+  - 构建：全过；add-in 476,195 字节 SHA256 `A20E263B…C6C7`；自安装包 658,962 字节 SHA256 `F1ACCDCA…7BB9`。
+  - 验证：`test_distill.py` 7/7、`test_catalog_matches_bridge.py` 4/4；50 张专家级地图图件的批量蒸馏回归（49 幅全绿，1 幅封面页被正确拒绝）与三方评审见 `release/distill-verify-20261119/`。
+  - 实机：握手 `1.1.12.0`、`ping` 122、`tools/list` 125；MCP `template_*` 全流程 11/11 通过；官方自检 21 通过 / 0 失败。
+
 ## Customer 1.1.11（1.14 增强版，构建号 1.1.11，2026-11-19）
 
 - 相对 v1.1.4 累计合入 1.1.5 的 F1–F10、1.1.6 的 V-1–V-7，以及 2026-11-18 实机全量测试确认的 P0–P2 缺陷修复：

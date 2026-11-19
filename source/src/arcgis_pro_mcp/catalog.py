@@ -1009,6 +1009,75 @@ CATALOG: List[Tool] = [
         '"roads", "visible": true}}].'),
       P("continue_on_error", "bool", False,
         "Keep going after a failed step instead of stopping.")),
+
+    # --- template distillation (ported from 2.x, M2) -------------------------
+    T("template_list", "Template",
+      "List distilled layout templates in the local library, optionally "
+      "filtered by status or tag.",
+      P("status", "str", None, "Filter: imported/measured/analyzed/validated/ready."),
+      P("tag", "str", None, "Only templates carrying this tag.")),
+
+    T("template_get", "Template",
+      "Read one distilled template spec (layout geometry, palette, typography, "
+      "regions, pitfalls and review record).",
+      P("template_id", "str", REQUIRED, "Template id from template_list.")),
+
+    T("template_import", "Template",
+      "Import a sample map figure into the template library as a draft. "
+      "Deduplicated by image sha256; the next step is template_measure.",
+      P("image", "str", REQUIRED, "Path to the sample figure."),
+      P("name", "str", REQUIRED, "Human name for the template."),
+      P("tags", "list[str]", None, "Optional tags."),
+      P("width_in", "float", 6.7,
+        "Assumed printed width of the figure in inches (170 mm = 6.7 in)."),
+      P("template_id", "str", None, "Optional explicit id.")),
+
+    T("template_measure", "Template",
+      "Measure a template's sample figure: figure bbox, aspect, strong frame "
+      "lines, palette and DPI. Writes the measured block that must not be "
+      "edited by hand.",
+      P("template_id", "str", REQUIRED, "Template id."),
+      P("width_in", "float", None, "Override the assumed printed width."),
+      P("force", "bool", False, "Recompute canvas height even if already set.")),
+
+    T("template_patch", "Template",
+      "Submit semantic fields (regions, legend, typography, palette, pitfalls) "
+      "as a validated merge. Protected fields such as measured are rejected; "
+      "nothing is written when validation fails.",
+      P("template_id", "str", REQUIRED, "Template id."),
+      P("patch", "dict", None, "Patch object to merge into the spec."),
+      P("patch_file", "str", None, "Alternatively, a JSON patch file on disk.")),
+
+    T("template_validate", "Template",
+      "Run schema and geometric consistency checks (frame/regions inside the "
+      "canvas, measured tolerance <= 3%, typography order, colours, pitfalls).",
+      P("template_id", "str", REQUIRED, "Template id.")),
+
+    T("template_review", "Template",
+      "Record a human review decision for a validated template.",
+      P("template_id", "str", REQUIRED, "Template id."),
+      P("by", "str", REQUIRED, "Reviewer name."),
+      P("notes", "str", None, "Decision notes.")),
+
+    T("template_approve", "Template",
+      "Approve a reviewed, validated template so it becomes ready to apply. "
+      "Validation errors or a missing review refuse approval unless force is set.",
+      P("template_id", "str", REQUIRED, "Template id."),
+      P("force", "bool", False, "Override validation/review gates (recorded).")),
+
+    T("template_preview", "Template",
+      "Render the template as a wireframe PNG next to the sample figure and "
+      "return the image so it can be checked visually.",
+      P("template_id", "str", REQUIRED, "Template id."),
+      P("out", "str", None, "Optional PNG path; defaults to a temporary file."),
+      P("width", "int", 900, "Panel width in pixels."),
+      returns_image=True),
+
+    T("template_apply", "Template",
+      "Write a ready template into a mapping context JSON file (layout, "
+      "palette, typography) for the assistant to follow while composing a map.",
+      P("template_id", "str", REQUIRED, "Template id."),
+      P("out", "str", None, "Optional context path.")),
 ]
 
 BY_NAME = {tool.name: tool for tool in CATALOG}

@@ -21,6 +21,15 @@ function Ok($t)   { Write-Host ('   [OK] ' + $t) -ForegroundColor Green }
 function Warn($t) { Write-Host ('   [!]  ' + $t) -ForegroundColor Yellow }
 function Fail($t) { Write-Host ('   [X]  ' + $t) -ForegroundColor Red }
 
+# Directory moves must be deterministic: PowerShell Move-Item happily moves a
+# folder INTO an existing destination folder, which turned a failed upgrade
+# into nested directories. .NET Move fails outright when the target exists.
+function Move-Dir([string]$Source, [string]$Destination) {
+    if (-not (Test-Path -LiteralPath $Source)) { throw ('missing source: ' + $Source) }
+    if (Test-Path -LiteralPath $Destination) { throw ('destination already exists: ' + $Destination) }
+    [System.IO.Directory]::Move($Source, $Destination)
+}
+
 $pkgRoot    = Split-Path -Parent $PSScriptRoot
 $addinSrc   = Join-Path $PSScriptRoot 'ArcGISProMCP.esriAddinX'
 $runtimeSrc = Join-Path $PSScriptRoot 'runtime'
@@ -28,8 +37,8 @@ $addinsDir  = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'ArcGIS\Ad
 $runtimeDst = Join-Path $env:LOCALAPPDATA 'ArcGIS Pro MCP'
 $stamp      = Get-Date -Format 'yyyyMMdd-HHmmss'
 
-Write-Host 'ArcGIS Pro MCP 优化版 · 客户版 Customer 1.1.11（1.14 增强版）' -ForegroundColor White
-Write-Host '组件：add-in + stdio 桥 + RunCode + 弹窗守护 + Python 桥'
+Write-Host 'ArcGIS Pro MCP 优化版 · 客户版 Customer 1.1.12（1.14 增强版 + 模板蒸馏）' -ForegroundColor White
+Write-Host '组件：add-in + stdio 桥 + RunCode + 弹窗守护 + Python 桥 + 模板蒸馏（arcgis-distill）'
 
 if ($Rest -and $Rest.Count -gt 0) {
     Warn ('已忽略未知参数：' + ($Rest -join ' ') + '（支持的参数只有 -SkipClients）')
@@ -118,7 +127,46 @@ if ($docDir -match 'OneDrive') {
     Ok ('文档目录：' + $docDir)
 }
 
-# ---------- 5. 安装 add-in（原子替换） ----------
+# ---------- 5. 暂存运行时（先校验，后动 add-in） ----------
+Step '暂存运行时组件'
+$stage = Join-Path $env:LOCALAPPDATA ('ArcGIS Pro MCP.stage.' + $stamp)
+if (Test-Path -LiteralPath $stage) { Remove-Item -LiteralPath $stage -Recurse -Force }
+New-Item -ItemType Directory -Force -Path $stage | Out-Null
+Copy-Item -LiteralPath (Join-Path $runtimeSrc 'stdio-bridge.ps1') -Destination $stage -Force
+foreach ($d in @('runcode', 'guard', 'plugin', 'distill', 'library')) {
+    Copy-Item -LiteralPath (Join-Path $runtimeSrc $d) -Destination (Join-Path $stage $d) -Recurse -Force
+}
+$required = @('stdio-bridge.ps1', 'runcode\RunCode.pyt', 'guard\watch_pro_dialog.ps1', 'plugin\mcp_bridge.py', 'distill\run-distill.ps1', 'distill\arcgis_agentkit\distill\cli.py')
+$missing = @($required | Where-Object { -not (Test-Path -LiteralPath (Join-Path $stage $_)) })
+if ($missing.Count -gt 0) {
+    Remove-Item -LiteralPath $stage -Recurse -Force
+    Fail ('运行时不完整，安装中止（未改动现有 add-in 与运行时）：' + ($missing -join ', '))
+    exit 1
+}
+# 模板蒸馏库是用户数据：升级时优先保留旧库（含已蒸馏模板），
+# 新包只提供空的 schema/index 种子。若当前运行时没有库（例如上一次回滚
+# 把旧库留在了某次备份里），退回最近一次备份中的库。
+$oldLibrary = Join-Path $runtimeDst 'library'
+if (-not (Test-Path -LiteralPath $oldLibrary)) {
+    $recentBakLibrary = Get-ChildItem -LiteralPath $env:LOCALAPPDATA -Directory -Filter 'ArcGIS Pro MCP.bak-*' -ErrorAction SilentlyContinue |
+        Sort-Object Name -Descending |
+        ForEach-Object { Join-Path $_.FullName 'library' } |
+        Where-Object { Test-Path -LiteralPath $_ } |
+        Select-Object -First 1
+    if ($recentBakLibrary) {
+        $oldLibrary = $recentBakLibrary
+        Ok ('未发现现役库，改用最近备份中的模板库：' + $recentBakLibrary)
+    }
+}
+if (Test-Path -LiteralPath $oldLibrary) {
+    $stagedLibrary = Join-Path $stage 'library'
+    if (Test-Path -LiteralPath $stagedLibrary) { Remove-Item -LiteralPath $stagedLibrary -Recurse -Force }
+    Copy-Item -LiteralPath $oldLibrary -Destination $stagedLibrary -Recurse -Force
+    Ok '已保留旧模板库（library）'
+}
+Ok ('运行时已暂存并通过完整性校验：' + $stage)
+
+# ---------- 6. 安装 add-in（原子替换；失败则清理暂存并中止） ----------
 Step '安装 add-in（当前用户，不需要管理员）'
 if (-not (Test-Path -LiteralPath $addinsDir)) {
     New-Item -ItemType Directory -Force -Path $addinsDir | Out-Null
@@ -126,6 +174,8 @@ if (-not (Test-Path -LiteralPath $addinsDir)) {
 $addinDst = Join-Path $addinsDir 'ArcGISProMCP.esriAddinX'
 $srcHash = (Get-FileHash -LiteralPath $addinSrc -Algorithm SHA256).Hash
 $needCopy = $true
+$bakAddin = $null
+$addinChanged = $false
 if (Test-Path -LiteralPath $addinDst) {
     if ((Get-FileHash -LiteralPath $addinDst -Algorithm SHA256).Hash -eq $srcHash) {
         $needCopy = $false
@@ -137,51 +187,115 @@ if ($needCopy) {
     Copy-Item -LiteralPath $addinSrc -Destination $tmp -Force
     if ((Get-FileHash -LiteralPath $tmp -Algorithm SHA256).Hash -ne $srcHash) {
         Remove-Item -LiteralPath $tmp -Force
+        Remove-Item -LiteralPath $stage -Recurse -Force
         Fail 'add-in 复制校验失败，安装中止（未改动现有文件）'
         exit 1
     }
-    $bak = $null
     if (Test-Path -LiteralPath $addinDst) {
-        $bak = $addinDst + '.bak-' + $stamp
-        Move-Item -LiteralPath $addinDst -Destination $bak -Force
+        $bakAddin = $addinDst + '.bak-' + $stamp
+        Move-Item -LiteralPath $addinDst -Destination $bakAddin -Force
     }
     try {
         Move-Item -LiteralPath $tmp -Destination $addinDst -Force
     } catch {
-        if ($bak) { Move-Item -LiteralPath $bak -Destination $addinDst -Force }
+        if ($bakAddin) { Move-Item -LiteralPath $bakAddin -Destination $addinDst -Force }
+        Remove-Item -LiteralPath $stage -Recurse -Force
         Fail ('add-in 替换失败，已回滚：' + $_.Exception.Message)
         exit 1
     }
-    if ($bak) { Ok ('已更新（旧版备份：' + (Split-Path -Leaf $bak) + '）') } else { Ok 'add-in 已安装' }
+    $addinChanged = $true
+    if ($bakAddin) { Ok ('已更新（旧版备份：' + (Split-Path -Leaf $bakAddin) + '）') } else { Ok 'add-in 已安装' }
 }
 Ok ('SHA256 ' + $srcHash)
 
-# ---------- 6. 部署运行时（暂存 → 校验 → 原子替换 → 失败回滚） ----------
-Step '部署运行时组件'
-$stage = Join-Path $env:LOCALAPPDATA ('ArcGIS Pro MCP.stage.' + $stamp)
-if (Test-Path -LiteralPath $stage) { Remove-Item -LiteralPath $stage -Recurse -Force }
-New-Item -ItemType Directory -Force -Path $stage | Out-Null
-Copy-Item -LiteralPath (Join-Path $runtimeSrc 'stdio-bridge.ps1') -Destination $stage -Force
-foreach ($d in @('runcode', 'guard', 'plugin')) {
-    Copy-Item -LiteralPath (Join-Path $runtimeSrc $d) -Destination (Join-Path $stage $d) -Recurse -Force
-}
-$required = @('stdio-bridge.ps1', 'runcode\RunCode.pyt', 'guard\watch_pro_dialog.ps1', 'plugin\mcp_bridge.py')
-$missing = @($required | Where-Object { -not (Test-Path -LiteralPath (Join-Path $stage $_)) })
-if ($missing.Count -gt 0) {
-    Remove-Item -LiteralPath $stage -Recurse -Force
-    Fail ('运行时不完整，安装中止（未改动现有运行时）：' + ($missing -join ', '))
-    exit 1
-}
+# ---------- 7. 提交运行时（任何一步失败都回滚，且绝不删除未动过的旧运行时） ----------
+Step '提交运行时组件'
 $bakRt = $null
 if (Test-Path -LiteralPath $runtimeDst) {
     $bakRt = $runtimeDst + '.bak-' + $stamp
-    Move-Item -LiteralPath $runtimeDst -Destination $bakRt -Force
 }
+$movedToBak = $false
 try {
-    Move-Item -LiteralPath $stage -Destination $runtimeDst -Force
+    if ($bakRt) {
+        Move-Dir $runtimeDst $bakRt
+        $movedToBak = $true
+    }
+    Move-Dir $stage $runtimeDst
 } catch {
-    if ($bakRt) { Move-Item -LiteralPath $bakRt -Destination $runtimeDst -Force }
-    Fail ('运行时替换失败，已回滚：' + $_.Exception.Message)
+    $reason = $_.Exception.Message
+    $runtimeRestored = $false
+    $addinRestored = $false
+    $addinRemoved = $false
+    $addinAbsent = $false
+    if ($movedToBak) {
+        # The old runtime (and the user's template library) is safe in $bakRt.
+        # Remove a half-created destination, then put the old runtime back.
+        try { if (Test-Path -LiteralPath $runtimeDst) { Remove-Item -LiteralPath $runtimeDst -Recurse -Force } }
+        catch { $reason += ' | WARNING: cleanup failed: ' + $_.Exception.Message }
+        try {
+            if ($bakRt -and (Test-Path -LiteralPath $bakRt)) { Move-Dir $bakRt $runtimeDst; $runtimeRestored = $true }
+            else { throw ('backup missing: ' + $bakRt) }
+        } catch {
+            $reason += ' | WARNING: runtime restore failed: ' + $_.Exception.Message
+        }
+    } else {
+        # The very first move failed: $runtimeDst is still the untouched old
+        # runtime (including the user's library), so leave it exactly as is.
+    }
+    if ($bakAddin) {
+        try {
+            if (Test-Path -LiteralPath $addinDst) { Move-Item -LiteralPath $addinDst -Destination ($addinDst + '.failed-' + $stamp) -Force }
+            Move-Item -LiteralPath $bakAddin -Destination $addinDst -Force
+            $addinRestored = $true
+        } catch { $reason += ' | WARNING: add-in restore failed: ' + $_.Exception.Message }
+    } elseif ($addinChanged) {
+        # First install: no previous add-in to restore; take the new one out.
+        try {
+            if (Test-Path -LiteralPath $addinDst) {
+                Move-Item -LiteralPath $addinDst -Destination ($addinDst + '.failed-' + $stamp) -Force
+                $addinRemoved = $true
+            } else {
+                $addinAbsent = $true
+            }
+        } catch { $reason += ' | WARNING: add-in removal failed: ' + $_.Exception.Message }
+    }
+    try { if (Test-Path -LiteralPath $stage) { Remove-Item -LiteralPath $stage -Recurse -Force } }
+    catch { $reason += ' | WARNING: staging cleanup failed: ' + $_.Exception.Message }
+
+    if ($addinRestored) {
+        $addinHint = '(旧版已从备份恢复原位)'
+    } elseif (-not $addinChanged) {
+        $addinHint = '(本机 add-in 未变更，无备份)'
+    } elseif ($bakAddin) {
+        if (Test-Path -LiteralPath $bakAddin) {
+            $addinHint = $bakAddin + '（旧版备份仍在）'
+        } else {
+            $addinHint = '(升级；add-in 备份缺失：' + $bakAddin + ')'
+        }
+    } elseif ($addinRemoved) {
+        $addinHint = '(首次安装；新 add-in 已移出为 .failed-' + $stamp + ')'
+    } elseif ($addinAbsent) {
+        $addinHint = '(首次安装；目标路径已无 add-in，无需移出)'
+    } else {
+        $addinHint = '(首次安装；新 add-in 移出失败，仍在原位)'
+    }
+    if (-not $bakRt) {
+        $rtHint = '(无，首次安装)'
+    } elseif ($runtimeRestored) {
+        $rtHint = '(旧运行时已从备份恢复原位)'
+    } elseif (-not $movedToBak) {
+        $rtHint = '(未创建备份：旧运行时原地未动)'
+    } elseif (Test-Path -LiteralPath $bakRt) {
+        $rtHint = $bakRt + '（旧运行时备份仍在）'
+    } else {
+        $rtHint = '(备份缺失：' + $bakRt + ')'
+    }
+    $bakHint = 'add-in：' + $addinHint + '；运行时：' + $rtHint
+    if ($reason -match 'WARNING') {
+        Fail ('运行时替换失败，回滚未完全成功（' + $bakHint + '）：' + $reason)
+    } else {
+        Fail ('运行时替换失败，已回滚运行时与 add-in（' + $bakHint + '）：' + $reason)
+    }
     exit 1
 }
 if ($bakRt) { Ok ('运行时已更新（旧版备份：' + (Split-Path -Leaf $bakRt) + '）') } else { Ok '运行时已部署' }
@@ -189,7 +303,7 @@ Ok ('运行时目录：' + $runtimeDst)
 
 $marker = [ordered]@{
     package       = 'ArcGIS Pro MCP 优化版（客户版）'
-    version       = '1.1.11'
+    version       = '1.1.12'
     installed_at  = (Get-Date).ToString('s')
     addin_sha256  = $srcHash
     package_root  = $pkgRoot

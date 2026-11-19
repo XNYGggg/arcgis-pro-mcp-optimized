@@ -1,4 +1,35 @@
-# 发布说明 · Customer 1.1.11（1.14 增强版，构建号 1.1.11，2026-11-19）
+# 发布说明 · Customer 1.1.12（1.14 增强版 + 模板蒸馏，构建号 1.1.12，2026-11-19）
+
+> **🚀 发布定位**：本包是 **Customer 1.1.12**，在 Customer 1.1.11 的基础上**整体并入 2.x（v2.0.2）的模板蒸馏模块**——1.1.x 客户线首次具备 10 个 `template_*` 工具与 `arcgis-distill` 命令行；其余能力与 1.1.11 完全一致（含 1.1.5–1.1.11 全部修复）。**v1.1.4 是已发布的稳定版（推荐日常使用）**，本分支是其增强构建；不创建 GitHub Release / Gitee 发行版、不上传发行资产、不打 tag；安装包仅随仓库提供（`install/`）。可随时回滚到 v1.1.11 或 v1.1.4。
+
+## 变更摘要（相对 1.1.11）
+
+**1.1.12（模板蒸馏移植，模块来源 v2.0.2-opt @ 0aa42aa）**：
+
+- 新增 `arcgis_agentkit.distill` Python 包（2.x 原样移植，仅依赖 Pillow；用 Pro 自带 `arcgispro-py3` 运行，零额外安装）。
+- 新增 10 个 MCP 工具：`template_list` / `get` / `import` / `measure` / `patch` / `validate` / `review` / `approve` / `preview` / `apply`（C# 薄封装 `TemplateCommands.cs` → `arcgis-distill` CLI，单一实现不漂移）；工具数 115→**125**，命令 112→**122**。
+- 新增运行时 `%LOCALAPPDATA%\ArcGIS Pro MCP\distill\`（`arcgis_agentkit` 包 + `run-distill.ps1` 启动器）与模板库种子 `library\`；模板库实际位置 `%LOCALAPPDATA%\ArcGIS Pro MCP\library`，**升级安装保留已有模板**。
+- 新增 `skills/template-distill/SKILL.md`（语义 patch 作业指导）与 `docs/distill.md`（状态机/命令/库结构）；`tests/test_distill.py` 覆盖 import→measure→patch→validate→preview→review→approve→apply 全链。
+- 2.x 的 `guard_summon` / `guard_status` **不并入**本线，弹窗守护仍为独立脚本 `03-dialog-guard.cmd`。
+- 版本与文档：Config.daml / csproj / pyproject / VERSION.json 统一 1.1.12；四语 README（模块状态、能力对照、工具目录 Template 组）、`docs/使用指南.md`、`docs/CHANGELOG.md`、`source/docs/local-1.1.12.md` 同步。
+
+## 验证（2026-11-19）
+
+- 构建：`scripts/build.ps1` 全过（installer 脚本检查、client-registration、HTTP transport net8.0+net10.0、单文件安装器检查）；add-in **476,195 字节** SHA256 `A20E263B041E78A1F5631B1DD4EFC1B7946C05A28038751DC20C38F0AB55C6C7`；自安装包 658,962 字节 SHA256 `F1ACCDCABA406617816B7318BEBE33732968D3065332BB5FA451791A34657BB9`。
+- 单元测试：`tests/test_distill.py` 7/7；`tests/test_catalog_matches_bridge.py` 4/4（新增 tools.json 一致性与非图片拒绝、force 评审完整性测试）。
+- 批量蒸馏测试：**50 张**专家级地图图件（10 类，已验证 49 幅全绿；1 幅图集封面页被工具确定性拒绝）的 import/measure/validate/preview 批量回归，及三方会谈评审记录，见 `release/distill-verify-20261119/`。
+- 安装口径：`install/00-install.cmd` 是完整客户安装入口（add-in + 运行时 + 模板蒸馏）；`source/dist/Install-ArcGISProMCP.cmd` 是 add-in 单文件安装器，只安装 add-in，供源码审阅与校验。
+- 实机（2026-11-19，真实终端）：握手 `1.1.12.0`、`ping` 命令数 122、`tools/list` 125 工具；MCP 端 `template_*` 全流程 11/11 通过（含 preview 1.5MB PNG 与 apply context），用户库验完清空；官方自检 21 通过 / 2 警告（均非失败）/ 0 失败。
+- **规模**：122 命令 / 125 工具（已实机验证）。仅验证 ArcGIS Pro 3.7；add-in 未签名（首次加载需信任）。
+
+## 回滚
+
+- add-in 回退到 1.1.11：`release/isolation-1.1.11-20261119/addin/ArcGISProMCP.esriAddinX`（SHA256 `0ABB872F…6DF9`，469,634 字节）；
+- 运行时回退：`release/isolation-1.1.11-20261119/runtime/ArcGIS Pro MCP`；installed.json 回写 version=1.1.11、addin_sha256=`0ABB872F…`、addin_size=469634；重启 Pro。
+
+---
+
+## 历史发布 · Customer 1.1.11（1.14 增强版，构建号 1.1.11，2026-11-19）
 
 > **🚀 发布定位**：本包是 **Customer 1.1.11（1.14 增强版）**，在 v1.1.4 之上累计合入 1.1.5–1.1.11 的修复与增强，重点是把 2026-11-18 实机全量测试确认的 P0–P2 缺陷全部修掉，并按发布前三方评审修正了失败清理与文档口径。**v1.1.4 是已发布的稳定版（推荐日常使用）**，本分支是其增强构建；本分支不创建 GitHub Release / Gitee 发行版、不上传发行资产、不打 tag；安装包仅随仓库提供（`install/`）。可随时回滚到 v1.1.4。
 

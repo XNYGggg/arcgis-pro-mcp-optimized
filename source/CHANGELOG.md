@@ -4,6 +4,42 @@ Notable changes, newest first. Versions are the add-in version in
 `addin/ArcGISProMCP/Config.daml`, which is what the ribbon, the installer and
 the MCP handshake all report.
 
+## 1.1.12 — 2026-11-19
+
+### Added
+
+- **Template distillation, ported from 2.x (v2.0.2).** The customer line now
+  ships the `arcgis_agentkit.distill` Python package (Pillow only, no other
+  dependency) and ten `template_*` MCP tools: `template_list`, `template_get`,
+  `template_import`, `template_measure`, `template_patch`, `template_validate`,
+  `template_review`, `template_approve`, `template_preview`, `template_apply`.
+  The tools are thin C# wrappers over the `arcgis-distill` CLI
+  (`Commands/TemplateCommands.cs`), so the CLI and the MCP surface share one
+  implementation and cannot drift.
+- **Runtime `distill/` component and seeded `library/`.** `install/runtime`
+  gains `distill/` (the `arcgis_agentkit` package plus `run-distill.ps1`,
+  which runs the CLI on ArcGIS Pro's own `arcgispro-py3` Python) and a seeded
+  empty `library/` (schema + index). The template library lives at
+  `%LOCALAPPDATA%\ArcGIS Pro MCP\library`.
+- `skills/template-distill/SKILL.md` (the semantic-patch work guide) and
+  `docs/distill.md` (state machine, commands, library layout) travel with the
+  source tree; `tests/test_distill.py` covers the full pipeline
+  (import → measure → patch → validate → preview → review → approve → apply).
+- `scripts/gen_tool_docs.py` knows the new `Template` group; the README tool
+  tables and `Resources/tools.json` are regenerated from `catalog.py`
+  (115 → 125 tools, 112 → 122 commands).
+
+### Changed
+
+- `install/install.ps1` copies the new `distill` and `library` directories,
+  verifies the launcher and module files, and **preserves an existing template
+  library across upgrades** (user templates win over the empty seed).
+- `install/check.ps1` reports the distill launcher and module; the 2.x dialog
+  guard is deliberately not included (1.1.x keeps its standalone
+  `03-dialog-guard.cmd` script).
+- `pyproject.toml`: version 1.1.12, `Pillow>=9` dependency, the
+  `arcgis-distill` entry point, and `src/arcgis_agentkit` in the wheel.
+
 ## 1.1.11 — 2026-11-19
 
 ### Fixed

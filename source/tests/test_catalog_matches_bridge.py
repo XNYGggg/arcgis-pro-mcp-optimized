@@ -5,20 +5,26 @@ command names are read from the source with the ast module instead.
 """
 
 import ast
+import json
 import pathlib
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from arcgis_pro_mcp.catalog import BY_NAME  # noqa: E402
+from arcgis_pro_mcp.catalog import BY_NAME, CATALOG  # noqa: E402
 
 # Commands that exist on the bridge but are deliberately not exposed as tools.
 INTERNAL_ONLY = {"get_last_traceback"}
 
 # Tools the add-in answers in C# itself with no Python handler by design --
-# restarting ArcGIS Pro only makes sense from inside it.
-CSHARP_ONLY = {"restart_pro"}
+# restarting ArcGIS Pro only makes sense from inside it, and the template_*
+# tools are thin wrappers over the arcgis-distill CLI (Commands/TemplateCommands.cs).
+CSHARP_ONLY = {"restart_pro"} | {
+    "template_list", "template_get", "template_import", "template_measure",
+    "template_patch", "template_validate", "template_review",
+    "template_approve", "template_preview", "template_apply",
+}
 
 
 def bridge_commands():
@@ -38,6 +44,41 @@ def bridge_commands():
 def test_every_tool_has_a_handler():
     missing = sorted(set(BY_NAME) - bridge_commands() - CSHARP_ONLY)
     assert not missing, f"Tools with no bridge handler: {missing}"
+
+
+def test_tools_json_matches_catalog():
+    """The add-in embeds Resources/tools.json generated from this catalog.
+
+    A stale copy would silently hide or mis-describe tools on the HTTP
+    transport while the Python server advertises the new ones, so the whole
+    entry -- name, description, inputSchema, returnsImage -- must match what
+    scripts/export_tool_schemas.py would generate today.
+    """
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "export_tool_schemas", ROOT / "scripts" / "export_tool_schemas.py")
+    exporter = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(exporter)
+    expected = {
+        tool.name: {
+            "name": tool.name,
+            "description": tool.description,
+            "inputSchema": exporter.schema_for(tool),
+            "returnsImage": tool.returns_image,
+        }
+        for tool in CATALOG
+    }
+    tools_file = ROOT / "addin" / "ArcGISProMCP" / "Resources" / "tools.json"
+    data = json.loads(tools_file.read_text(encoding="utf-8-sig"))
+    tools = data["tools"] if isinstance(data, dict) else data
+    actual = {entry["name"]: entry for entry in tools}
+    drifted = sorted(name for name in expected
+                     if actual.get(name) != expected[name])
+    assert actual == expected, (
+        "tools.json differs from what export_tool_schemas.py generates: "
+        f"drifted={drifted} missing={sorted(set(expected) - set(actual))} "
+        f"extra={sorted(set(actual) - set(expected))}")
 
 
 def test_every_handler_is_exposed():
