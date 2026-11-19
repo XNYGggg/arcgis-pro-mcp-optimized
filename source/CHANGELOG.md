@@ -26,6 +26,9 @@ the MCP handshake all report.
 
 ### Changed
 
+- Library locking moved to an OS advisory lock (`msvcrt.locking` / `flock`
+  on a persistent lock file): released automatically when a process dies, and
+  no waiter can unlink another waiter's lock.
 - `docs/distill.md` and `skills/template-distill/SKILL.md` gained the delete
   section; the four-language READMEs, `docs/使用指南.md`, `RELEASE-NOTES.md` and
   `VERSION.json` were bumped to 1.1.13 (Config.daml / csproj / pyproject /

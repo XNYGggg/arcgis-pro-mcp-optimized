@@ -32,7 +32,7 @@
 
 이 컴퓨터 실기 검증(**ArcGIS Pro 3.7 전용**): 1.1.7 회귀 21/21 PASS; 1.1.8 연속 두 라운드 0 실패; 1.1.9 P2 10/10 및 P1 재실행 0 실패; 1.1.10 핸드셰이크 `1.1.10.0`; 1.1.11 핸드셰이크 `1.1.11.0`, ping `command_count=112`, D1 필드 회귀는 현재 테스트 프로젝트에 적용되는 모든 어서션 PASS(4개 레거시 어서션은 퇴역 프로젝트의 레이어 이름 참조), `get_features` 페이징/요약/정밀도 실기 재확인. 다른 Pro 버전은 미검증.
 
-1.1.13(템플릿 삭제): 빌드 전 과정 통과(client-registration / installer / HTTP net8.0+net10.0), `tests/test_distill.py` 15/15(삭제 8개: 공유되지 않은 이미지 삭제, 공유 이미지 유지, 미지의 id not_found, ready는 force 필요, 경로형 id 거부, 고아 색인 정리, 긴 id 충돌 후에도 삭제 가능, 중단된 삭제 후 id 예약 유지), `tests/test_catalog_matches_bridge.py` 4/4 통과. `tools.json`과 `catalog.py`는 126개 도구 / 123개 명령에서 완전 동일. 1.1.12 실기 인수 기록(핸드셰이크, 125개 도구, `template_*` 전체 흐름 11/11, 공식 자체 점검 21 통과 / 0 실패)은 `docs/CHANGELOG.md`에 있습니다. 1.1.13(템플릿 삭제) 실기 인수(2026-11-19, Pro 3.7, 실제 터미널): 설치된 빌드는 핸드셰이크 `1.1.13.0`, `ping` 명령 수 **123**, `tools/list` **126**개 도구(`template_delete` 포함). 설치된 `run-distill.ps1`로 import → measure → delete 전 경로 통과(재삭제 → `not_found`/exit 3), 공식 자체 점검 **22 통과 / 0 실패**.
+1.1.13(템플릿 삭제): 빌드 전 과정 통과(client-registration / installer / HTTP net8.0+net10.0), `tests/test_distill.py` 16/16(삭제 8개: 공유되지 않은 이미지 삭제, 공유 이미지 유지, 미지의 id not_found, ready는 force 필요, 경로형 id 거부, 고아 색인 정리, 긴 id 충돌 후에도 삭제 가능, 중단된 삭제 후 id 예약 유지), `tests/test_catalog_matches_bridge.py` 4/4 통과. `tools.json`과 `catalog.py`는 126개 도구 / 123개 명령에서 완전 동일. 1.1.12 실기 인수 기록(핸드셰이크, 125개 도구, `template_*` 전체 흐름 11/11, 공식 자체 점검 21 통과 / 0 실패)은 `docs/CHANGELOG.md`에 있습니다. 1.1.13(템플릿 삭제) 실기 인수(2026-11-19, Pro 3.7, 실제 터미널): 설치된 빌드는 핸드셰이크 `1.1.13.0`, `ping` 명령 수 **123**, `tools/list` **126**개 도구(`template_delete` 포함). 설치된 `run-distill.ps1`로 import → measure → delete 전 경로 통과(재삭제 → `not_found`/exit 3), 공식 자체 점검 **22 통과 / 0 실패**.
 
 ---
 

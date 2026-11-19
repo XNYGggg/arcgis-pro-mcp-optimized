@@ -225,6 +225,31 @@ def test_delete_clears_orphan_index_entry(pipeline):
     assert library.list() == []
 
 
+def test_lock_serializes_concurrent_writers(pipeline):
+    import threading
+    import time
+
+    _tmp, library, template_id = pipeline
+    order = []
+    barrier = threading.Barrier(2)
+
+    def worker(name):
+        barrier.wait()
+        with library._lock():
+            order.append(name + "-enter")
+            time.sleep(0.2)
+            order.append(name + "-exit")
+
+    threads = [threading.Thread(target=worker, args=(name,))
+               for name in ("A", "B")]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+    assert order in (["A-enter", "A-exit", "B-enter", "B-exit"],
+                     ["B-enter", "B-exit", "A-enter", "A-exit"]), order
+
+
 def test_import_does_not_reuse_id_reserved_by_orphan_entry(pipeline, tmp_path):
     _tmp, library, template_id = pipeline
     # An interrupted delete leaves the index entry without the spec; the id

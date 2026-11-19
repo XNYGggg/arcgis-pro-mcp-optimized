@@ -68,32 +68,33 @@ def valid_template_id(template_id: str) -> bool:
 _valid_template_id = valid_template_id
 
 
-def _pid_alive(pid: int) -> bool:
-    """Best-effort liveness check used before stealing a stale lock file."""
-    if pid <= 0:
-        return False
-    if os.name == "nt":
-        import ctypes
+def _try_os_lock(descriptor: int) -> None:
+    """Non-blocking exclusive lock on the open lock file.
 
-        process_query_limited_information = 0x1000
-        still_active = 259
-        kernel32 = ctypes.windll.kernel32
-        handle = kernel32.OpenProcess(
-            process_query_limited_information, False, pid)
-        if not handle:
-            return False
-        try:
-            exit_code = ctypes.c_ulong()
-            if not kernel32.GetExitCodeProcess(handle, ctypes.byref(exit_code)):
-                return False
-            return exit_code.value == still_active
-        finally:
-            kernel32.CloseHandle(handle)
-    try:
-        os.kill(pid, 0)
-        return True
-    except OSError:
-        return False
+    The OS releases it when the holding process exits, so there is no stale
+    lock to steal and no check-then-unlink window between two waiters.
+    """
+    if os.name == "nt":
+        import msvcrt
+
+        os.lseek(descriptor, 0, os.SEEK_SET)
+        msvcrt.locking(descriptor, msvcrt.LK_NBLCK, 1)
+    else:
+        import fcntl
+
+        fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+
+
+def _release_os_lock(descriptor: int) -> None:
+    if os.name == "nt":
+        import msvcrt
+
+        os.lseek(descriptor, 0, os.SEEK_SET)
+        msvcrt.locking(descriptor, msvcrt.LK_UNLCK, 1)
+    else:
+        import fcntl
+
+        fcntl.flock(descriptor, fcntl.LOCK_UN)
 
 
 class TemplateLibrary:
@@ -129,43 +130,35 @@ class TemplateLibrary:
 
     @contextlib.contextmanager
     def _lock(self) -> Iterator[None]:
+        # An OS advisory lock on a persistent file: released automatically
+        # when the holder dies (crash included), and two waiters cannot both
+        # enter because nobody ever unlinks the lock by name.
         lock = self.root / ".index.lock"
+        descriptor = os.open(str(lock), os.O_CREAT | os.O_RDWR)
         acquired = False
-        deadline = time.monotonic() + 5
-        while time.monotonic() < deadline:
-            try:
-                descriptor = os.open(str(lock), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-                os.write(descriptor, str(os.getpid()).encode())
-                os.close(descriptor)
-                acquired = True
-                break
-            except FileExistsError:
+        deadline = time.monotonic() + 10
+        try:
+            while time.monotonic() < deadline:
                 try:
-                    if time.time() - lock.stat().st_mtime > 10:
-                        # Only steal a stale lock whose owner is gone: a live
-                        # import may legitimately hold the lock past 10 s, and
-                        # stealing from it reintroduces the race the lock exists
-                        # to prevent.
-                        try:
-                            owner = int(lock.read_text(
-                                encoding="ascii", errors="ignore").strip() or 0)
-                        except OSError:
-                            owner = 0
-                        if not _pid_alive(owner):
-                            lock.unlink(missing_ok=True)
-                            continue
+                    _try_os_lock(descriptor)
+                    acquired = True
+                    break
+                except OSError:
+                    time.sleep(0.05)
+            if not acquired:
+                raise TimeoutError(f"template library is locked: {lock}")
+            try:
+                os.ftruncate(descriptor, 0)
+                os.lseek(descriptor, 0, os.SEEK_SET)
+                os.write(descriptor, str(os.getpid()).encode())
+                yield
+            finally:
+                try:
+                    _release_os_lock(descriptor)
                 except OSError:
                     pass
-                time.sleep(0.05)
-        if not acquired:
-            raise TimeoutError(f"template library is locked: {lock}")
-        try:
-            yield
         finally:
-            try:
-                lock.unlink(missing_ok=True)
-            except OSError:
-                pass
+            os.close(descriptor)
 
     def index(self) -> dict[str, Any]:
         try:
