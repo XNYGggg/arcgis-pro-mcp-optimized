@@ -4,9 +4,9 @@
 
 One natural-language sentence lets your AI assistant drive the ArcGIS Pro project you already have open: add layers, change symbology, query attributes, run geoprocessing, export maps. Your data never leaves your machine — all traffic stays on `127.0.0.1` 🔒.
 
-> **🚀 This is Customer 1.1.13 (1.14 Enhanced Edition + template distillation + template deletion, build 1.1.13) — the official, tested-and-stable, recommended release.** It stacks every fix accumulated since 1.14 (v1.1.4): 1.1.5 (F1–F10), 1.1.6 (V-1–V-7), the P0–P2 defects confirmed by the 2026-11-18 live test (1.1.7–1.1.9), 1.1.10's restart self-healing, 1.1.11's cleanup fixes, 1.1.12's template-distillation module ported from 2.x and 1.1.13's template deletion. The **GitHub Release `v1.1.13` ships the offline package** (same content as the `install/` tree in this repository); **v1.1.11 has been retired — its release and tag were removed — and this version replaces it as the recommended download**; v1.1.4 stays available as the previous stable release for rollback.
+> **🚀 This is Customer 1.1.13 (1.14 Enhanced Edition + template distillation + template deletion, build 1.1.13) — the official, tested-and-stable, recommended release.** It stacks every fix accumulated since 1.14 (v1.1.4): 1.1.5 (F1–F10), 1.1.6 (V-1–V-7), the P0–P2 defects confirmed by the 2026-11-18 live test (1.1.7–1.1.9), 1.1.10's restart self-healing, 1.1.11's cleanup fixes, 1.1.12's template-distillation module ported from 2.x and 1.1.13's template deletion. The **GitHub Release `v1.1.13` ships the offline package** (same content as the `install/` tree in this repository); **v1.1.11 has been retired — its release and tag were removed — and this version replaces it as the recommended download**; v1.1.4 is a historical release (archive only).
 
-> **📌 Version note (2026-11-19)**: **Customer 1.1.13 is the current official release of the 1.x stable line — tested and recommended for daily work**; v1.1.11 is retired (its release and tag were removed) and fully superseded by 1.1.13; v1.1.4 remains the previous stable release for rollback. **2.0 is a testing line** — its optimisation is unfinished, and its GitHub Release assets and tags have been removed, so it is not downloadable for now. 2.0 code lives only on the `customer-v2.0.1` / `customer-v2.0.0` branches.
+> **📌 Version note (2026-11-19)**: **Customer 1.1.13 is the current official release of the 1.x stable line — tested and recommended for daily work**; v1.1.11 is retired (its release and tag were removed) and fully superseded by 1.1.13; v1.1.4 is a historical release (archive only). **2.0 is a testing line** — its optimisation is unfinished, and its GitHub Release assets and tags have been removed, so it is not downloadable for now. 2.0 code lives only on the `customer-v2.0.1` / `customer-v2.0.0` branches.
 
 > **🙏 Upstream project and original author**: this Customer Edition is based on **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)** (original author **Pisut Nakmuenwai**, AGPL-3.0-or-later), with local patches accumulated up to **v1.1.13**. Full attribution and modification notices are in `NOTICE` and `source/SOURCE-NOTICE.md`.
 
@@ -55,6 +55,8 @@ Verification on this machine (live, **ArcGIS Pro 3.7 only**): 1.1.7 regression 2
 4. 🔌 **Connect your AI client** (see “Configuration” below), then double-click `install\01-check.cmd`; when every check reports `[OK]`, you are ready (๑•̀ㅂ•́)و✧
 
 > If Pro is not running during the check, the port test shows a warning — open Pro and run it again 👌
+
+> **NuGet (GitHub Packages) alternative**: `dotnet tool install --global ArcGISProMCP.Install --version 1.1.13` from source `https://nuget.pkg.github.com/XNYGggg/index.json` (GitHub Packages needs a credential with `read:packages`). The tool downloads this release's offline package, verifies SHA256SUMS and runs the installer.
 
 ---
 
