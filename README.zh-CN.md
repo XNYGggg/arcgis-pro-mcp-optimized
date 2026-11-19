@@ -4,9 +4,9 @@
 
 用一句自然语言，让 AI 助手直接操作你正开着的 ArcGIS Pro 工程：加图层、改符号、查属性、跑地理处理、出图导出。数据不出本机，所有通信都走 `127.0.0.1` 🔒。
 
-> **🚀 本分支为 Customer 1.1.13（1.14 增强版 + 模板蒸馏，构建号 1.1.13）**：在 **v1.1.4** 之上累计合入 1.14 之后的修复——1.1.5（F1–F10）、1.1.6（V-1–V-7）、2026-11-18 实机全量测试确认的 P0–P2 缺陷修复（1.1.7–1.1.9）、1.1.10 的重启自愈、1.1.11 的清理修复，以及 1.1.12 从 2.x 并入的模板蒸馏模块、1.1.13 的模板删除（template_delete）。**v1.1.4 已作为稳定版正式发布（推荐使用）**；本分支**不提供 Release 资产**——安装包随仓库提供（`install/`），可随时回滚到 v1.1.4。
+> **🚀 本版为 Customer 1.1.13（1.14 增强版 + 模板蒸馏 + 模板删除，构建号 1.1.13）——正式版：经测试稳定，推荐下载**。在 **v1.1.4** 之上累计合入 1.14 之后的全部修复：1.1.5（F1–F10）、1.1.6（V-1–V-7）、2026-11-18 实机全量测试确认的 P0–P2 缺陷修复（1.1.7–1.1.9）、1.1.10 的重启自愈、1.1.11 的清理修复、1.1.12 从 2.x 并入的模板蒸馏模块，以及 1.1.13 的模板删除（template_delete）。**GitHub Release `v1.1.13` 提供离线包**（与本仓 `install/` 内容一致）；**v1.1.11 已下线（发行版与 tag 均已删除），由本版接替成为推荐下载**；v1.1.4 保留为上一稳定版供回滚。
 
-> **📌 版本说明（2026-11-16 更新）**：**1.0 线（v1.1.4 正式客户版）非常稳定，推荐日常使用**；**2.0 线为测试版**——优化尚未完成，其 GitHub Release 资产与 tag 已移除，暂不可下载；2.0 代码仅保留在 `customer-v2.0.1` / `customer-v2.0.0` 分支中。
+> **📌 版本说明（2026-11-19 更新）**：**Customer 1.1.13 是 1.x 稳定线的当前正式版——经测试稳定，推荐日常使用**；v1.1.11 已下线（发行版与 tag 均已删除），由 1.1.13 完全接替；v1.1.4 保留为上一稳定版供回滚。**2.0 线为测试版**——优化尚未完成，其 GitHub Release 资产与 tag 已移除，暂不可下载；2.0 代码仅保留在 `customer-v2.0.1` / `customer-v2.0.0` 分支中。
 
 > **🙏 上游项目与原作者**：本客户版基于 **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)**（原作者 **Pisut Nakmuenwai**，AGPL-3.0-or-later），在其基础上累计本地补丁至 **v1.1.13**。完整署名与修改声明见包根 `NOTICE` 与 `source/SOURCE-NOTICE.md`。
 
@@ -195,6 +195,7 @@ url = "http://127.0.0.1:6520/mcp"
 - **作用**：把一张样本成图蒸馏成可复用的版式模板；之后批量出图直接套模板，多张图版式统一、可复现。
 - **使用方法**：本版**已包含**（1.1.12 起，模块移植自 2.x）：直接对助手说“把这张图蒸馏成模板”即可；助手按 `import → measure → patch → validate → preview → review → approve → apply` 流程调用 11 个 `template_*` 工具，确定性步骤由 `arcgis-distill` 完成，语义字段由助手按 `skills/template-distill/SKILL.md` 撰写；模板库在 `%LOCALAPPDATA%\ArcGIS Pro MCP\library`，升级安装会保留。
 - **提示词写法**：给模板起名，并把流程和确认点写进去。
+- **清理模板**：`template_delete`（或 `arcgis-distill delete <id> [--force]`）删除模板——spec、索引条目、作业单，以及不再被其他模板引用的样本图；已批准（ready）模板需 `force`。
   - ✅ "把 `D:\samples\fig3.png` 蒸馏成模板，命名『研究区总览图』：import → measure → patch → validate → preview，预览先发我确认，确认后再 review + approve。"
   - ✅ "用『研究区总览图』模板给 `maps` 里每张地图出 A3 PDF，标题用地图名，输出到 `D:\out\maps\`。"
   - ❌ "照着这张图做。"——没说模板名、流程和确认点，版式无法复现。
@@ -358,6 +359,7 @@ print(mcp_bridge.start_pump())
 - 模板库在 `%LOCALAPPDATA%\ArcGIS Pro MCP\library`，升级安装会保留已有模板；
 - 确定性步骤（测量/校验/预览/入库）由 `arcgis-distill` 完成（Pro 自带 Python，零额外依赖），语义字段由助手按 `skills/template-distill/SKILL.md` 撰写，工具本身零 API key；
 - 典型用法："把 `D:\samples\fig3.png` 蒸馏成模板，名称研究区总览图；按 import → measure → patch → validate → preview 流程，预览给我确认后再 review + approve。"
+- 清理：`arcgis-distill delete <id> [--force]` 删除模板及无引用样本图；ready 模板需 `force`。
 
 1.1.13 与 2.x 的能力对照：
 

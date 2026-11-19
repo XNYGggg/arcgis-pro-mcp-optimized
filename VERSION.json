@@ -19,9 +19,9 @@
   "license": "AGPL-3.0-or-later",
   "upstream": "https://github.com/Knight60/ArcGIS-Pro-MCP",
   "source": "source/",
-  "branch": "customer-v1.1.13-delete",
+  "branch": "customer-v1.1.13",
   "release": {
     "status": "enhanced",
-    "note": "1.14 增强版（构建号 1.1.13），在 1.1.12 基础上为模板库新增 template_delete（删除 spec/index 条目/作业单/无引用去重图片，ready 模板需 --force）；v1.1.4 为已发布稳定版（推荐）；本分支未创建 Release/发行版资产"
+    "note": "1.14 增强版（构建号 1.1.13），在 1.1.12 基础上为模板库新增 template_delete（删除 spec/index 条目/作业单/无引用去重图片，ready 模板需 --force）；正式版：经测试稳定，推荐下载；已发布 GitHub Release v1.1.13（tag v1.1.13，main 分支内容同此版本），接替并删除 v1.1.11；v1.1.4 保留供回滚"
   }
 }

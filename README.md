@@ -4,9 +4,9 @@
 
 One natural-language sentence lets your AI assistant drive the ArcGIS Pro project you already have open: add layers, change symbology, query attributes, run geoprocessing, export maps. Your data never leaves your machine — all traffic stays on `127.0.0.1` 🔒.
 
-> **🚀 This branch is Customer 1.1.13 (1.14 Enhanced Edition + template distillation, build 1.1.13)**: it stacks the fixes accumulated since 1.14 (v1.1.4) — 1.1.5 (F1–F10), 1.1.6 (V-1–V-7), the P0–P2 defects confirmed by the full live test on 2026-11-18 (1.1.7–1.1.9), 1.1.10's restart self-healing, 1.1.11's cleanup fixes and 1.1.12's template-distillation module ported from 2.x and 1.1.13's template deletion — on top of **v1.1.4**. **v1.1.4 is already released as the stable, recommended edition**; this branch **ships no Release assets of its own** — the installer lives in `install/`, and you can roll back to v1.1.4 at any time.
+> **🚀 This is Customer 1.1.13 (1.14 Enhanced Edition + template distillation + template deletion, build 1.1.13) — the official, tested-and-stable, recommended release.** It stacks every fix accumulated since 1.14 (v1.1.4): 1.1.5 (F1–F10), 1.1.6 (V-1–V-7), the P0–P2 defects confirmed by the 2026-11-18 live test (1.1.7–1.1.9), 1.1.10's restart self-healing, 1.1.11's cleanup fixes, 1.1.12's template-distillation module ported from 2.x and 1.1.13's template deletion. The **GitHub Release `v1.1.13` ships the offline package** (same content as the `install/` tree in this repository); **v1.1.11 has been retired — its release and tag were removed — and this version replaces it as the recommended download**; v1.1.4 stays available as the previous stable release for rollback.
 
-> **📌 Version note (2026-11-16)**: **the 1.0 line (the official v1.1.4 package) is very stable and recommended for daily work**; **2.0 is a testing line** — its optimisation is unfinished, and its GitHub Release assets and tags have been removed, so it is not downloadable for now. 2.0 code lives only on the `customer-v2.0.1` / `customer-v2.0.0` branches.
+> **📌 Version note (2026-11-19)**: **Customer 1.1.13 is the current official release of the 1.x stable line — tested and recommended for daily work**; v1.1.11 is retired (its release and tag were removed) and fully superseded by 1.1.13; v1.1.4 remains the previous stable release for rollback. **2.0 is a testing line** — its optimisation is unfinished, and its GitHub Release assets and tags have been removed, so it is not downloadable for now. 2.0 code lives only on the `customer-v2.0.1` / `customer-v2.0.0` branches.
 
 > **🙏 Upstream project and original author**: this Customer Edition is based on **[Knight60/ArcGIS-Pro-MCP](https://github.com/Knight60/ArcGIS-Pro-MCP)** (original author **Pisut Nakmuenwai**, AGPL-3.0-or-later), with local patches accumulated up to **v1.1.13**. Full attribution and modification notices are in `NOTICE` and `source/SOURCE-NOTICE.md`.
 
@@ -195,6 +195,7 @@ The project is designed as “one repository, three modules”; each stands alon
 - **What it does**: distils a sample finished map into a reusable layout template; later batch exports reuse the template for a consistent, reproducible look.
 - **How to use it**: **included in this build** (since 1.1.12, ported from 2.x) — just tell the assistant “distil this figure into a template”; it then drives the 11 `template_*` tools through `import → measure → patch → validate → preview → review → approve → apply`. Deterministic steps run in `arcgis-distill`; semantic fields are written by the assistant per `skills/template-distill/SKILL.md`; the template library lives in `%LOCALAPPDATA%\ArcGIS Pro MCP\library` and upgrades keep it.
 - **How to ask**: name the template and spell out the flow and confirmation points.
+- **Cleaning up**: `template_delete` (or `arcgis-distill delete <id> [--force]`) removes a template — its spec, index entry, job sheet and its sample image when no other template references it; an approved (ready) template needs `force`.
   - ✅ “Distil `D:\samples\fig3.png` into a template named 'Study area overview': import → measure → patch → validate → preview; send me the preview first, then review + approve after I confirm.”
   - ✅ “Use the 'Study area overview' template to export every map in `maps` as A3 PDF, title = map name, output to `D:\out\maps\`.”
   - ❌ “Do it like this picture.” — no template name, flow or confirmation points; the layout cannot be reproduced.
@@ -358,6 +359,7 @@ Since **1.1.12** this branch **includes** template distillation (ported wholesal
 - the template library lives in `%LOCALAPPDATA%\ArcGIS Pro MCP\library`; upgrades keep existing templates;
 - deterministic steps (measure / validate / preview / import) run in `arcgis-distill` on Pro's own Python with no extra dependency; semantic fields are written by the assistant per `skills/template-distill/SKILL.md`; the tools themselves need no API key;
 - typical use: “Distil `D:\samples\fig3.png` into a template named Study-area overview; run import → measure → patch → validate → preview, show me the preview, then review + approve.”
+- cleaning up: `arcgis-distill delete <id> [--force]` removes the template together with its unreferenced sample image; a ready template needs `force`.
 
 Capability comparison between 1.1.13 and 2.x:
 
