@@ -1,6 +1,6 @@
 # 更新日志
 
-## Customer 1.1.11（1.14 增强版，构建号 1.1.11，2026-11-19）
+## Customer 1.1.11（1.14 增强版，构建号 1.1.11，2026-11-19）· 正式版
 
 - 相对 v1.1.4 累计合入 1.1.5 的 F1–F10、1.1.6 的 V-1–V-7，以及 2026-11-18 实机全量测试确认的 P0–P2 缺陷修复：
   - 1.1.7（P0）：`create_feature_class` / `create_table` 的 `fields` 真正生效（AddField + describe 回读校验、失败清理）；`run_batch` 图片默认剥离为 path/bytes/sha；`get_features` 分页与几何摘要/精度；`preview_layout` 支持 `output_path`。
@@ -9,7 +9,7 @@
   - 1.1.10：`restart_pro` 超时自愈（15 秒硬超时、本地化按钮、UTF-8 心跳日志、5 秒 TCP 超时）；重启调度标志 10 分钟过期；部署脚本归一。
   - 1.1.11（发布前评审修正）：失败清理改为按对象身份、从捕获时所属地图移除并逐条上报；`update_installed.py` 去本机路径并支持 RunCode `__mcprun__` 入口；清理旧部署脚本与历史文档本机路径；构建 PathMap 剔除 DLL/PDB 源码路径；兼容口径统一为仅实机验证 Pro 3.7；第 3 轮终审后清理在字段处理前捕获、AddField 异常入清理、版本提示按主/次版本判断、live_verify 路径参数化、登记脚本优先读 MCP_UPDATE_ARGS；失败清理扫描全部地图并按所属地图移除（不依赖活动视图）。
 - 规模：112 命令 / 115 工具；add-in SHA256 `0ABB872F…6DF9`（469,634 字节）。
-- 未创建 Release：不上传发行资产、不打 tag；默认分支保持 v1.1.4。
+- 正式发行：经测试稳定，推荐下载；tag `v1.1.11`，GitHub Release（Latest）与 Gitee 发行版提供 `ArcGIS-Pro-MCP-1.1.11.zip` + SHA256；默认分支 main 同步为本版内容。
 
 ## Customer 1.16（1.14 增强版，构建号 1.1.6，2026-11-18）
 

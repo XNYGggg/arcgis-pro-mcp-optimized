@@ -20,7 +20,7 @@
   "source": "source/",
   "branch": "customer-v1.1.11",
   "release": {
-    "status": "enhanced",
-    "note": "1.14 增强版（构建号 1.1.11）；v1.1.4 为已发布稳定版（推荐）；本分支未创建 Release/发行版资产"
+    "status": "stable",
+    "note": "正式版：经测试稳定，推荐下载（2026-11-19）。tag v1.1.11；GitHub Release 与 Gitee 发行版提供 ArcGIS-Pro-MCP-1.1.11.zip；v1.1.4 为上一稳定版，可回滚"
   }
 }
